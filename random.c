@@ -9,4 +9,3 @@ int main() {
 		printf("rand is = %d\n", rand());
 	}
 }
-

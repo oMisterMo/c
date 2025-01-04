@@ -12,4 +12,3 @@ int main() {
     printf("%d\n", myBool);
     return 0;
 }
-
