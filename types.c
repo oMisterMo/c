@@ -18,6 +18,14 @@ int main(int argc, char *argv[]) {
 
     // ints
     int b; // 4 bytes
+
+    // floats
+    float l; // 4 bytes
+
+    // doubles
+    double m; // 8 bytes
+
+    // more ints from stdint.h
     int8_t c; // 1 byte
     int16_t d; // 2 bytes
     int32_t f; // 4 bytes
@@ -26,12 +34,6 @@ int main(int argc, char *argv[]) {
     uint16_t i; // 2 bytes
     uint32_t j; // 4 bytes
     uint64_t k; // 8 bytes
-
-    // floats
-    float l; // 4 bytes
-
-    //doubles
-    double m; // 8 bytes
 
     // pass by value
     print_pretty(l, h);
