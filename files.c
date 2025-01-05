@@ -1,12 +1,18 @@
 #include <stdio.h>
 #include <stdint.h>
 
-int read_file();
+// r
+int read_file_char();
+int read_file_line();
+int print_line();
+
+// w
 int write_file();
-int append_file();
 int overwrite_file();
 
-int print_line();
+// a
+int append_file();
+
 
 /**
  * File I/O
@@ -15,16 +21,25 @@ int print_line();
  */
 int main() {
 
-    // read_file();
+    // r
+    // read_file_char();
+    read_file_line();
+    // print_line();
+
+    // w
     // write_file();
-    // append_file();
     // overwrite_file();
-    print_line();
+
+    // a
+    // append_file();
 
     return 0;
 }
 
-int read_file() {
+/**
+ * Read the file using fgets (char by char)
+ */
+int read_file_char() {
     printf("Opening file...\n");
     FILE *file = fopen("test.txt", "r");  // r = read, w = write, a = append
 
@@ -45,9 +60,32 @@ int read_file() {
     }
 
 
-    printf("Closing file...\n");
+    printf("\nClosing file...(read char by char)\n");
     fclose(file);
 
+    return 0;
+}
+
+/**
+ * Read the file using fgets (line by line)
+ */
+int read_file_line() {
+    FILE *file;
+
+    // Open a file in read mode
+    file = fopen("test.txt", "r");
+
+    // Store the content of the file
+    char lines[100];
+
+    // Read the content and print it
+    while(fgets(lines, 100, file)) {
+        printf("%s", lines);
+    }
+
+    // Close the file
+    printf("\nClosing file...(read line by line)\n");
+    fclose(file); 
     return 0;
 }
 
@@ -60,7 +98,7 @@ int write_file() {
 
     FILE *file;
     // fopen(filename, mode);
-    fopen("test.txt", "w");  // r = read, w = write, a = append
+    file = fopen("test.txt", "w");  // r = read, w = write, a = append
 
 
     // Check if file is opened
