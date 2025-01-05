@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 void print_pretty(float, uint8_t);
+void print_types();
 
 /**
  * Type coversion can be implicit or explicit
@@ -35,6 +37,10 @@ int main(int argc, char *argv[]) {
     uint32_t j; // 4 bytes
     uint64_t k; // 8 bytes
 
+    // print_pretty(l, h); // pass by value
+    print_types();
+
+
     // may change size depending on major 32-bit systems or 64-bit systems (use stdint.h)
     // char c; // 1 byte
     // short d; // 2 bytes
@@ -46,12 +52,6 @@ int main(int argc, char *argv[]) {
     // unsigned int j; // 4 bytes
     // unsigned long k; // 4 bytes or 8 bytes
     // unsigned long long k; // 8 bytes
-
-    // pass by value
-    print_pretty(l, h);
-
-    // no change to the original values
-    printf("\nl = %f, h = %d\n", l, h);
     
     printf("\n");
     return 0;
@@ -89,19 +89,55 @@ void print_pretty(float l, uint8_t h) {
     }
 
     // Others
-    printf("\n\n*** Type Size ***\n");
-    printf("char %5ld\n", sizeof(char));
-    printf("int %5ld\n", sizeof(int));
-    printf("float %5ld\n", sizeof(float));
-    printf("double %5ld\n", sizeof(double));
+    printf("\n---End, Printing pretty---\n");
+}
 
-    printf("int8_t %5ld\n", sizeof(int8_t));
-    printf("int8_t %5ld\n", sizeof(int16_t));
-    printf("int8_t %5ld\n", sizeof(int32_t));
-    printf("int8_t %5ld\n", sizeof(int64_t));
-    printf("uint8_t %5lu\n", sizeof(uint8_t));
-    printf("uint8_t %5lu\n", sizeof(uint16_t));
-    printf("uint8_t %5lu\n", sizeof(uint32_t));
-    printf("uint8_t %5lu\n", sizeof(uint64_t));
-    printf("---End, Printing pretty---\n");
+void print_types() {
+    // const char *BUILD_IN_TYPES[] = {
+    //     "char",
+    //     "int",
+    //     "float",
+    //     "double",
+    // };
+
+    // const char *STD_INT_TYPES[] = {
+    //     "int8_t",
+    //     "int16_t",
+    //     "int32_t",
+    //     "int64_t",
+    //     "uint8_t",
+    //     "uint16_t",
+    //     "uint32_t",
+    //     "uint64_t",
+    // };
+    // const int len = sizeof(BUILD_IN_TYPES) / sizeof(BUILD_IN_TYPES[0]);
+    // const int std_len = sizeof(STD_INT_TYPES) / sizeof(STD_INT_TYPES[0]);
+
+    // printf("%8s size\n", "Type");
+    // for(int i = 0; i < len; i++) {
+    //     printf("%8s %ld\n", BUILD_IN_TYPES[i], sizeof(BUILD_IN_TYPES[i]));
+    // }
+    // printf("\n");
+    // for(int i = 0; i < std_len; i++) {
+    //     printf("%8s %ld\n", STD_INT_TYPES[i], sizeof(STD_INT_TYPES[i]));
+    // }
+
+
+    printf("%8s %5s\n", "Type", "Size");
+    printf("----------------\n");
+    printf("%8s %5ld\n", "char", sizeof(char));
+    printf("%8s %5ld\n", "int", sizeof(int));
+    printf("%8s %5ld\n", "float", sizeof(float));
+    printf("%8s %5ld\n", "double", sizeof(double));
+
+    printf("\n");
+
+    printf("%8s %5ld\n", "int8_t", sizeof(int8_t));
+    printf("%8s %5ld\n", "int16_t", sizeof(int16_t));
+    printf("%8s %5ld\n", "int32_t", sizeof(int32_t));
+    printf("%8s %5ld\n", "int64_t", sizeof(int64_t));
+    printf("%8s %5lu\n", "uint8_t", sizeof(uint8_t));
+    printf("%8s %5lu\n", "uint16_t", sizeof(uint16_t));
+    printf("%8s %5lu\n", "uint32_t", sizeof(uint32_t));
+    printf("%8s %5lu\n", "uint64_t", sizeof(uint64_t));
 }
