@@ -4,7 +4,7 @@
 // r
 int read_file_char();
 int read_file_line();
-int print_line();
+int read_line();
 
 // w
 int write_file();
@@ -18,13 +18,15 @@ int append_file();
  * File I/O
  *
  * FILE is basically a data type that holds information about a file
+ * If you try to open a file for reading that does not exist, the fopen() function will return NULL.
+ *
  */
 int main() {
 
     // r
     // read_file_char();
     read_file_line();
-    // print_line();
+    // read_line();
 
     // w
     // write_file();
@@ -165,12 +167,13 @@ int overwrite_file() {
     return 0;
 }
 
-int print_line() {
+int read_line() {
     // Store the content of the file
     char line[255];
     FILE *file = fopen("test.txt", "r");
 
     // Check if file is opened
+    // If you try to open a file for reading that does not exist, the fopen() function will return NULL.
     if(file == NULL) {
         printf("Error opening file\n");
         return 1;
