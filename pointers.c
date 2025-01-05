@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdint.h>
 
 void array_pointers();
 void simple_pointers();
+void pointer_arithmetic();
 
 /**
  * Pointers are variables that store the memory address of another variable.
@@ -74,4 +76,30 @@ void array_pointers() {
     printf("\nModify first and second number:\n");
     printf("numbers: %d\n", numbers[0]); // 10
     printf("numbers: %d\n", numbers[1]); // 11
+}
+
+void pointer_arithmetic() {
+    int64_t nums[10] = { 7, 8, 9, 2};
+    int64_t *ptr = nums;   // &nums[0]
+
+    // unsigned long long mo = 3039334; // 8 bytes
+    printf("\n\n %ld \n\n", sizeof(int64_t));   // 8 bytes
+
+    // printf("nums: %p\n", nums); // &nums[0] | ptr
+    printf("nums: %p\n", ptr);
+    printf("nums: %p\n", (ptr + 1));
+    printf("nums: %p\n", (ptr + 2));
+    printf("nums: %p\n", (ptr + 3));
+
+    printf("\n");
+    printf("nums: %p\n", &nums[0]);
+    printf("nums: %p\n", &nums[1]);
+    printf("nums: %p\n", &nums[2]);
+    printf("nums: %p\n", &nums[3]);
+
+    printf("\n");
+    printf("nums: %ld\n", *(ptr));
+    printf("nums: %ld\n", *(ptr + 1));
+    printf("nums: %ld\n", *(ptr + 2));
+    printf("nums: %ld\n", *(ptr + 3));
 }
