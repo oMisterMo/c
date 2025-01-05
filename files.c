@@ -43,7 +43,7 @@ int main() {
  */
 int read_file_char() {
     printf("Opening file...\n");
-    FILE *file = fopen("test.txt", "r");  // r = read, w = write, a = append
+    FILE *file = fopen("x.txt", "r");  // r = read, w = write, a = append
 
 
     // Check if file is opened
@@ -75,7 +75,7 @@ int read_file_line() {
     FILE *file;
 
     // Open a file in read mode
-    file = fopen("test.txt", "r");
+    file = fopen("x.txt", "r");
 
     // Store the content of the file
     char lines[100];
@@ -100,7 +100,7 @@ int write_file() {
 
     FILE *file;
     // fopen(filename, mode);
-    file = fopen("test.txt", "w");  // r = read, w = write, a = append
+    file = fopen("x.txt", "w");  // r = read, w = write, a = append
 
 
     // Check if file is opened
@@ -127,7 +127,7 @@ int write_file() {
  */
 int append_file() {
     printf("Opening file...\n");
-    FILE *file = fopen("test.txt", "a");  // r = read, w = write, a = append
+    FILE *file = fopen("x.txt", "a");  // r = read, w = write, a = append
 
 
     // Check if file is opened
@@ -151,7 +151,7 @@ int append_file() {
 
 int overwrite_file() {
     printf("Opening file...\n");
-    FILE *file = fopen("test.txt", "w");  // r = read, w = write, a = append
+    FILE *file = fopen("x.txt", "w");  // r = read, w = write, a = append
 
 
     // Check if file is opened
@@ -170,7 +170,7 @@ int overwrite_file() {
 int read_line() {
     // Store the content of the file
     char line[255];
-    FILE *file = fopen("test.txt", "r");
+    FILE *file = fopen("x.txt", "r");
 
     // Check if file is opened
     // If you try to open a file for reading that does not exist, the fopen() function will return NULL.
