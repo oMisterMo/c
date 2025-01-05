@@ -35,6 +35,18 @@ int main(int argc, char *argv[]) {
     uint32_t j; // 4 bytes
     uint64_t k; // 8 bytes
 
+    // may change size depending on major 32-bit systems or 64-bit systems (use stdint.h)
+    // char c; // 1 byte
+    // short d; // 2 bytes
+    // int f; // 4 bytes
+    // long g; // 4 bytes or 8 bytes
+    // long long g; // 8 bytes
+    // unsigned char h; // 1 byte
+    // unsigned short i; // 2 bytes
+    // unsigned int j; // 4 bytes
+    // unsigned long k; // 4 bytes or 8 bytes
+    // unsigned long long k; // 8 bytes
+
     // pass by value
     print_pretty(l, h);
 
