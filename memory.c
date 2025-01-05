@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <assert.h>
 
 void allocate();
 
@@ -12,6 +13,8 @@ int main() {
 }
 
 void allocate() {
+    assert(sizeof(int) == 4);
+
     // allocate memory for 4 bytes
     int *ptr1 = malloc(4);
     char *ptr2 = (char*) ptr1;
