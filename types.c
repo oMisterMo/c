@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     char a; // 1 byte
 
     // string
-    char *e[10]; // string
+    char *e[10]; // 10 bytes string
 
     // ints
     int b; // 4 bytes
