@@ -16,8 +16,8 @@ void pointer_arithmetic();
  */
 int main() {
 
-    // simple_pointers();
-    array_pointers();
+    simple_pointers();
+    // array_pointers();
 
     printf("\n");
     return 0;
@@ -25,8 +25,8 @@ int main() {
 
 void simple_pointers() {
     // Note that the type of the pointer has to match the type of the variable you're working with (int in our example).
-    int num = 10;   // variable
-    int* ptr = &num;    // pointer type of variable
+    int num = 10; // variable
+    int* ptr = &num; // the address of the variable num (aka pointer)
 
     /*
         Good To Know: There are two ways to declare pointer variables in C:
@@ -36,7 +36,7 @@ void simple_pointers() {
 
 
     printf("%d\n", num); // the value 10
-    printf("%p\n", &num); // a pointer to the address of num
+    printf("%p\n", &num); // a pointer to the physical address in memory of num
 
 
     // Reference: Output the memory address of myAge with the pointer (0x7ffe5367e044)
