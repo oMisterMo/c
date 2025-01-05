@@ -4,6 +4,7 @@
 void array_pointers();
 void simple_pointers();
 void pointer_arithmetic();
+void function_pointers(int*, int*);
 
 /**
  * Pointers are variables that store the memory address of another variable.
@@ -15,9 +16,11 @@ void pointer_arithmetic();
  * 
  */
 int main() {
+    int a = 1, b = 2;
 
-    simple_pointers();
+    // simple_pointers();
     // array_pointers();
+    function_pointers(&a, &b);
 
     printf("\n");
     return 0;
@@ -102,4 +105,13 @@ void pointer_arithmetic() {
     printf("nums: %ld\n", *(ptr + 1));
     printf("nums: %ld\n", *(ptr + 2));
     printf("nums: %ld\n", *(ptr + 3));
+}
+
+void function_pointers(int* a, int* b) {
+    printf("---function_pointers---\n");
+
+    printf("before: (%d  %d)\n", *a, *b);
+    (*a) *= 2;
+    (*b) *= 2;
+    printf("after: (%d  %d)\n", *a, *b);
 }
