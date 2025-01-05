@@ -89,12 +89,19 @@ void print_pretty(float l, uint8_t h) {
     }
 
     // Others
-    printf("\n\n*** Others ***\n");
-    printf("char %lu\n", sizeof(char));
-    printf("int %lu\n", sizeof(int));
-    printf("float %lu\n", sizeof(float));
-    printf("double %lu\n", sizeof(double));
+    printf("\n\n*** Type Size ***\n");
+    printf("char %5ld\n", sizeof(char));
+    printf("int %5ld\n", sizeof(int));
+    printf("float %5ld\n", sizeof(float));
+    printf("double %5ld\n", sizeof(double));
 
-    printf("uint8_t %lu\n", sizeof(uint8_t));
+    printf("int8_t %5ld\n", sizeof(int8_t));
+    printf("int8_t %5ld\n", sizeof(int16_t));
+    printf("int8_t %5ld\n", sizeof(int32_t));
+    printf("int8_t %5ld\n", sizeof(int64_t));
+    printf("uint8_t %5lu\n", sizeof(uint8_t));
+    printf("uint8_t %5lu\n", sizeof(uint16_t));
+    printf("uint8_t %5lu\n", sizeof(uint32_t));
+    printf("uint8_t %5lu\n", sizeof(uint64_t));
     printf("---End, Printing pretty---\n");
 }
