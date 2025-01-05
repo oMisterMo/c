@@ -11,7 +11,10 @@
  * argv[2] is the second argument
  */
 int main(int argc, char *argv[]) {
-	printf("Number of args: %d\n", argc);
+	printf("Number of args: %d\n\n", argc);
+
+	printf("Start address of string: %p\n", argv);
+	printf("First value: %s\n\n", *argv);
 
     for (int i = 0; i < argc; i++) {
         printf("argument %d: %s\n", i, argv[i]);
