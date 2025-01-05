@@ -8,6 +8,11 @@ int overwrite_file();
 
 int print_line();
 
+/**
+ * File I/O
+ *
+ * FILE is basically a data type that holds information about a file
+ */
 int main() {
 
     // read_file();
@@ -52,7 +57,10 @@ int read_file() {
  */
 int write_file() {
     printf("Opening file...\n");
-    FILE *file = fopen("test.txt", "w");  // r = read, w = write, a = append
+
+    FILE *file;
+    // fopen(filename, mode);
+    fopen("test.txt", "w");  // r = read, w = write, a = append
 
 
     // Check if file is opened
@@ -120,6 +128,7 @@ int overwrite_file() {
 }
 
 int print_line() {
+    // Store the content of the file
     char line[255];
     FILE *file = fopen("test.txt", "r");
 
@@ -129,8 +138,10 @@ int print_line() {
         return 1;
     }
 
-    // Read line and increment pointer
+    // Read the content and store it inside 'line', finally increment pointer
     fgets(line, 255, file);
+
+    // Print the content of the file
     printf("%s", line);
 
     // Read the second line
