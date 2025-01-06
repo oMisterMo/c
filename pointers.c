@@ -19,8 +19,8 @@ int main() {
     int a = 1, b = 2;
 
     // simple_pointers();
-    // array_pointers();
-    function_pointers(&a, &b);
+    array_pointers();
+    // function_pointers(&a, &b);
 
     printf("\n");
     return 0;
@@ -50,35 +50,60 @@ void simple_pointers() {
 }
 
 /**
- * The memory address of the first element is the same as the name of the array:
+ * The memory address of the first element is the same as the name of the array
+ *
+ * Pointer arithmetic: The pointer is incremented by the size of the data type
+ * Deference the pointer to get the value using the * operator
+ *
  */
 void array_pointers() {
     int numbers[5] = {1, 2, 3, 4, 5};
 
-    // GET
-    printf("numbers: %p\n", numbers);
-    printf("numbers[0]: %p\n", &numbers[0]);
+    // Print the original array
+    printf("\n");
+    printf("numbers[5]: ");
+    for(int i = 0; i < 5; i++) {
+        printf("%d ", numbers[i]);
+    }
+    printf("\n\n");
+
+    // Print the memory address of the array and the first element
+    printf("The name of the array and first value point to the same address.\n");
+    printf("-----------------------------\n");
+    printf("%11s %14p\n%11s %14p\n", "numbers", numbers, "&numbers[0]", &numbers[0]);
+    printf("-----------------------------\n");
 
     // Get the first number in the array
-    printf("\nGet first number:\n");
+    printf("\n");
+    printf("Get first number:\n");
+    printf("-----------------------------\n");
     printf("*numbers: %d\n", *numbers); // 1
-    printf("*(&numbers[0]): %d\n", *(&numbers[0])); // 1
+    printf("numbers[0]: %d\n", numbers[0]); // 1
+    printf("*(&numbers[0]): %d\n", *(&numbers[0])); // 1 (silly)
+    printf("*(&(*(&numbers[0]))): %d\n", *(&(*(&numbers[0])))); // 1 (sillier)
 
+    // Get the second, third and fourth numbers in the array
+    printf("\nGet other numbers:\n");
+    printf("-----------------------------\n");
+    printf("*(numbers + 1): %d\n", *(numbers + 1)); // 2
+    printf("*(numbers + 2): %d\n", *(numbers + 2)); // 3
+    printf("*(numbers + 3): %d\n", *(numbers + 3)); // 4
 
-    // Get the second number in the array
-    // Deference the pointer to get the value using the * operator
-    printf("\nGet second number:\n");
-    printf("*numbers + 1: %d\n", *(numbers + 1)); // 2
-    printf("*(&numbers[1]): %d\n", *(&numbers[0] + 1)); // 2
-    printf("*(&numbers[1]): %d\n", *(&numbers[1])); // 2
-
-    // MODIFY
-    *numbers = 10;
-    *(&numbers[1]) = 11;
-
+    // Modify the first and second numbers in the array
     printf("\nModify first and second number:\n");
-    printf("numbers: %d\n", numbers[0]); // 10
-    printf("numbers: %d\n", numbers[1]); // 11
+    printf("-----------------------------\n");
+    *numbers = 10;
+    numbers[1] = 11; // same as *(&numbers[1])
+    printf("*numbers = %d\n", numbers[0]); // 10
+    printf("numbers[1] = %d\n", numbers[1]); // 11
+
+    // Print the original array
+    printf("\n");
+    printf("numbers[5]: ");
+    for(int i = 0; i < 5; i++) {
+        printf("%d ", numbers[i]);
+    }
+    printf("\n\n");
 }
 
 void pointer_arithmetic() {
