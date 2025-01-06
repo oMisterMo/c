@@ -28,11 +28,11 @@ int main(int argc, char *argv[]) {
     double m; // 8 bytes
 
     // more ints from stdint.h
-    int8_t c; // 1 byte
+    int8_t c; // 1 byte (-128 - 127)
     int16_t d; // 2 bytes
     int32_t f; // 4 bytes
     int64_t g; // 8 bytes
-    uint8_t h; // 1 byte
+    uint8_t h; // 1 byte (0 - 255)
     uint16_t i; // 2 bytes
     uint32_t j; // 4 bytes
     uint64_t k; // 8 bytes
