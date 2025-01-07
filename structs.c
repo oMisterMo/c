@@ -4,6 +4,7 @@
 
 void basic_structure();
 void copy_structure();
+void raylib_structure();
 
 /**
  * A struct is a user-defined data type in C/C++.
@@ -22,8 +23,9 @@ void copy_structure();
 int main(int argc, char *argv[]) {
 
 
-    basic_structure();
+    // basic_structure();
     // copy_structure();
+    raylib_structure();
 
     return 0;
 }
@@ -72,4 +74,18 @@ void copy_structure() {
     // Print values
     printf("%d %c %s\n", s1.myNum, s1.myLetter, s1.myString);
     printf("%d %c %s\n", s2.myNum, s2.myLetter, s2.myString); 
+}
+
+void raylib_structure() {
+    struct {
+        int flags;
+        char name[256];
+        char raylibSrcPath[256];
+        char compilerPath[256];
+        char outputPath[256];
+    } building;
+
+    printf("%4d = int * 1\n", 4);
+    printf("%4d = string[256] * 4\n", 256 * 4);
+    printf("%4ld = total size\n", sizeof(building));
 }
