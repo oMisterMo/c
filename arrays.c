@@ -7,14 +7,14 @@
 void declare();
 void declare_initialize();
 void multi_dimensional();
-void allocate();
+void dynamic_allocation();
 
 int main() {
 
     // declare();
     // declare_initialize();
     // multi_dimensional();
-    allocate();
+    dynamic_allocation();
 
 
     printf("\n");
@@ -22,14 +22,18 @@ int main() {
 }
 
 void declare() {
+    // Declare an array of 10 integers
     int nums[10];
+
+    // Declare an array of 4 characters
     char list[4];
 
 
-    // Initialize the values
+    // Initialize the first and third values
     list[0] = 'a';
     list[2] = 'c';
 
+    // Print the ints in nums
     for(int i = 0; i < 10; ++i) {
         nums[i] = 0;
     }
@@ -79,10 +83,11 @@ void multi_dimensional() {
     }
 }
 
-void allocate() {
+void dynamic_allocation() {
+    // Start by allocating 6 * 1 byte
     char *string = (char*) malloc(6 * sizeof(char));
 
-    // Start by manually allocating some characters missing a few
+    // Initialize the 1st, 4th and 5th bytes
     string[0] = 'a';
     // string[1] = 'b';
     // string[2] = 'c';
@@ -91,11 +96,11 @@ void allocate() {
     // string[5] = '\0';
 
     // Print the allocated registers
-    printf("\n\n");
+    printf("\n");
     for(int i = 0; i < 6; i++) {
         printf("%9p (%c) \n", (string + i), *(string + i));
     }
-    printf("%s\n", string);
+    printf("string: %s\n", string);
 
     // Copy over the string "xyz" into the first 4 bytes
     strcpy(string, "xyz\0"); // also usefull for copying strings into structs
@@ -105,7 +110,8 @@ void allocate() {
     for(int i = 0; i < 6; i++) {
         printf("%9p (%c) \n", (string + i), *(string + i));
     }
-    printf("%s\n", string);
+    printf("string: %s\n", string);
+
 
     free(string);
 }
