@@ -29,10 +29,10 @@ void allocate() {
     ptr1[0] = 0b01100101011000100100000101000010; // a b A B or 01100101 01100010 01000001 01000010 or 845300034
 
     // Print the value in different formats
-    printf("%u is %7x %7x %7x %7x in hex\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
-    printf("%u is %7d %7d %7d %7d in dec <=\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
-    printf("%u is %7c %7c %7c %7c in char\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
-    printf("%u is %7b %7b %7b %7b in bin\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
+    printf("%d is %7b %7b %7b %7b in bin\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
+    printf("%d is %7d %7d %7d %7d in dec <=\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
+    printf("%d is %7x %7x %7x %7x in hex\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
+    printf("%d is %7c %7c %7c %7c in char\n", *ptr1, ptr2[0], ptr2[1], ptr2[2], ptr2[3]);
 
     // You must always remember to free the allocated memory
     free(ptr1);
@@ -42,4 +42,3 @@ void allocate() {
     ptr1 = NULL;
     ptr2 = NULL;
 }
-
