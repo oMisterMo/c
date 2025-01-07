@@ -149,6 +149,10 @@ void print_types() {
     printf("%8s %5lu\n", "uint64_t", sizeof(uint64_t));
 }
 
+/**
+ * Unary operators are the operators that perform operations on a single operand
+ * to produce a new value.
+ */
 void unary_operators() {
 
     /**
@@ -163,5 +167,8 @@ void unary_operators() {
      * 7. Address of (&)
      * 8. Indirection (pointer) (*)
      */
+
+    // Indirection = Initialize a pointer to a variable
+    // Defereference = Get the value of the variable the pointer is pointing to
 
 }
