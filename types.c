@@ -2,8 +2,10 @@
 #include <stdint.h>
 #include <string.h>
 
+void defaults();
 void print_pretty(float, uint8_t);
 void print_types();
+void unary_operators();
 
 /**
  * Type coversion can be implicit or explicit
@@ -12,6 +14,15 @@ void print_types();
  * Explicit = Manual
  */
 int main(int argc, char *argv[]) {
+
+    defaults();
+    print_types();
+    
+    printf("\n");
+    return 0;
+}
+
+void defaults() {
     // char
     char a; // 1 byte
 
@@ -36,9 +47,7 @@ int main(int argc, char *argv[]) {
     uint16_t i; // 2 bytes
     uint32_t j; // 4 bytes
     uint64_t k; // 8 bytes
-
     // print_pretty(l, h); // pass by value
-    print_types();
 
 
     // may change size depending on major 32-bit systems or 64-bit systems (use stdint.h)
@@ -52,9 +61,7 @@ int main(int argc, char *argv[]) {
     // unsigned int j; // 4 bytes
     // unsigned long k; // 4 bytes or 8 bytes
     // unsigned long long k; // 8 bytes
-    
-    printf("\n");
-    return 0;
+
 }
 
 void print_pretty(float l, uint8_t h) {
@@ -140,4 +147,20 @@ void print_types() {
     printf("%8s %5lu\n", "uint16_t", sizeof(uint16_t));
     printf("%8s %5lu\n", "uint32_t", sizeof(uint32_t));
     printf("%8s %5lu\n", "uint64_t", sizeof(uint64_t));
+}
+
+void unary_operators() {
+
+    /**
+     * Unary operators
+     * 
+     * 1. Unary minus (-)
+     * 2. Increment (++)
+     * 3. Decrement (--)
+     * 4. Logical negation (!)
+     * 5. Bitwise negation (~)
+     * 6. Sizeof
+     * 7. Address of (&)
+     */
+
 }
