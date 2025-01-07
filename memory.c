@@ -18,10 +18,10 @@ int main() {
 void allocate() {
     assert(sizeof(int) == 4);
 
-    // Allocate memory for 4 bytes (int)
+    // Allocate memory for 4 bytes, store the result in a variable (int pointer)
     int *ptr1 = malloc(4);
 
-    // Create another pointer to the same memory location (char)
+    // Create another varaible which points to the same memory location (char pointer)
     char *ptr2 = (char*) ptr1;
 
     // Set the initial value to some binary number
