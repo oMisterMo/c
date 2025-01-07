@@ -161,6 +161,7 @@ void unary_operators() {
      * 5. Bitwise negation (~)
      * 6. Sizeof
      * 7. Address of (&)
+     * 8. Indirection (pointer) (*)
      */
 
 }
