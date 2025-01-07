@@ -20,10 +20,10 @@ This repo holds various examples. You'll find basic to complex programs.
 
 To compile c programs, you can use `cc`, `gcc`, `clang` or any other compiler
 ```
-$ clang arrays.c
+clang arrays.c
 ```
 
 Now run the generated executable
 ```
-$ ./a.out
+./a.out
 ```
