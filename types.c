@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-void defaults();
+void types();
 void print_pretty(float, uint8_t);
 void print_types();
 void unary_operators();
@@ -15,16 +15,22 @@ void unary_operators();
  */
 int main(int argc, char *argv[]) {
 
-    defaults();
+    types();
     print_types();
     
     printf("\n");
     return 0;
 }
 
-void defaults() {
+/**
+ * https://en.wikipedia.org/wiki/C_data_types#Main_types
+ */
+void types() {
     // char
     char a; // 1 byte
+
+    // short
+    short b; // 2 bytes
 
     // string
     char *e[10]; // 10 bytes string
@@ -133,6 +139,7 @@ void print_types() {
     printf("%8s %5s\n", "Type", "Size");
     printf("----------------\n");
     printf("%8s %5ld\n", "char", sizeof(char));
+    printf("%8s %5ld\n", "short", sizeof(short));
     printf("%8s %5ld\n", "int", sizeof(int));
     printf("%8s %5ld\n", "float", sizeof(float));
     printf("%8s %5ld\n", "double", sizeof(double));
