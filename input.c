@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+void single_char();
 void single_int();
 void multiple_input();
 void scanf_string();    // single word
@@ -14,15 +15,29 @@ const char INPUT_CHAR = '$';
 int main() {
 
     
-
+    single_char();
     // single_int();
     // multiple_input();
     // scanf_string();
-    fgets_string();
+    // fgets_string();
 
     return 0;
 }
 
+void single_char() {
+
+    printf("Enter a character: \n");
+    printf(INPUT_STR, INPUT_CHAR);
+
+    char c = getchar();
+
+    // putchar(c);  // prints the character, but not the newline
+
+    printf("You entered: %c\n", c);
+}
+/**
+ * Single word input
+ */
 void single_int() {
     int muNum;
 
