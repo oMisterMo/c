@@ -9,6 +9,7 @@ void fgets_string();    // multiple words
 void count_lines();
 void count_blanks_tabs_newlines();
 void skip_additional_blanks();
+void replace_special_characters();
 
 const char INPUT_STR[] = "%c ";
 const char INPUT_CHAR = '$';
@@ -26,7 +27,8 @@ int main() {
     // fgets_string();
     // count_lines();
     // count_blanks_tabs_newlines();
-    skip_additional_blanks();
+    // skip_additional_blanks();
+    replace_special_characters();
 
     return 0;
 }
@@ -183,4 +185,26 @@ void skip_additional_blanks() {
         }
     }
     printf("\b\b\b\n\nTotal count: %d\n", nl);
+}
+
+void replace_special_characters() {
+    printf("A program to copy its input to its output, replacing each tab by \\t each backspace by \\b, and each backslash by \\\\.\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+
+    int c;
+
+    while ((c = getchar()) != EOF) {
+        if ( c == '\t') {
+            printf("\\t");
+        } else if (c == '\b') {
+            printf("\\b");
+        } else if (c == '\\') {
+            printf("\\\\");
+        } else {
+            printf("%c", c);
+        }
+    }
 }
