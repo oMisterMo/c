@@ -260,6 +260,13 @@ void count_words() {
             state = IN;
             ++nw;
         }
+
+        // Exercise 1-12. Write a program that prints its input one word per line.
+        if (state == IN) {
+            printf("%c", c);
+        } else {
+            printf("\n");
+        }
     }
     printf("--------------------\n");
     printf("lines %d\nwords %d\ncharacters %d\n", nl, nw, nc);
