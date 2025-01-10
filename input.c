@@ -183,7 +183,6 @@ void skip_additional_blanks() {
             // printf("Spaces: %d\n", nb);
         }
 
-
         printf("%c", c);
 
         if ( c == '\n') {
