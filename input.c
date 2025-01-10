@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+void echo();
 void single_char();
 void single_int();
 void multiple_input();
@@ -15,7 +16,7 @@ const char INPUT_CHAR = '$';
 int main() {
 
     
-    single_char();
+    // single_char();
     // single_int();
     // multiple_input();
     // scanf_string();
@@ -24,6 +25,18 @@ int main() {
     return 0;
 }
 
+/**
+ * This function reads characters from the standard input and writes them to the standard output.
+ */
+void echo() {
+    // getchar() = unsigned int (characters on ascii table)
+    // EOF = -1
+    int c;
+    while ((c = getchar()) != EOF) {
+        putchar(c);
+    }
+
+}
 void single_char() {
 
     printf("Enter a character: \n");
