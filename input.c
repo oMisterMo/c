@@ -10,6 +10,10 @@ void count_lines();
 void count_blanks_tabs_newlines();
 void skip_additional_blanks();
 void replace_special_characters();
+void count_words();
+
+#define IN 1        // Inside a word
+#define OUT 0       // Outside a word
 
 const char INPUT_STR[] = "%c ";
 const char INPUT_CHAR = '$';
@@ -28,7 +32,8 @@ int main() {
     // count_lines();
     // count_blanks_tabs_newlines();
     // skip_additional_blanks();
-    replace_special_characters();
+    // replace_special_characters();
+    count_words();
 
     return 0;
 }
@@ -45,6 +50,7 @@ void echo() {
     }
 
 }
+
 void single_char() {
 
     printf("Enter a character: \n");
@@ -207,4 +213,32 @@ void replace_special_characters() {
             printf("%c", c);
         }
     }
+}
+
+void count_words() {
+    printf("A program to count lines, words and characters.\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+    int c, nl, nw, nc, state;
+
+    state = OUT;
+    nl = nw = nc = 0;
+
+    while ((c = getchar()) != EOF) {
+        ++nc;
+        if (c == '\n') {
+            ++nl;
+        }
+        if (c == ' ' || c == '\n' || c == '\t') {
+            state = OUT;
+        } else if (state == OUT) {
+            state = IN;
+            ++nw;
+        }
+    }
+    printf("--------------------\n");
+    printf("lines %d\nwords %d\ncharacters %d\n", nl, nw, nc);
+    printf("--------------------\n");
 }
