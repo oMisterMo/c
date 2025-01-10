@@ -4,17 +4,22 @@
 #include <time.h> // time
 #include <string.h> // strcpy
 
+const char INPUT_STR[] = "%c ";
+const char INPUT_CHAR = '$';
+
 void declare();
 void declare_initialize();
 void multi_dimensional();
 void dynamic_allocation();
+void histogram_of_lengths();
 
 int main() {
 
     // declare();
     // declare_initialize();
     // multi_dimensional();
-    dynamic_allocation();
+    // dynamic_allocation();
+    histogram_of_lengths();
 
 
     printf("\n");
@@ -114,4 +119,67 @@ void dynamic_allocation() {
 
 
     free(string);
+}
+
+/**
+ * Exercise 1-13. Write a program to print a histogram of the lengths of words in its input. It is easy to draw the histogram with the bars horizontal; a vertical orientation is more challenging.
+ * Exercise 1-14. Write a program to print a histogram of the frequencies of different characters in its input.
+ */
+void histogram_of_lengths() {
+    // Terminal help
+    printf("A program to print a histogram of the lengths.\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+
+    // Program
+    int c, i, nwhite, nother;
+    int ndigit[10];
+
+    nwhite = nother = 0;
+    for(i = 0; i < 10; i++) {
+        ndigit[i] = 0;
+    }
+
+    while((c = getchar()) != EOF) {
+        if(c >= '0' && c <= '9') {
+            ++ndigit[c - '0'];
+        } else if(c == ' ' || c == '\n' || c == '\t') {
+            ++nwhite;
+        } else {
+            ++nother;
+        }
+    }
+
+    // Result
+    printf("--------------------------------\n");
+    printf("digits =");
+    for(i = 0; i < 10; i++) {
+        printf(" %d", ndigit[i]);
+    }
+    printf(", white space = %d, other = %d\n", nwhite, nother);
+    printf("--------------------------------\n");
+
+    // Histogram
+    for(i = 0; i < 10; i++) {
+        printf("%6d: ", i);
+        for(int j = 0; j < ndigit[i]; j++) {
+            printf("%c ", 'x');
+        }
+        printf("(%d)", ndigit[i]);
+        printf("\n");
+    }
+    printf("%6s: ", "blanks");
+    for(int j = 0; j < nwhite; j++) {
+        printf("%c ", 'x');
+    }
+    printf("(%d)", nwhite);
+    printf("\n");
+    printf("%6s: ", "others");
+    for(int j = 0; j < nother; j++) {
+        printf("%c ", 'x');
+    }
+    printf("(%d)", nother);
+
 }
