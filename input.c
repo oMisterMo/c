@@ -7,6 +7,7 @@ void multiple_input();
 void scanf_string();    // single word
 void fgets_string();    // multiple words
 void count_lines();
+void count_blanks_tabs_newlines();
 
 const char INPUT_STR[] = "%c ";
 const char INPUT_CHAR = '$';
@@ -22,7 +23,8 @@ int main() {
     // multiple_input();
     // scanf_string();
     // fgets_string();
-    count_lines();
+    // count_lines();
+    count_blanks_tabs_newlines();
 
     return 0;
 }
@@ -111,10 +113,13 @@ void fgets_string() {
 }
 
 void count_lines() {
-    printf("Counting the number of new lines\n");
-    int c, nl;
-
+    printf("Counting the number of new lines\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
     printf(INPUT_STR, INPUT_CHAR);
+
+    int c, nl;
     nl = 0;
     while ((c = getchar()) != EOF) {
         if (c == '\n') {
@@ -123,5 +128,25 @@ void count_lines() {
             printf(INPUT_STR, INPUT_CHAR);
         }
     }
-    printf("Number of lines: %d\n", nl);
+    printf("Total lines: %d\n", nl);
+}
+
+void count_blanks_tabs_newlines() {
+    printf("Counting blanks, tabs and newlines\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+
+    int c, nl;
+    nl = 0;
+    while ((c = getchar()) != EOF) {
+        if (c == '\n' || c == '\t' || c == ' ') {
+            ++nl;
+
+            printf("Number of lines: %d\n", nl);
+            printf(INPUT_STR, INPUT_CHAR);
+        }
+    }
+    printf("\b\b\b\n\nTotal count: %d\n", nl);
 }
