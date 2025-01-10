@@ -215,6 +215,29 @@ void replace_special_characters() {
     }
 }
 
+/**
+ * Exercise 1-11. How would you test the word count program? What kinds of input are most likely to uncover bugs if there are any?
+ *
+ * To test I would use the following inputs:
+ * - a single word
+ * - multiple words
+ * - a single word with multiple spaces
+ * - multiple words with multiple spaces
+ * - a single word with a newline
+ * - multiple words with a newline
+ * - a single word with a tab
+ * - multiple words with a tab
+ * - a single word with a tab and a newline
+ * - multiple words with a tab and a newline
+ * - a single word with a tab and a space
+ *
+ * The kind of inputs that are most likely to uncover bugs are:
+ * - special characters
+ * - function characters
+ * - non ascii characters
+ * - emojis
+ *
+ */
 void count_words() {
     printf("A program to count lines, words and characters.\n\n");
     printf("Type 'Ctrl + D' to exit\n");
