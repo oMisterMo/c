@@ -6,6 +6,7 @@ void single_int();
 void multiple_input();
 void scanf_string();    // single word
 void fgets_string();    // multiple words
+void count_lines();
 
 const char INPUT_STR[] = "%c ";
 const char INPUT_CHAR = '$';
@@ -21,6 +22,7 @@ int main() {
     // multiple_input();
     // scanf_string();
     // fgets_string();
+    count_lines();
 
     return 0;
 }
@@ -106,4 +108,20 @@ void fgets_string() {
     fgets(fullName, 30, stdin); // sizeof(fullName); or 30
 
     printf("Hello %s\n", fullName);
+}
+
+void count_lines() {
+    printf("Counting the number of new lines\n");
+    int c, nl;
+
+    printf(INPUT_STR, INPUT_CHAR);
+    nl = 0;
+    while ((c = getchar()) != EOF) {
+        if (c == '\n') {
+            ++nl;
+            printf("Number of lines: %d (ctrl + d to exit)\n", nl);
+            printf(INPUT_STR, INPUT_CHAR);
+        }
+    }
+    printf("Number of lines: %d\n", nl);
 }
