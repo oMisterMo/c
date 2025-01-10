@@ -8,6 +8,7 @@ void scanf_string();    // single word
 void fgets_string();    // multiple words
 void count_lines();
 void count_blanks_tabs_newlines();
+void skip_additional_blanks();
 
 const char INPUT_STR[] = "%c ";
 const char INPUT_CHAR = '$';
@@ -24,7 +25,8 @@ int main() {
     // scanf_string();
     // fgets_string();
     // count_lines();
-    count_blanks_tabs_newlines();
+    // count_blanks_tabs_newlines();
+    skip_additional_blanks();
 
     return 0;
 }
@@ -146,6 +148,38 @@ void count_blanks_tabs_newlines() {
 
             printf("Number of lines: %d\n", nl);
             printf(INPUT_STR, INPUT_CHAR);
+        }
+    }
+    printf("\b\b\b\n\nTotal count: %d\n", nl);
+}
+
+void skip_additional_blanks() {
+    printf("A program to copy its input to its output, replacing each string of one or more blanks by a single blank.\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+
+    int c, nl, nb;
+    nb = 0;
+    nl = 0;
+
+    // a b c
+    while ((c = getchar()) != EOF) {
+        if ( c == ' ') {
+            ++nb;
+
+            if (nb > 1) {
+                continue;
+            }
+            // printf("Spaces: %d\n", nb);
+        }
+
+
+        printf("%c", c);
+
+        if ( c == '\n') {
+            nb = 0;
         }
     }
     printf("\b\b\b\n\nTotal count: %d\n", nl);
