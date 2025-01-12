@@ -49,9 +49,19 @@ void declare() {
  * but I like to manully add it
  */
 void declare_initialize() {
+    // Array with 5 elements
     int arr[] = {1, 2, 3, 4, 5};
-    char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'}; // 5 characters + 1 null terminator
+
+    // Initialized with 0
+    int arr[128] = {0};
+
+    // Single quote character array
+    char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};  // 5 characters + 1 null terminator
+    char str[6] = {'H', 'e', 'l', 'l', 'o'};        // 5 characters + 1 null terminator
+
+    // Double quotes
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\0"; // 26 characters + 1 null terminator
+
 
     printf("\n");
     for(int i = 0; i < 5; ++i) {
