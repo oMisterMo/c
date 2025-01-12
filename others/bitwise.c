@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 void shift();
 void flags();
@@ -24,6 +25,8 @@ void shift() {
 void flags() {
     // 1 byte represents 8 different states
     // 1 2 4 8 16 32 64 128
+
+    // Init Flags
     uint8_t one = 1;
     uint8_t two = 2;
     uint8_t four = 4;
@@ -43,5 +46,18 @@ void flags() {
     printf("%3d | %08b\n", one_hundred_twenty_eight, one_hundred_twenty_eight);
 
     printf("\n");
-    printf("flag: %08b", one | two | one_hundred_twenty_eight);
+
+    // Set Flags
+    uint8_t flags = one | two | one_hundred_twenty_eight;
+    printf("flags: %08b\n\n", flags);
+
+    // Extract Flags
+    bool isOneSet = flags & one;
+    bool isTwoSet = flags & two;
+    bool isFourSet = flags & four;
+
+    printf("is one set: %d\n", isOneSet);
+    printf("is two set: %d\n", isTwoSet);
+    printf("is four set: %d\n", isFourSet);
+
 }
