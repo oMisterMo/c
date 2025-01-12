@@ -1,26 +1,28 @@
 #include <stdio.h>
 #include <string.h>
 
-void string_copy();
-void string_init();
+void initialize();
+void copy();
 
 int main() {
 
-    string_init();
-    string_copy();
+    initialize();
+    copy();
 
 
     printf("\n");
     return 0;
 }
 
-void string_init() {
+void initialize() {
     printf("\n---String Init---\n");
+
     // string literal (automatically appends '\0')
     char greetings[] = "Hello World!";
-    // character array
-    char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 26 characters
+
+    // character array (must manually append '\0')
+    char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
 
 
     // It is also important that you know that sizeof will always return the memory size (in bytes), and not the actual string length
@@ -37,13 +39,15 @@ void string_init() {
  * Copies the string from src to dest
  * Note that the size of dest should be large enough to store the result of the two strings combined
  */
-void string_copy() {
+void copy() {
     printf("\n---String Copy---\n");
     char src[6] = "hi", dest[6] = "empty";
 
     printf("Initial source string: %s\n", src);
     printf("Initial destination string: %s\n", dest);
 
+    // Copy bytes from src to dest
     strcpy(dest, src);
+
     printf("Final copied string: %s\n", dest);
 }
