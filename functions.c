@@ -5,6 +5,7 @@ int add(int, int);
 int sub(int a, int b);  // Well-chosen names are good documentation however, so we will often use them
 int square(int*);
 
+// int can be omitted since its the default return type
 int power(int base, int n);
 
 int main() {
