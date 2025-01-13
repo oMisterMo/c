@@ -2,9 +2,9 @@
 #include <stdint.h>
 
 // r
-int read_file_char();
-int read_file_line();
-int read_line();
+int read_file_by_character();
+int read_file_by_line();
+int read_single_line();
 
 // w
 int write_file();
@@ -24,9 +24,9 @@ int append_file();
 int main() {
 
     // r
-    // read_file_char();
-    read_file_line();
-    // read_line();
+    // read_file_by_character();
+    read_file_by_line();
+    // read_single_line();
 
     // w
     // write_file();
@@ -41,8 +41,8 @@ int main() {
 /**
  * Read the file using fgets (char by char)
  */
-int read_file_char() {
-    printf("Opening file...\n");
+int read_file_by_character() {
+    printf("Opening file...\n\n");
     FILE *file = fopen("x.txt", "r");  // r = read, w = write, a = append
 
 
@@ -53,12 +53,14 @@ int read_file_char() {
     }
 
 
-    // Write to file
-    // fprintf(file, "Hello, World!\n");
-    // fprintf(file, "Whats up Mooo!\n");
+    // Read char until we reach EOF (-1)
     while(!feof(file)) {
         char c = fgetc(file);
-        printf("%c", c);
+        // printf("%c", c);
+
+        // Stop it from printing the final character
+        if(feof(file)) break;
+        putchar(c);
     }
 
 
@@ -71,7 +73,8 @@ int read_file_char() {
 /**
  * Read the file using fgets (line by line)
  */
-int read_file_line() {
+int read_file_by_line() {
+    printf("Opening file...\n\n");
     FILE *file;
 
     // Open a file in read mode
@@ -88,6 +91,33 @@ int read_file_line() {
     // Close the file
     printf("\nClosing file...(read line by line)\n");
     fclose(file); 
+    return 0;
+}
+
+int read_single_line() {
+    // Store the content of the file
+    char line[255];
+    FILE *file = fopen("x.txt", "r");
+
+    // Check if file is opened
+    // If you try to open a file for reading that does not exist, the fopen() function will return NULL.
+    if(file == NULL) {
+        printf("Error opening file\n");
+        return 1;
+    }
+
+    // Read the content and store it inside 'line', finally increment pointer
+    fgets(line, 255, file);
+
+    // Print the content of the file
+    printf("%s", line);
+
+    // Read the second line
+    // fgets(line, 255, file);
+    // printf("%s", line);
+
+    fclose(file);
+
     return 0;
 }
 
@@ -162,33 +192,6 @@ int overwrite_file() {
 
 
     printf("Closing file...\n");
-    fclose(file);
-
-    return 0;
-}
-
-int read_line() {
-    // Store the content of the file
-    char line[255];
-    FILE *file = fopen("x.txt", "r");
-
-    // Check if file is opened
-    // If you try to open a file for reading that does not exist, the fopen() function will return NULL.
-    if(file == NULL) {
-        printf("Error opening file\n");
-        return 1;
-    }
-
-    // Read the content and store it inside 'line', finally increment pointer
-    fgets(line, 255, file);
-
-    // Print the content of the file
-    printf("%s", line);
-
-    // Read the second line
-    // fgets(line, 255, file);
-    // printf("%s", line);
-
     fclose(file);
 
     return 0;
