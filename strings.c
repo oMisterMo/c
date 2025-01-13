@@ -15,13 +15,11 @@ int main() {
 }
 
 void initialize() {
-    printf("\n---String Init---\n");
-
-    // string literal (automatically appends '\0')
+    // String literal (automatically appends '\0')
     char greetings[] = "Hello World!";
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 26 characters
 
-    // character array (must manually append '\0')
+    // Character array (must manually append '\0')
     char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
 
 
