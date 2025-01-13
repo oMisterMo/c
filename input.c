@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
 void echo();
 void single_char();
@@ -12,6 +14,12 @@ void skip_additional_blanks();
 void replace_special_characters();
 void count_words();
 
+void copy(char to[], char from[]);
+int get_line(char s[], int lim);
+void print_longest_line();
+
+void test();
+
 #define IN 1        // Inside a word
 #define OUT 0       // Outside a word
 
@@ -23,6 +31,8 @@ const char INPUT_CHAR = '$';
  */
 int main() {
 
+    int a = 1;
+    int b = 10;
     
     // single_char();
     // single_int();
@@ -33,7 +43,8 @@ int main() {
     // count_blanks_tabs_newlines();
     // skip_additional_blanks();
     // replace_special_characters();
-    count_words();
+    // count_words();
+    print_longest_line();
 
     return 0;
 }
@@ -270,4 +281,103 @@ void count_words() {
     printf("--------------------\n");
     printf("lines %d\nwords %d\ncharacters %d\n", nl, nw, nc);
     printf("--------------------\n");
+}
+
+void test() {
+    printf("A program to count lines, words and characters.\n\n");
+    printf("Type 'Ctrl + D' to exit\n");
+    printf("Type 'Ctrl + C' to terminate\n");
+    printf("\n");
+    printf(INPUT_STR, INPUT_CHAR);
+    int c, nl, nw, nc, state;
+
+    state = OUT;
+    nl = nw = nc = 0;
+
+    while ((c = getchar()) != EOF) {
+        ++nc;
+        if (c == '\n') {
+            ++nl;
+        }
+        if (c == ' ' || c == '\n' || c == '\t') {
+            state = OUT;
+        } else if (state == OUT) {
+            state = IN;
+            ++nw;
+        }
+
+        // Exercise 1-12. Write a program that prints its input one word per line.
+        if (state == IN) {
+            printf("%c", c);
+        } else {
+            printf("\n");
+        }
+    }
+    printf("--------------------\n");
+    printf("lines %d\nwords %d\ncharacters %d\n", nl, nw, nc);
+    printf("--------------------\n");
+}
+
+void copy(char to[], char from[]) {
+    int i = 0;
+    while((to[i] = from[i]) != '\0') {
+        ++i;
+    }
+}
+
+int get_line(char line[], int lim) {
+    // printf(INPUT_STR, INPUT_CHAR);
+
+    int c, i;
+
+    i = 0;
+    // 1. While less than limit (1000)
+    // 2. Not reached the end of file
+    // 3. Not a new line
+    while(i < lim - 1 && (c = getchar()) != EOF && c != '\n') {
+        // Add character to line
+        line[i] = c;
+        ++i;
+    }
+
+    // Append new line in character array
+    if (c == '\n') {
+        line[i] = '*';
+        ++i;
+    }
+
+    // Reached the end of the input -> Terminate string with \0
+    line[i] = '\0';
+    return i;
+}
+
+void print_longest_line() {
+    #define MAXLINE 5
+
+    int len;
+    int max = 0;
+    char line[MAXLINE];
+    char longest[MAXLINE];
+
+    printf("\nline[%ld]\n", sizeof(line));
+    printf("Max characters = %ld\n\n", sizeof(line) - 2);
+
+
+    while((len = get_line(line, MAXLINE)) > 0) {
+
+
+
+
+
+        // DEBUG - Print line length and inputted line
+        printf("(len: %d) - [", len);
+        for(int i = 0; i < strlen(line) + 1; ++i) {
+            printf("'%c' ", line[i]);
+        }
+        printf("\b] - (bytes: %d)\n", len + 1);
+
+
+        printf("\n");
+    }
+
 }
