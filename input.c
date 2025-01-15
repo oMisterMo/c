@@ -325,6 +325,10 @@ void copy(char to[], char from[]) {
     }
 }
 
+/**
+ * Returns the length of the line
+ * Return 0 when we reach the EOF
+ */
 int get_line(char line[], int lim) {
     // printf(INPUT_STR, INPUT_CHAR);
 
@@ -354,10 +358,10 @@ int get_line(char line[], int lim) {
 void print_longest_line() {
     #define MAXLINE 5
 
-    int len;
-    int max = 0;
-    char line[MAXLINE];
-    char longest[MAXLINE];
+    int len;                // the len of the current line
+    int max = 0;            // max line length found
+    char line[MAXLINE];     // a line read through the terminal
+    char longest[MAXLINE];  // longest found
 
     printf("\nline[%ld]\n", sizeof(line));
     printf("Max characters = %ld\n\n", sizeof(line) - 2);
