@@ -5,8 +5,9 @@
 #define MAX_TOUCH_POINTS 10
 #define MAX_GESTURE_STRINGS   20
 
-
 #define NO_OF_TRAYS 3
+#define TRAY_WIDTH 300
+#define TRAY_HEIGHT 150
 #define MIN_NO_OF_TRAYS 3
 #define MAX_NO_OF_TRAYS 8
 
@@ -15,9 +16,6 @@
 #define CARD_HEIGHT 270
 
 #define GAP 100
-
-#define BASE_WIDTH 300
-#define BASE_HEIGHT 150
 
 struct Card {
     Vector2 originalPosition;
@@ -28,7 +26,8 @@ struct Card {
     bool hasScore;
 };
 
-void initCard(struct Card cards[], int startX, int centerX, Color colors[]);
+void initCards(struct Card cards[], int startX, int centerX, Color colors[]);
+void initTrays(Rectangle trays[], int startX, int centerX);
 void reset(int *score);
 
 int main() {
@@ -49,18 +48,12 @@ int main() {
 
     int centerX = GetScreenWidth() / 2;
     int centerY = GetScreenHeight() / 2;
-    int startX = -(BASE_WIDTH * NO_OF_TRAYS) / 2;
-    int startY = -(BASE_HEIGHT) / 2;
+    int startX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
+    int startY = -(TRAY_HEIGHT) / 2;
 
-    for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        trays[i] = (Rectangle) {
-            -GAP * (NO_OF_TRAYS - 1) + centerX + startX  + ((i + 1) * GAP) + (BASE_WIDTH * i),
-            GetScreenHeight() - BASE_HEIGHT - 20, 
-            BASE_WIDTH,
-            BASE_HEIGHT
-        };
-    }
-    initCard(cards, startX, centerX, colors);
+
+    initTrays(trays, startX, centerX);
+    initCards(cards, startX, centerX, colors);
 
     // ================================================
     Vector2 touchPosition = { 0, 0 };
@@ -82,7 +75,7 @@ int main() {
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
         if (IsKeyPressed(KEY_R)) {
             reset(&score);
-            initCard(cards, startX, centerX, colors);
+            initCards(cards, startX, centerX, colors);
         }
 
         lastGesture = currentGesture;
@@ -146,7 +139,7 @@ int main() {
                     sum += cards[j].hasTouchedEndZone;
                 }
                 if (sum >= NO_OF_CARDS) {
-                    initCard(cards, startX, centerX, colors);
+                    initCards(cards, startX, centerX, colors);
                 }
                     
             }
@@ -191,7 +184,18 @@ int main() {
     return 0;
 }
 
-void initCard(struct Card cards[], int centerX, int startX, Color colors[]) {
+void initTrays(Rectangle trays[], int startX, int centerX) {
+    for (int i = 0; i < NO_OF_TRAYS; ++i) {
+        trays[i] = (Rectangle) {
+            -GAP * (NO_OF_TRAYS - 1) + centerX + startX  + ((i + 1) * GAP) + (TRAY_WIDTH * i),
+            GetScreenHeight() - TRAY_HEIGHT - 20,
+            TRAY_WIDTH,
+            TRAY_HEIGHT
+        };
+    }
+}
+
+void initCards(struct Card cards[], int centerX, int startX, Color colors[]) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 position = {
             -GAP * (NO_OF_TRAYS - 1) + centerX + startX  + ((i + 1) * GAP) + (CARD_WIDTH * i),
