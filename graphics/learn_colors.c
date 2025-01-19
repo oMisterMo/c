@@ -33,42 +33,26 @@ void reset(int *score);
 
 int main() {
 
+    // Setup config
     int screenWidth = 800 * 2;
     int screenHeight = 400 * 2;
-
     SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
 
-
-
-    // init vars
+    // Initialization
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Color original[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
     struct Card cards[NO_OF_CARDS];
 
-    printf("---------------------------------\n");
-    // printf("sizeof(trays) %ld\n", sizeof(trays));
-    // printf("sizeof(trays[0]) %ld\n", sizeof(trays[0]));
-    printf("---------------------------------\n");
-
-    // int centerX = GetMonitorWidth(1) / 2;
-    // int centerY = GetMonitorWidth(1) / 2;
     int centerX = GetScreenWidth() / 2;
     int centerY = GetScreenHeight() / 2;
-    // int startX = GetMonitorWidth(1) / 4 - BASE_WIDTH / 2;
     int startX = -(BASE_WIDTH * NO_OF_TRAYS) / 2;
     int startY = -(BASE_HEIGHT) / 2;
 
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        // Rectangle rect;
-        // rect.x = 100 + (i + 1) * BASE_WIDTH;
-        // rect.y = GetScreenHeight() - 100;
-        // rect.width = BASE_WIDTH;
-        // rect.height = BASE_HEIGHT;
-
         trays[i] = (Rectangle) {
             -GAP * (NO_OF_TRAYS - 1) + centerX + startX  + ((i + 1) * GAP) + (BASE_WIDTH * i),
             GetScreenHeight() - BASE_HEIGHT - 20, 
@@ -76,37 +60,20 @@ int main() {
             BASE_HEIGHT
         };
     }
-    // for (int i = 0; i < NO_OF_CARDS; ++i) {
-    //     Vector2 position = {
-    //         -GAP * (NO_OF_TRAYS - 1) + centerX + startX  + ((i + 1) * GAP) + (CARD_WIDTH * i),
-    //         20
-    //     };
-    //     cards[i].rect = (Rectangle) {
-    //         position.x,
-    //         position.y, 
-    //         CARD_WIDTH,
-    //         CARD_HEIGHT
-    //     };
-
-    //     cards[i].originalPosition = position;
-    //     cards[i].isDragging = false;
-    //     cards[i].hasTouchedEndZone = false;
-    //     cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
-    // }
     initCard(cards, startX, centerX, colors);
-
 
     // ================================================
     Vector2 touchPosition = { 0, 0 };
-
     int gesturesCount = 0;
     int currentGesture = GESTURE_NONE;
     char gestureStrings[MAX_GESTURE_STRINGS][32];
     int lastGesture = GESTURE_NONE;
+    // ================================================
 
 
     int counter = 0;
     int score = 0;
+
 
     SetTargetFPS(60);
 
@@ -127,14 +94,9 @@ int main() {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                // if (CheckCollisionPointRec(touchPosition, trays[i])) {
-                //         colors[i] = ORANGE;
-                // } else {
-                //         colors[i] = original[i];
-                // }
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                colors[i] = original[i];
+                // colors[i] = original[i];
             }
         }
 
