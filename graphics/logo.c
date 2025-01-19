@@ -25,9 +25,9 @@ int main() {
     printf("---------rest---------------\n");
     //After window creation
 
-    // Texture2D logo = LoadTexture("/raylib/logo/raylib_logo_animation.gif");
+    // Texture2D logo = LoadTexture("resources/logo/raylib_logo_animation.gif");
     int frameCounter = 0;
-    Texture2D logo = LoadTexture("raylib/logo/raylib_256x256.png");
+    Texture2D logo = LoadTexture("resources/logo/raylib_256x256.png");
     Rectangle logoPos = { (GetScreenWidth() - logo.width ) / 2, (GetScreenHeight() - logo.height ) / 2, logo.width, logo.height };
     bool logoTouched = false;
 
