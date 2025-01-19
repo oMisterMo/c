@@ -120,6 +120,7 @@ int main() {
                     }
                 }
 
+                // Increment score or reset card position
                 if (hit) {
                     if (cards[i].hasTouchedEndZone) continue;
                     printf("HIT %d\n", counter);
@@ -134,10 +135,12 @@ int main() {
                     cards[i].rect.y = cards[i].originalPosition.y; 
                 }
 
-                // Check complete
+                // Have all cards been moved to the correct zone?
                 for (int j = 0; j < NO_OF_CARDS; ++j) {
                     sum += cards[j].hasTouchedEndZone;
                 }
+
+                // Yes? Reset cards
                 if (sum >= NO_OF_CARDS) {
                     initCards(cards, startX, centerX, colors);
                 }
