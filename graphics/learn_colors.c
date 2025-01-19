@@ -12,7 +12,7 @@
 #define MAX_NO_OF_TRAYS 8
 
 #define NO_OF_CARDS 4
-#define CARD_WIDTH 140
+#define CARD_WIDTH 150
 #define CARD_HEIGHT 180
 
 #define GAP 70
@@ -42,6 +42,7 @@ int main() {
 
 
     // Initialization
+    Texture2D check = LoadTexture("resources/sprites/check.png");
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Color original[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
@@ -132,7 +133,7 @@ int main() {
                 } else {
                     printf("Reset Card...\n");
                     cards[i].rect.x = cards[i].originalPosition.x;
-                    cards[i].rect.y = cards[i].originalPosition.y; 
+                    cards[i].rect.y = cards[i].originalPosition.y;
                 }
 
                 // Have all cards been moved to the correct zone?
@@ -168,11 +169,14 @@ int main() {
             DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
         }
         for (int i = 0; i < NO_OF_CARDS; ++i) {
-            if (cards[i].hasTouchedEndZone) {
-                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
-            }
             DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
             DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
+            if (cards[i].hasTouchedEndZone) {
+                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
+                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+                DrawTexture(check, x, y, WHITE);
+            }
         }
         DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 
@@ -181,6 +185,7 @@ int main() {
 
     }
 
+    UnloadTexture(check);
     CloseWindow();
 
 
@@ -211,6 +216,7 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
             CARD_HEIGHT
         };
 
+        // cards[i].originalPosition = (Vector2) { position.x, position.y };
         cards[i].originalPosition = position;
         cards[i].isDragging = false;
         cards[i].hasTouchedEndZone = false;
