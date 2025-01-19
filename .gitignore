@@ -1,3 +1,5 @@
 *.out
 test.c
 *.txt
+
+out/
