@@ -1,6 +1,8 @@
 # c
 
-This repo holds various examples. You'll find basic to complex programs.
+This repo holds a range of programs I used to learn the c programming language. Running applications in the `basics/` and `others/` directory should run without any external libaraies.
+
+Programs found in the `graphics/` directory will require `raylib`.
 
 ## Files
 
