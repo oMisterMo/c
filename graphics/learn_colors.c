@@ -23,9 +23,9 @@ struct Card {
     Vector2 originalPosition;
     Rectangle rect;
     Color color;
-    bool dragging;
-    bool inEndZone;
-    bool scoreRecieved;
+    bool isDragging;
+    bool hasTouchedEndZone;
+    bool hasScore;
 };
 
 void initCard(struct Card cards[], int startX, int centerX, Color colors[]);
@@ -89,8 +89,8 @@ int main() {
     //     };
 
     //     cards[i].originalPosition = position;
-    //     cards[i].dragging = false;
-    //     cards[i].inEndZone = false;
+    //     cards[i].isDragging = false;
+    //     cards[i].hasTouchedEndZone = false;
     //     cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
     // }
     initCard(cards, startX, centerX, colors);
@@ -142,17 +142,17 @@ int main() {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(touchPosition, cards[i].rect)) {
-                    cards[i].dragging = true;
+                    cards[i].isDragging = true;
                 }
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                if (cards[i].dragging) {
+                if (cards[i].isDragging) {
                     cards[i].rect.x = touchPosition.x - cards[i].rect.width / 2;
                     cards[i].rect.y = touchPosition.y - cards[i].rect.height / 2;
                 }
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                cards[i].dragging = false;
+                cards[i].isDragging = false;
 
                 bool hit = false;
                 int sum = 0;
@@ -166,13 +166,13 @@ int main() {
                 }
 
                 if (hit) {
-                    if (cards[i].inEndZone) continue;
+                    if (cards[i].hasTouchedEndZone) continue;
                     printf("HIT %d\n", counter);
-                    if (!cards[i].scoreRecieved) {
+                    if (!cards[i].hasScore) {
                         ++score;
                     }
-                    cards[i].inEndZone = true;
-                    cards[i].scoreRecieved = true;
+                    cards[i].hasTouchedEndZone = true;
+                    cards[i].hasScore = true;
                 } else {
                     printf("Reset Card...\n");
                     cards[i].rect.x = cards[i].originalPosition.x;
@@ -181,7 +181,7 @@ int main() {
 
                 // Check complete
                 for (int j = 0; j < NO_OF_CARDS; ++j) {
-                    sum += cards[j].inEndZone;
+                    sum += cards[j].hasTouchedEndZone;
                 }
                 if (sum >= NO_OF_CARDS) {
                     initCard(cards, startX, centerX, colors);
@@ -210,7 +210,7 @@ int main() {
             DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
         }
         for (int i = 0; i < NO_OF_CARDS; ++i) {
-            if (cards[i].inEndZone) {
+            if (cards[i].hasTouchedEndZone) {
                 DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
             }
             DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
@@ -243,9 +243,9 @@ void initCard(struct Card cards[], int centerX, int startX, Color colors[]) {
         };
 
         cards[i].originalPosition = position;
-        cards[i].dragging = false;
-        cards[i].inEndZone = false;
-        cards[i].scoreRecieved = false;
+        cards[i].isDragging = false;
+        cards[i].hasTouchedEndZone = false;
+        cards[i].hasScore = false;
         cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
     }
 }
