@@ -9,7 +9,7 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "Mo Man");
+    InitWindow(screenWidth, screenHeight, "mo");
     SetTargetFPS(60);
 
     // Initialize varaibles
