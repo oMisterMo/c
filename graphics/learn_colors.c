@@ -51,10 +51,9 @@ int main() {
     // Textures
     Texture2D check = LoadTexture("resources/sprites/check.png");
     Texture2D clouds[NO_OF_CLOUDS];
-    clouds[0] = LoadTexture("resources/backgrounds/clouds_1.png");;
-    clouds[1] = LoadTexture("resources/backgrounds/clouds_2.png");;
-    clouds[2] = LoadTexture("resources/backgrounds/clouds_3.png");;
-    clouds[3] = LoadTexture("resources/backgrounds/clouds_4.png");;
+    for (int i = 0; i < NO_OF_CLOUDS; ++i) {
+        clouds[i] = LoadTexture(TextFormat("resources/backgrounds/clouds_%d.png", i + 1));
+    }
 
     // Game vars
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
