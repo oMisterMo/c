@@ -34,7 +34,7 @@ void initCards(struct Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX);
 void reset(int *score);
 
-void drawBackground(Texture2D clouds[]);
+void drawBackground(Texture2D clouds[], double increment);
 
 int main() {
 
@@ -56,6 +56,7 @@ int main() {
     }
 
     // Game vars
+    double increment = 0.0;
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
     struct Card cards[NO_OF_CARDS];
@@ -75,6 +76,7 @@ int main() {
     // ================================================
 
 
+    int frameCounter = 0;
     int counter = 0;
     int score = 0;
 
@@ -82,6 +84,8 @@ int main() {
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
+        frameCounter++;
+        increment += 0.02;
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
         if (IsKeyPressed(KEY_R)) {
@@ -173,7 +177,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds);
+        drawBackground(clouds, increment);
 
 
         // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
@@ -246,20 +250,30 @@ void reset(int *score) {
 
 
 // Draw
-void drawBackground(Texture2D layers[]) {
+void drawBackground(Texture2D layers[], double increment) {
     int width = layers[0].width;
     int height = layers[0].height;
     int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
-    int startX = -200;
+    int startX = 0;
     int startY = GetScreenHeight() - height;
 
+
     // printf("--------------------\n");
-    // printf("screen / width, %d / %d\n", GetScreenWidth(), width);
-    // printf("X layers needed: %d\n", X_REAPEAT);
+    // // x repeat
+    // // printf("screen / width, %d / %d\n", GetScreenWidth(), width);
+    // // printf("X layers needed: %d\n", X_REAPEAT);
+
+    // // sin
+    // // printf("sin(frame): %lf\n", (sin(increment) * 10) + 10);
+    // //
     // printf("--------------------\n");
 
+
+    int speed = (sin(increment/25) * width/3) + width/3;
+    // int speed = 0;
     for (int i = 0; i < X_REAPEAT; ++i) {
-        DrawTexture(layers[0], startX + ( i * width ), startY, WHITE);
+        int xPos = startX + ( i * width ) - speed;
+        DrawTexture(layers[0], xPos, startY, WHITE);
     }
 
 
