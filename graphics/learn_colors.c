@@ -16,7 +16,7 @@
 #define CARD_WIDTH 150      // min size = 150 = size of check texture
 #define CARD_HEIGHT 180
 
-#define GAP 150             // Space between cards & trays
+#define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
 
 #define NO_OF_CLOUDS 4
@@ -34,14 +34,16 @@ void initCards(struct Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX);
 void reset(int *score);
 
-void drawBackground(Texture2D clouds[], double increment);
+void drawBackground(Texture2D clouds[], double increment, int order[]);
 
 int main() {
 
     // Setup config
-    int screenWidth = 1024 * 1.5;
-    int screenHeight = 768;
-    // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
+    // int screenWidth = 1024 * 1.5;
+    // int screenHeight = 768;
+    int screenWidth = 960;
+    int screenHeight = 600;
+    SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
@@ -80,6 +82,11 @@ int main() {
     int counter = 0;
     int score = 0;
 
+    int order[20];
+    for (int i = 0; i < 20; i++) {
+        order[i] = GetRandomValue(0, 3);
+        // printf("order[i]: %d\n", order[i]);
+    }
 
     SetTargetFPS(60);
 
@@ -177,7 +184,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds, increment);
+        drawBackground(clouds, increment, order);
 
 
         // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
@@ -250,32 +257,29 @@ void reset(int *score) {
 
 
 // Draw
-void drawBackground(Texture2D layers[], double increment) {
+void drawBackground(Texture2D layers[], double increment, int order[]) {
     int width = layers[0].width;
     int height = layers[0].height;
     int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
     int startX = 0;
     int startY = -height / 2 ;
 
+    int row = 0;
 
-    // printf("--------------------\n");
-    // // x repeat
-    // // printf("screen / width, %d / %d\n", GetScreenWidth(), width);
-    // // printf("X layers needed: %d\n", X_REAPEAT);
-
-    // // sin
-    // // printf("sin(frame): %lf\n", (sin(increment) * 10) + 10);
-    // //
-    // printf("--------------------\n");
-
+    // For each layer on the y axis
     while (startY < GetScreenHeight() + height * 2) {
-        int speed = (sin(increment/25) * width/3) + width/3;
-        // int speed = 0;
-        for (int i = 0; i < X_REAPEAT; ++i) {
-            int xPos = startX + ( i * width ) - speed;
-            DrawTexture(layers[0], xPos, startY, WHITE);
-        }
 
-        startY += height;
+        int index = order[row % 4];
+        int clampedW = (width - GetScreenWidth()) / 2;
+        int speed = (sin(increment / 25 * index) * clampedW) + clampedW; // 0 > speed > 900
+        // speed = 0;
+
+        int xPos = startX - speed;
+
+        DrawTexture(layers[index], xPos, startY, WHITE);
+
+        startY += height / 1.6;
+        row++;
+
     }
 }
