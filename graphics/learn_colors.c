@@ -12,11 +12,11 @@
 #define MAX_NO_OF_TRAYS 8
 
 #define NO_OF_CARDS 4
-#define CARD_WIDTH 150
+#define CARD_WIDTH 150      // min size = 150 = size of check texture
 #define CARD_HEIGHT 180
 
-#define GAP 70
-#define PADDING 70
+#define GAP 150             // Space between cards & trays
+#define PADDING 70          // Space above & below
 
 struct Card {
     Vector2 originalPosition;
@@ -34,8 +34,8 @@ void reset(int *score);
 int main() {
 
     // Setup config
-    int screenWidth = 1024;
-    int screenHeight = 768;
+    int screenWidth = 1024 * 1.5;
+    int screenHeight = 768 * 1.2;
     SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
@@ -44,14 +44,11 @@ int main() {
     // Initialization
     Texture2D check = LoadTexture("resources/sprites/check.png");
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
-    Color original[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
     struct Card cards[NO_OF_CARDS];
 
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
-    int startY = -(TRAY_HEIGHT) / 2;
-
 
     initTrays(trays, trayStartX);
     initCards(cards, cardStartX, colors);
