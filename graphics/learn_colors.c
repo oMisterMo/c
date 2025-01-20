@@ -40,8 +40,8 @@ int main() {
 
     // Setup config
     int screenWidth = 1024 * 1.5;
-    int screenHeight = 768 * 1.2;
-    SetConfigFlags( FLAG_WINDOW_UNDECORATED );
+    int screenHeight = 768;
+    // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
@@ -255,7 +255,7 @@ void drawBackground(Texture2D layers[], double increment) {
     int height = layers[0].height;
     int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
     int startX = 0;
-    int startY = GetScreenHeight() - height;
+    int startY = -height / 2 ;
 
 
     // printf("--------------------\n");
@@ -268,16 +268,14 @@ void drawBackground(Texture2D layers[], double increment) {
     // //
     // printf("--------------------\n");
 
+    while (startY < GetScreenHeight() + height * 2) {
+        int speed = (sin(increment/25) * width/3) + width/3;
+        // int speed = 0;
+        for (int i = 0; i < X_REAPEAT; ++i) {
+            int xPos = startX + ( i * width ) - speed;
+            DrawTexture(layers[0], xPos, startY, WHITE);
+        }
 
-    int speed = (sin(increment/25) * width/3) + width/3;
-    // int speed = 0;
-    for (int i = 0; i < X_REAPEAT; ++i) {
-        int xPos = startX + ( i * width ) - speed;
-        DrawTexture(layers[0], xPos, startY, WHITE);
+        startY += height;
     }
-
-
-    // for (int i = 0; i < NO_OF_CLOUDS; ++i) {
-
-    // }
 }
