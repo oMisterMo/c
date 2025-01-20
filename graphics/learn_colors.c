@@ -10,8 +10,8 @@
 #define NO_OF_CARDS 4
 #define NO_OF_CLOUDS 4      // fixed
 
-#define TRAY_WIDTH 175
-#define TRAY_HEIGHT 140
+#define TRAY_WIDTH 250
+#define TRAY_HEIGHT 183
 #define CARD_WIDTH 150      // min size = 150 = size of check texture
 #define CARD_HEIGHT 180
 
@@ -32,6 +32,7 @@
 #define isDrawBackground true
 #define isPrarallaxBackground true
 #define isShowCursor true
+#define isDrawTray true
 
 
 
@@ -58,7 +59,7 @@ int main() {
     // int screenHeight = 768;
     int screenWidth = 960;
     int screenHeight = 600;
-    SetConfigFlags( FLAG_WINDOW_UNDECORATED );
+    // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
@@ -79,6 +80,9 @@ int main() {
     }
     Texture2D cursor = LoadTexture("resources/ui/icon_hand_1.png");
     Texture2D cursorPressed = LoadTexture("resources/ui/icon_hand_2.png");
+    Texture2D tray = LoadTexture("resources/sprites/tray.png");
+    // tray.width = TRAY_WIDTH * 1.5;
+    // tray.height = TRAY_HEIGHT * 1.5;
 
     // Game vars
     double increment = 0.0;
@@ -214,7 +218,12 @@ int main() {
 
         // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
         for (int i = 0; i < NO_OF_TRAYS; ++i) {
-            DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
+            if (isDrawTray) {
+                Rectangle rect = trays[i];
+                DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
+            } else {
+                DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
+            }
         }
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
@@ -246,6 +255,7 @@ int main() {
     }
     UnloadTexture(cursor);
     UnloadTexture(cursorPressed);
+    UnloadTexture(tray);
     CloseWindow();
 
 
