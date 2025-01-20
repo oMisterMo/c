@@ -7,19 +7,26 @@
 #define MAX_GESTURE_STRINGS   20
 
 #define NO_OF_TRAYS 3
+#define NO_OF_CARDS 4
+#define NO_OF_CLOUDS 4      // fixed
+
 #define TRAY_WIDTH 175
 #define TRAY_HEIGHT 140
-#define MIN_NO_OF_TRAYS 2
-#define MAX_NO_OF_TRAYS 8
-
-#define NO_OF_CARDS 4
 #define CARD_WIDTH 150      // min size = 150 = size of check texture
 #define CARD_HEIGHT 180
 
 #define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
 
-#define NO_OF_CLOUDS 4
+
+
+
+
+#define MIN_NO_OF_TRAYS 2   // unused
+#define MAX_NO_OF_TRAYS 8   // unused
+
+
+
 
 // Presentation
 #define isDrawBackground true
