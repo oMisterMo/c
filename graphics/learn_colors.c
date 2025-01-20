@@ -24,6 +24,10 @@
 // Presentation
 #define isDrawBackground true
 #define isPrarallaxBackground true
+#define isShowCursor true
+
+
+
 
 struct Card {
     Vector2 originalPosition;
@@ -51,6 +55,12 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
+    // if (isShowCursor) {
+    //     // Cursor stuff not working :(
+    //     HideCursor();
+    //     // DisableCursor();
+    //     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
+    // }
 
     // Initialization
 
@@ -60,6 +70,8 @@ int main() {
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
         clouds[i] = LoadTexture(TextFormat("resources/backgrounds/clouds_%d.png", i + 1));
     }
+    Texture2D cursor = LoadTexture("resources/ui/icon_hand_1.png");
+    Texture2D cursorPressed = LoadTexture("resources/ui/icon_hand_2.png");
 
     // Game vars
     double increment = 0.0;
@@ -209,6 +221,13 @@ int main() {
         }
         DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 
+        if (isShowCursor && IsCursorOnScreen()) {
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+                DrawTexture(cursorPressed, GetMouseX() - 17, GetMouseY() - 17, WHITE);
+            } else {
+                DrawTexture(cursor, GetMouseX() - 17, GetMouseY() - 17, WHITE);
+            }
+        }
 
         EndDrawing();
 
@@ -218,6 +237,8 @@ int main() {
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
         UnloadTexture(clouds[i]);
     }
+    UnloadTexture(cursor);
+    UnloadTexture(cursorPressed);
     CloseWindow();
 
 
