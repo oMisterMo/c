@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 
 #define MAX_TOUCH_POINTS 10
 #define MAX_GESTURE_STRINGS   20
@@ -18,6 +19,8 @@
 #define GAP 150             // Space between cards & trays
 #define PADDING 70          // Space above & below
 
+#define NO_OF_CLOUDS 4
+
 struct Card {
     Vector2 originalPosition;
     Rectangle rect;
@@ -31,6 +34,8 @@ void initCards(struct Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX);
 void reset(int *score);
 
+void drawBackground(Texture2D clouds[]);
+
 int main() {
 
     // Setup config
@@ -42,7 +47,16 @@ int main() {
 
 
     // Initialization
+
+    // Textures
     Texture2D check = LoadTexture("resources/sprites/check.png");
+    Texture2D clouds[NO_OF_CLOUDS];
+    clouds[0] = LoadTexture("resources/backgrounds/clouds_1.png");;
+    clouds[1] = LoadTexture("resources/backgrounds/clouds_2.png");;
+    clouds[2] = LoadTexture("resources/backgrounds/clouds_3.png");;
+    clouds[3] = LoadTexture("resources/backgrounds/clouds_4.png");;
+
+    // Game vars
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
     struct Card cards[NO_OF_CARDS];
@@ -160,6 +174,8 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        drawBackground(clouds);
+
 
         // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
         for (int i = 0; i < NO_OF_TRAYS; ++i) {
@@ -183,6 +199,9 @@ int main() {
     }
 
     UnloadTexture(check);
+    for (int i = 0; i < NO_OF_CLOUDS; ++i) {
+        UnloadTexture(clouds[i]);
+    }
     CloseWindow();
 
 
@@ -224,4 +243,28 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
 
 void reset(int *score) {
     *score = 0;
+}
+
+
+// Draw
+void drawBackground(Texture2D layers[]) {
+    int width = layers[0].width;
+    int height = layers[0].height;
+    int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
+    int startX = -200;
+    int startY = GetScreenHeight() - height;
+
+    // printf("--------------------\n");
+    // printf("screen / width, %d / %d\n", GetScreenWidth(), width);
+    // printf("X layers needed: %d\n", X_REAPEAT);
+    // printf("--------------------\n");
+
+    for (int i = 0; i < X_REAPEAT; ++i) {
+        DrawTexture(layers[0], startX + ( i * width ), startY, WHITE);
+    }
+
+
+    // for (int i = 0; i < NO_OF_CLOUDS; ++i) {
+
+    // }
 }
