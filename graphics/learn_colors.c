@@ -51,6 +51,8 @@ void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
+void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
+void drawCards(struct Card cards[], Texture2D check);
 
 int main() {
 
@@ -215,26 +217,9 @@ int main() {
             drawBackground(clouds, increment, order);
         }
 
+        drawTrays(trays, tray, colors);
+        drawCards(cards, check);
 
-        for (int i = 0; i < NO_OF_TRAYS; ++i) {
-            if (isDrawTray) {
-                // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
-                Rectangle rect = trays[i];
-                DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
-            } else {
-                DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
-            }
-        }
-        for (int i = 0; i < NO_OF_CARDS; ++i) {
-            DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
-            DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
-            if (cards[i].hasTouchedEndZone) {
-                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
-                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
-                DrawTexture(check, x, y, WHITE);
-            }
-        }
         DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 
         if (isShowCursor && IsCursorOnScreen()) {
@@ -330,5 +315,30 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
         startY += height / 1.6;
         row++;
 
+    }
+}
+
+void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
+    for (int i = 0; i < NO_OF_TRAYS; ++i) {
+        if (isDrawTray) {
+            // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
+            Rectangle rect = trays[i];
+            DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
+        } else {
+            DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
+        }
+    }
+}
+
+void drawCards(struct Card cards[], Texture2D check) {
+    for (int i = 0; i < NO_OF_CARDS; ++i) {
+        DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
+        DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
+        if (cards[i].hasTouchedEndZone) {
+            int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
+            int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+            DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+            DrawTexture(check, x, y, WHITE);
+        }
     }
 }
