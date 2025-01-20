@@ -119,7 +119,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         frameCounter++;
-        increment += 0.02;
+        increment += 0.02 / 25;
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
         if (IsKeyPressed(KEY_R)) {
@@ -320,7 +320,7 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
         int speed = 0;
 
         if (isPrarallaxBackground) {
-            speed = (sin(increment / 25 * index) * clampedW) + clampedW; // 0 > speed > 900
+            speed = (sin(increment * index) * clampedW) + clampedW; // 0 < speed < 900
         }
 
         int xPos = startX - speed;
