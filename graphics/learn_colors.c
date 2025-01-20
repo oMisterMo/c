@@ -47,7 +47,7 @@ struct Card {
 };
 
 void initCards(struct Card cards[], int trayStartX, Color colors[]);
-void initTrays(Rectangle trays[], int trayStartX);
+void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
@@ -93,7 +93,7 @@ int main() {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
 
-    initTrays(trays, trayStartX);
+    initTrays(trays, trayStartX, &tray);
     initCards(cards, cardStartX, colors);
 
     // ================================================
@@ -216,9 +216,9 @@ int main() {
         }
 
 
-        // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
         for (int i = 0; i < NO_OF_TRAYS; ++i) {
             if (isDrawTray) {
+                // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
                 Rectangle rect = trays[i];
                 DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
             } else {
@@ -262,7 +262,7 @@ int main() {
     return 0;
 }
 
-void initTrays(Rectangle trays[], int trayStartX) {
+void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray) {
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         trays[i] = (Rectangle) {
             trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
@@ -270,6 +270,8 @@ void initTrays(Rectangle trays[], int trayStartX) {
             TRAY_WIDTH,
             TRAY_HEIGHT
         };
+        tray->width = TRAY_WIDTH;
+        tray->height = TRAY_HEIGHT;
     }
 }
 
