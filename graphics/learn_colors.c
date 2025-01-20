@@ -21,6 +21,10 @@
 
 #define NO_OF_CLOUDS 4
 
+// Presentation
+#define isDrawBackground true
+#define isPrarallaxBackground true
+
 struct Card {
     Vector2 originalPosition;
     Rectangle rect;
@@ -184,7 +188,9 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds, increment, order);
+        if (isDrawBackground) {
+            drawBackground(clouds, increment, order);
+        }
 
 
         // DrawRectangle(trays[0].rect.x, trays[0].rect.y, trays[0].rect.width, trays[0].rect.height, RED);
@@ -271,8 +277,11 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
 
         int index = order[row % 4];
         int clampedW = (width - GetScreenWidth()) / 2;
-        int speed = (sin(increment / 25 * index) * clampedW) + clampedW; // 0 > speed > 900
-        // speed = 0;
+        int speed = 0;
+
+        if (isPrarallaxBackground) {
+            speed = (sin(increment / 25 * index) * clampedW) + clampedW; // 0 > speed > 900
+        }
 
         int xPos = startX - speed;
 
