@@ -57,6 +57,7 @@ void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(struct Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
+void drawScore(int score);
 
 int main() {
 
@@ -66,6 +67,9 @@ int main() {
     int screenWidth = 960;
     int screenHeight = 600;
     // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
+    printf("-------------------\n");
+    printf("INIT WINDOW\n");
+    printf("-------------------\n");
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
 
@@ -79,6 +83,9 @@ int main() {
     // Initialization
 
     // Textures
+    printf("-------------------\n");
+    printf("LOAD TEXTURES\n");
+    printf("-------------------\n");
     Texture2D check = LoadTexture("resources/sprites/check.png");
     Texture2D clouds[NO_OF_CLOUDS];
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
@@ -125,6 +132,10 @@ int main() {
     }
 
     SetTargetFPS(60);
+
+    printf("-------------------\n");
+    printf("GAME\n");
+    printf("-------------------\n");
 
     while(!WindowShouldClose()) {
         frameCounter++;
@@ -224,13 +235,15 @@ int main() {
         drawTrays(trays, tray, colors);
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
-
-        DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
+        drawScore(score);
 
         EndDrawing();
 
     }
 
+    printf("-------------------\n");
+    printf("DESTROY\n");
+    printf("-------------------\n");
     UnloadTexture(check);
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
         UnloadTexture(clouds[i]);
@@ -363,4 +376,8 @@ void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
             DrawTexture(cursor, GetMouseX() - 17, GetMouseY() - 17, WHITE);
         }
     }
+}
+
+void drawScore(int score) {
+    DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 }
