@@ -217,10 +217,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        if (isDrawBackground) {
-            drawBackground(clouds, increment, order);
-        }
-
+        drawBackground(clouds, increment, order);
         drawTrays(trays, tray, colors);
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
@@ -287,32 +284,34 @@ void reset(int *score) {
 
 // Draw
 void drawBackground(Texture2D layers[], double increment, int order[]) {
-    int width = layers[0].width;
-    int height = layers[0].height;
-    int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
-    int startX = 0;
-    int startY = -height / 2 ;
+    if (isDrawBackground) {
+        int width = layers[0].width;
+        int height = layers[0].height;
+        int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
+        int startX = 0;
+        int startY = -height / 2 ;
 
-    int row = 0;
+        int row = 0;
 
-    // For each layer on the y axis
-    while (startY < GetScreenHeight() + height * 2) {
+        // For each layer on the y axis
+        while (startY < GetScreenHeight() + height * 2) {
 
-        int index = order[row % 4];
-        int clampedW = (width - GetScreenWidth()) / 2;
-        int speed = 0;
+            int index = order[row % 4];
+            int clampedW = (width - GetScreenWidth()) / 2;
+            int speed = 0;
 
-        if (isPrarallaxBackground) {
-            speed = (sin(increment * index) * clampedW) + clampedW; // 0 < speed < 900
+            if (isPrarallaxBackground) {
+                speed = (sin(increment * index) * clampedW) + clampedW; // 0 < speed < 900
+            }
+
+            int xPos = startX - speed;
+
+            DrawTexture(layers[index], xPos, startY, WHITE);
+
+            startY += height / 1.6;
+            row++;
+
         }
-
-        int xPos = startX - speed;
-
-        DrawTexture(layers[index], xPos, startY, WHITE);
-
-        startY += height / 1.6;
-        row++;
-
     }
 }
 
