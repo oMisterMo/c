@@ -34,6 +34,8 @@
 #define isShowCursor true
 #define isDrawTray true
 
+#define isOff false   // global flag to turn all examples off
+
 
 
 
@@ -284,7 +286,7 @@ void reset(int *score) {
 
 // Draw
 void drawBackground(Texture2D layers[], double increment, int order[]) {
-    if (isDrawBackground) {
+    if (isDrawBackground && !isOff) {
         int width = layers[0].width;
         int height = layers[0].height;
         int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
@@ -300,7 +302,7 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
             int clampedW = (width - GetScreenWidth()) / 2;
             int speed = 0;
 
-            if (isPrarallaxBackground) {
+            if (isPrarallaxBackground && !isOff) {
                 speed = (sin(increment * index) * clampedW) + clampedW; // 0 < speed < 900
             }
 
@@ -317,7 +319,7 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
 
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        if (isDrawTray) {
+        if (isDrawTray && !isOff) {
             // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
             Rectangle rect = trays[i];
             DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
@@ -342,7 +344,7 @@ void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
 }
 
 void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
-    if (isShowCursor && IsCursorOnScreen()) {
+    if (isShowCursor && IsCursorOnScreen() && !isOff) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             DrawTexture(cursorPressed, GetMouseX() - 17, GetMouseY() - 17, WHITE);
         } else {
