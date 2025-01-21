@@ -33,6 +33,7 @@
 #define isPrarallaxBackground true
 #define isShowCursor true
 #define isDrawTray true
+#define isDrawCard false
 
 #define isOff false   // global flag to turn all examples off
 
@@ -332,14 +333,24 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
 
 void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
-        // DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
-        DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
-        DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
-        if (cards[i].hasTouchedEndZone) {
-            int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
-            int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-            DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
-            DrawTexture(check, x, y, WHITE);
+        if (isDrawCard) {
+            DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
+            DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
+            if (cards[i].hasTouchedEndZone) {
+                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
+                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+                DrawTexture(check, x, y, WHITE);
+            }
+        } else {
+            DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
+            DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
+            if (cards[i].hasTouchedEndZone) {
+                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
+                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+                DrawTexture(check, x, y, WHITE);
+            }
         }
     }
 }
