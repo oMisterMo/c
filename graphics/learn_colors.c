@@ -53,6 +53,7 @@ void reset(int *score);
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(struct Card cards[], Texture2D check, Texture2D border);
+void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 
 int main() {
 
@@ -222,16 +223,9 @@ int main() {
 
         drawTrays(trays, tray, colors);
         drawCards(cards, check, border);
+        drawCursor(cursor, cursorPressed);
 
         DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
-
-        if (isShowCursor && IsCursorOnScreen()) {
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                DrawTexture(cursorPressed, GetMouseX() - 17, GetMouseY() - 17, WHITE);
-            } else {
-                DrawTexture(cursor, GetMouseX() - 17, GetMouseY() - 17, WHITE);
-            }
-        }
 
         EndDrawing();
 
@@ -344,6 +338,16 @@ void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
             int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
             DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
             DrawTexture(check, x, y, WHITE);
+        }
+    }
+}
+
+void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
+    if (isShowCursor && IsCursorOnScreen()) {
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            DrawTexture(cursorPressed, GetMouseX() - 17, GetMouseY() - 17, WHITE);
+        } else {
+            DrawTexture(cursor, GetMouseX() - 17, GetMouseY() - 17, WHITE);
         }
     }
 }
