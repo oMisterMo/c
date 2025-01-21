@@ -72,13 +72,15 @@ int main() {
     printf("-------------------\n");
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
+    SetMousePosition(0, 0);
 
-    // if (isShowCursor) {
-    //     // Cursor stuff not working :(
-    //     HideCursor();
-    //     // DisableCursor();
-    //     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
-    // }
+    if (isShowCursor) {
+        // Cursor stuff not working :(
+        // HideCursor();
+        // DisableCursor();
+        // SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
+        SetMouseOffset(-17, -17);
+    }
 
     // Initialization
 
@@ -371,9 +373,9 @@ void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
 void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
     if (isShowCursor && IsCursorOnScreen() && !isOff) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            DrawTexture(cursorPressed, GetMouseX() - 17, GetMouseY() - 17, WHITE);
+            DrawTexture(cursorPressed, GetMouseX(), GetMouseY(), WHITE);
         } else {
-            DrawTexture(cursor, GetMouseX() - 17, GetMouseY() - 17, WHITE);
+            DrawTexture(cursor, GetMouseX(), GetMouseY(), WHITE);
         }
     }
 }
