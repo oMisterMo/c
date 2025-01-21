@@ -322,6 +322,7 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
         if (isDrawTray && !isOff) {
             // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
             Rectangle rect = trays[i];
+            DrawTextureV(tray, (Vector2){rect.x - 7, rect.y + 7}, BLACK);
             DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
         } else {
             DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
@@ -331,7 +332,7 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
 
 void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
-        DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
+        // DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
         DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
         DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
         if (cards[i].hasTouchedEndZone) {
