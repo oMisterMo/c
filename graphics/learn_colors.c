@@ -12,8 +12,8 @@
 
 #define TRAY_WIDTH 250
 #define TRAY_HEIGHT 183
-#define CARD_WIDTH 150      // min size = 150 = size of check texture
-#define CARD_HEIGHT 180
+#define CARD_WIDTH 200/2      // min size = 150 = size of check texture
+#define CARD_HEIGHT 200/2
 
 #define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
@@ -52,7 +52,7 @@ void reset(int *score);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
-void drawCards(struct Card cards[], Texture2D check);
+void drawCards(struct Card cards[], Texture2D check, Texture2D border);
 
 int main() {
 
@@ -83,6 +83,9 @@ int main() {
     Texture2D cursor = LoadTexture("resources/ui/icon_hand_1.png");
     Texture2D cursorPressed = LoadTexture("resources/ui/icon_hand_2.png");
     Texture2D tray = LoadTexture("resources/sprites/tray.png");
+    Texture2D border = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
+    border.width /= 4;
+    border.height /= 4;
     // tray.width = TRAY_WIDTH * 1.5;
     // tray.height = TRAY_HEIGHT * 1.5;
 
@@ -218,7 +221,7 @@ int main() {
         }
 
         drawTrays(trays, tray, colors);
-        drawCards(cards, check);
+        drawCards(cards, check, border);
 
         DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 
@@ -241,6 +244,7 @@ int main() {
     UnloadTexture(cursor);
     UnloadTexture(cursorPressed);
     UnloadTexture(tray);
+    UnloadTexture(border);
     CloseWindow();
 
 
@@ -330,10 +334,11 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
     }
 }
 
-void drawCards(struct Card cards[], Texture2D check) {
+void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 5, ColorAlpha(GRAY, 0.4f));
         DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
+        DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
         if (cards[i].hasTouchedEndZone) {
             int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
             int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
