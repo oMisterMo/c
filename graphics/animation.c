@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include <stdio.h>
 
 typedef struct Spritesheet {
     int totalFrames;
@@ -8,22 +9,39 @@ typedef struct Spritesheet {
     int frameSpeed;
 } Spritesheet;
 
+void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
+    // printf("%p\n", bunnySheet);
+    bunnySheet->frameCounter++;
+
+    if (bunnySheet->frameCounter >= (60 / bunnySheet->frameSpeed)) {
+        bunnySheet->frameCounter = 0;
+        bunnySheet->frameIndex++;
+
+        // I don't want to display the last frame
+        if (bunnySheet->frameIndex > bunnySheet->totalFrames - 2) bunnySheet->frameIndex = 0;
+
+        bunnySheet->frameRec.x = (float) bunnySheet->frameIndex * (float) bunnyTexture.width / bunnySheet->totalFrames;
+    }
+}
+
 int main() {
 
     InitWindow(1600, 768, "Animation");
     SetWindowMonitor(2);
 
-    Texture2D jumpbunny = LoadTexture("resources/sprites/jumpbunny_anim1.png");
+    Texture2D bunnyTexture = LoadTexture("resources/sprites/jumpbunny_anim1.png");
     Texture2D slime  = LoadTexture("resources/sprites/slime_green.png");
     slime.width *= 8;
     slime.height *= 8;
 
     //============================
     int TOTAL_FRAMES_BUNNY = 9;
-    Rectangle frameRec = { 0, 0, jumpbunny.width / TOTAL_FRAMES_BUNNY, jumpbunny.height };
-
-    //============================
-    Spritesheet bunnySheet = { TOTAL_FRAMES_BUNNY, frameRec, 0, 0, 5 };
+    Spritesheet bunnySheet = {
+        TOTAL_FRAMES_BUNNY,
+        (Rectangle){ 0, 0, bunnyTexture.width / TOTAL_FRAMES_BUNNY, bunnyTexture.height },
+        0, 0, 5
+    };
+    // printf("**%p**\n", &bunnySheet);
     //============================
 
 
@@ -32,17 +50,7 @@ int main() {
     // Game Loop
     while (!WindowShouldClose()) {
         // Update
-        bunnySheet.frameCounter++;
-
-        if (bunnySheet.frameCounter >= (60 / bunnySheet.frameSpeed)) {
-            bunnySheet.frameCounter = 0;
-            bunnySheet.frameIndex++;
-
-            // I don't want to display the last frame
-            if (bunnySheet.frameIndex > TOTAL_FRAMES_BUNNY - 2) bunnySheet.frameIndex = 0;
-
-            frameRec.x = (float) bunnySheet.frameIndex * (float) jumpbunny.width / TOTAL_FRAMES_BUNNY;
-        }
+        updateBunny(&bunnySheet, bunnyTexture);
 
 
 
@@ -55,8 +63,8 @@ int main() {
 
 
 
-        DrawTextureRec(jumpbunny, frameRec, (Vector2) { 0 } , WHITE);
-        DrawTexture(slime, 0, jumpbunny.height , WHITE);
+        DrawTextureRec(bunnyTexture, bunnySheet.frameRec, (Vector2) { 0 } , WHITE);
+        DrawTexture(slime, 0, bunnyTexture.height , WHITE);
 
 
 
@@ -67,7 +75,7 @@ int main() {
 
 
 
-    UnloadTexture(jumpbunny);
+    UnloadTexture(bunnyTexture);
     UnloadTexture(slime);
     CloseWindow();
 
