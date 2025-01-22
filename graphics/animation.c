@@ -4,7 +4,7 @@
 typedef struct Spritesheet {
     int totalFrames;
     Rectangle frameRec;     // Draw a part of a texture defined by a rectangle
-    int frameIndex;         // Current frame from 0 -> TOTAL_FRAMES - 1
+    int frameIndex;         // The current frame, ranges from 0 to TOTAL_FRAMES - 1
     int frameCounter;
     int frameSpeed;
 } Spritesheet;
@@ -52,6 +52,7 @@ int main() {
     Texture2D bunnyTexture = LoadTexture("resources/sprites/jumpbunny_anim1.png");
     Texture2D slime  = LoadTexture("resources/sprites/slime_green.png");
     Texture2D buttonTexture  = LoadTexture("resources/sprites/button.png");
+
     slime.width *= 8;
     slime.height *= 8;
 
@@ -62,7 +63,6 @@ int main() {
         (Rectangle){ 0, 0, bunnyTexture.width / TOTAL_FRAMES_BUNNY, bunnyTexture.height },
         0, 0, 5
     };
-    // printf("**%p**\n", &bunnySheet);
     //============================
     int TOTAL_FRAMES_BUTTON = 3;
     Spritesheet buttonSheet = {
@@ -75,10 +75,10 @@ int main() {
     SetTargetFPS(60);
     // Game Loop
     while (!WindowShouldClose()) {
+
         // Update
         updateBunny(&bunnySheet, bunnyTexture);
         updateButton(&buttonSheet, buttonTexture);
-
 
         // Draw
         BeginDrawing();
@@ -89,6 +89,7 @@ int main() {
         DrawTexture(slime, 0, bunnyTexture.height , WHITE);
 
         EndDrawing();
+
     }
 
     UnloadTexture(bunnyTexture);
