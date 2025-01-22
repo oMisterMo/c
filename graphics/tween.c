@@ -97,7 +97,7 @@ void updateMo(Item *mo) {
 }
 void drawMo(Item mo) {
     // Draw Mo
-    DrawRectangleRec(mo.bounds, WHITE);
+    // DrawRectangleRec(mo.bounds, WHITE);
     DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
     DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
 }
