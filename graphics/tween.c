@@ -15,18 +15,13 @@
 #define MAX(a, b) (a > b ? a : b)
 #define MIN(a, b) (a < b ? a : b)
 
-int normalize(int value, int min, int max);
-float lerp(float norm, int min, int max);
-void logger(int frameCounter);
-float linearTween(float currentTime, float start, float change, float duration);
-
 typedef enum {
     IDLE = 0,
     TWEENING
 } TweenState;
 
 typedef struct Tween {
-    Vector2 startPosition;    // Tween start
+    Vector2 startPosition;      // Tween start
     Vector2 targetPosition;     // Tween end [could be consts]
     int state;                  // IDLE | TWEENING
     int frameCounter;           // Current time in tween
@@ -47,6 +42,54 @@ typedef struct Item {
     Tween tween;
 } Item;
 
+int normalize(int value, int min, int max);
+float lerp(float norm, int min, int max);
+void logger(int frameCounter);
+float linearTween(float currentTime, float start, float change, float duration);
+
+void handleInput(int *state, Rectangle rect, Vector2 center, Item *mo) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        printf("yes\n");
+        // reset original
+        *state = 0;
+        rect.x = 0;
+        rect.y = center.y;
+
+        // reset mo
+        printf("=> %p\n", mo);
+        mo->tween.state = TWEENING;
+    }
+}
+
+void updateMo(Item *mo) {
+        if (mo->tween.state == TWEENING) {
+            mo->tween.frameCounter++;
+
+            // Tween
+            mo->position.x  = EaseElasticInOut(
+                (float) mo->tween.frameCounter,
+                mo->tween.startPosition.x,
+                mo->tween.targetPosition.x - mo->tween.startPosition.x,
+                mo->tween.duration
+            );
+
+            // Tween complete
+            if (mo->tween.frameCounter > mo->tween.duration) {
+                mo->tween.frameCounter = 0;
+                mo->tween.state = IDLE;
+
+
+                printf("Final pos x: %f\n", mo->position.x);
+                mo->position.x = mo->tween.targetPosition.x;
+                printf("Final pos x: %f\n", mo->position.x);
+            }
+        }
+}
+
+void drawMo(Item mo) {
+    // Draw Mo
+    DrawTextureV(mo.texture, mo.position, WHITE);
+}
 
 int main() {
 
@@ -65,7 +108,7 @@ int main() {
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
 
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
-    Rectangle item = { START_X, START_Y, RECT_WIDTH, RECT_HEIGHT };
+    Rectangle rect = { START_X, START_Y, RECT_WIDTH, RECT_HEIGHT };
 
     Vector2 pos = { 0, center.y  - bunny.height / 2 };
     Tween leftToRight = {
@@ -78,9 +121,8 @@ int main() {
 
 
     Item mo = { bunny, pos, leftToRight };
+    printf("original => %p\n", &mo);
     
-
-
 
 
     int frameCounter = 0;
@@ -97,24 +139,15 @@ int main() {
         // ---------------------------------------------
         // Input
         // ---------------------------------------------
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            printf("yes\n");
-            // reset original
-            state = 0;
-            item.x = 0;
-            item.y = center.y;
-
-            // reset mo
-            mo.tween.state = TWEENING;
-        }
+        handleInput(&state, rect, center, &mo);
 
         // ---------------------------------------------
         // Update
         // ---------------------------------------------
         if (state == 0) {
             frameCounter++;
-            item.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
-            item.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
+            rect.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
+            rect.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
 
             if (frameCounter > duration) {
                 frameCounter = 0;
@@ -122,28 +155,7 @@ int main() {
             }
         }
 
-        if (mo.tween.state == TWEENING) {
-            mo.tween.frameCounter++;
-
-            // Tween
-            mo.position.x  = EaseElasticInOut(
-                (float) mo.tween.frameCounter,
-                mo.tween.startPosition.x,
-                mo.tween.targetPosition.x - mo.tween.startPosition.x,
-                mo.tween.duration
-            );
-
-            // Tween complete
-            if (mo.tween.frameCounter > mo.tween.duration) {
-                mo.tween.frameCounter = 0;
-                mo.tween.state = IDLE;
-
-
-                printf("Final pos x: %f\n", mo.position.x);
-                mo.position.x = mo.tween.targetPosition.x;
-                printf("Final pos x: %f\n", mo.position.x);
-            }
-        }
+        updateMo(&mo);
 
         // ---------------------------------------------
         // Draw
@@ -155,16 +167,15 @@ int main() {
 
 
         // Draw a single rect
-        DrawRectangleRec(item, BLUE);
-        DrawRectangleLinesEx(item, 2, WHITE);
+        DrawRectangleRec(rect, BLUE);
+        DrawRectangleLinesEx(rect, 2, WHITE);
 
-        // Draw Mo
-        DrawTextureV(mo.texture, mo.position, WHITE);
-
+        drawMo(mo);
 
 
 
-        DrawText(TextFormat("x %.1f\ny %.1f", item.x, item.y), 20, 20, 50, WHITE);
+
+        DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), 20, 20, 50, WHITE);
         EndDrawing();
     }
 
