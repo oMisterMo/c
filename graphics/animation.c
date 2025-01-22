@@ -1,5 +1,13 @@
 #include "raylib.h"
 
+typedef struct Spritesheet {
+    int totalFrames;
+    Rectangle frameRec;     // Rec source to draw
+    int frameIndex;         // Current frame from 0 -> TOTAL_FRAMES - 1
+    int frameCounter;
+    int frameSpeed;
+} Spritesheet;
+
 int main() {
 
     InitWindow(1600, 768, "Animation");
@@ -9,29 +17,36 @@ int main() {
     Texture2D slime  = LoadTexture("resources/sprites/slime_green.png");
     slime.width *= 8;
     slime.height *= 8;
-    int TOTAL_FRAMES_BUNNY = 9;
 
     //============================
+    int TOTAL_FRAMES_BUNNY = 9;
     Rectangle frameRec = { 0, 0, jumpbunny.width / TOTAL_FRAMES_BUNNY, jumpbunny.height };
-    int currentFrame = 0;       // Frame index 0 -> TOTAL_FRAMES - 1
-    int frameCounter = 0;
-    int frameSpeed = 5;
+
+    //============================
+    Spritesheet bunnySheet = { TOTAL_FRAMES_BUNNY, frameRec, 0, 0, 5 };
+    //============================
+
+
 
     SetTargetFPS(60);
     // Game Loop
     while (!WindowShouldClose()) {
         // Update
-        frameCounter++;
+        bunnySheet.frameCounter++;
 
-        if (frameCounter >= (60 / frameSpeed)) {
-            frameCounter = 0;
-            currentFrame++;
+        if (bunnySheet.frameCounter >= (60 / bunnySheet.frameSpeed)) {
+            bunnySheet.frameCounter = 0;
+            bunnySheet.frameIndex++;
 
             // I don't want to display the last frame
-            if (currentFrame > TOTAL_FRAMES_BUNNY - 2) currentFrame = 0;
+            if (bunnySheet.frameIndex > TOTAL_FRAMES_BUNNY - 2) bunnySheet.frameIndex = 0;
 
-            frameRec.x = (float) currentFrame * (float) jumpbunny.width / TOTAL_FRAMES_BUNNY;
+            frameRec.x = (float) bunnySheet.frameIndex * (float) jumpbunny.width / TOTAL_FRAMES_BUNNY;
         }
+
+
+
+
 
         // Draw
         BeginDrawing();
