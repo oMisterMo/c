@@ -178,42 +178,45 @@ int main() {
                 }
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                cards[i].isDragging = false;
 
-                bool hit = false;
-                int sum = 0;
+                if (cards[i].isDragging) {
+                    cards[i].isDragging = false;
 
-                for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                    if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
-                        hit = true;
-                        ++counter;
-                        break;
+                    bool hit = false;
+                    int sum = 0;
+
+                    for (int j = 0; j < NO_OF_TRAYS; ++j) {
+                        if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
+                            hit = true;
+                            ++counter;
+                            break;
+                        }
                     }
-                }
 
-                // Increment score or reset card position
-                if (hit) {
-                    if (cards[i].hasTouchedEndZone) continue;
-                    printf("HIT %d\n", counter);
-                    if (!cards[i].hasScore) {
-                        ++score;
+                    // Increment score or reset card position
+                    if (hit) {
+                        if (cards[i].hasTouchedEndZone) continue;
+                        printf("HIT %d\n", counter);
+                        if (!cards[i].hasScore) {
+                            ++score;
+                        }
+                        cards[i].hasTouchedEndZone = true;
+                        cards[i].hasScore = true;
+                    } else {
+                        printf("Reset Card...\n");
+                        cards[i].rect.x = cards[i].originalPosition.x;
+                        cards[i].rect.y = cards[i].originalPosition.y;
                     }
-                    cards[i].hasTouchedEndZone = true;
-                    cards[i].hasScore = true;
-                } else {
-                    printf("Reset Card...\n");
-                    cards[i].rect.x = cards[i].originalPosition.x;
-                    cards[i].rect.y = cards[i].originalPosition.y;
-                }
 
-                // Have all cards been moved to the correct zone?
-                for (int j = 0; j < NO_OF_CARDS; ++j) {
-                    sum += cards[j].hasTouchedEndZone;
-                }
+                    // Have all cards been moved to the correct zone?
+                    for (int j = 0; j < NO_OF_CARDS; ++j) {
+                        sum += cards[j].hasTouchedEndZone;
+                    }
 
-                // Yes? Reset cards
-                if (sum >= NO_OF_CARDS) {
-                    initCards(cards, cardStartX, colors);
+                    // Yes? Reset cards
+                    if (sum >= NO_OF_CARDS) {
+                        initCards(cards, cardStartX, colors);
+                    }
                 }
                     
             }
