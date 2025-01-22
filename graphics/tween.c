@@ -83,7 +83,6 @@ void updateMo(Item *mo) {
             }
         }
 }
-
 void drawMo(Item mo) {
     // Draw Mo
     DrawTextureV(mo.texture, mo.position, WHITE);
@@ -107,7 +106,7 @@ void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, 
 }
 void drawRect(Rectangle rect) {
     // Draw a single rect
-    DrawRectangleRec(rect, BLUE);
+    DrawRectangleRec(rect, ORANGE);
     DrawRectangleLinesEx(rect, 2, WHITE);
     DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), rect.x + 5, rect.y - 50, 20, WHITE);
 }
@@ -172,7 +171,7 @@ int main() {
         // Draw
         // ---------------------------------------------
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(SKYBLUE);
 
 
 
