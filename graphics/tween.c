@@ -42,89 +42,14 @@ typedef struct Item {
 
 int normalize(int value, int min, int max);
 float lerp(float norm, int min, int max);
-void logger(int frameCounter);
 float linearTween(float currentTime, float start, float change, float duration);
+void logger(int frameCounter);
 
-void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        printf("left mouse pressed...\n");
-        if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
-            // reset mo
-            mo->tween.state = TWEENING;
-            return;
-        }
-        if (CheckCollisionPointRec(GetMousePosition(), *rect)) {
-            // reset rect
-            *state = TWEENING;
-            rect->x = 0;
-            rect->y = center.y;
-            return;
-        }
-
-        // Reset all
-        // reset rect
-        *state = TWEENING;
-        rect->x = 0;
-        rect->y = center.y;
-
-        // reset mo
-        mo->tween.state = TWEENING;
-    }
-}
-
-void updateMo(Item *mo) {
-        if (mo->tween.state == TWEENING) {
-            mo->tween.frameCounter++;
-
-            // Tween
-            mo->bounds.x  = EaseElasticInOut(
-                (float) mo->tween.frameCounter,
-                mo->tween.startPosition.x,
-                mo->tween.targetPosition.x - mo->tween.startPosition.x,
-                mo->tween.duration
-            );
-
-            // Tween complete
-            if (mo->tween.frameCounter > mo->tween.duration) {
-                mo->tween.frameCounter = 0;
-                mo->tween.state = IDLE;
-
-
-                // Set final position
-                mo->bounds.x = mo->tween.startPosition.x;
-            }
-        }
-}
-void drawMo(Item mo) {
-    // Draw Mo
-    // DrawRectangleRec(mo.bounds, WHITE);
-    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
-    DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
-}
-
-void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
-    // printf("rect => %p\n", rect);
-    if (*state == TWEENING) {
-
-        (*frameCounter)++;
-
-        rect->x  = EaseLinearIn((float) *frameCounter, start.x, end.x - start.x,  duration);
-        rect->y  = EaseLinearIn((float) *frameCounter, start.y, end.y - start.y,  duration);
-
-        if (*frameCounter > duration) {
-            *frameCounter = 0;
-            *state = IDLE;
-
-            rect->x = start.x;
-        }
-    }
-}
-void drawRect(Rectangle rect) {
-    // Draw a single rect
-    DrawRectangleRec(rect, ORANGE);
-    DrawRectangleLinesEx(rect, 2, WHITE);
-    DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), rect.x + 5, rect.y - 50, 20, WHITE);
-}
+void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo);
+void updateMo(Item *mo);
+void drawMo(Item mo);
+void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration);
+void drawRect(Rectangle rect);
 
 int main() {
 
@@ -223,4 +148,87 @@ float lerp(float norm, int min, int max) {
 
 float linearTween(float currentTime, float start, float change, float duration) {
     return change * currentTime / duration + start;
+}
+
+void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        printf("left mouse pressed...\n");
+        if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
+            // reset mo
+            mo->tween.state = TWEENING;
+            return;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), *rect)) {
+            // reset rect
+            *state = TWEENING;
+            rect->x = 0;
+            rect->y = center.y;
+            return;
+        }
+
+        // Reset all
+        // reset rect
+        *state = TWEENING;
+        rect->x = 0;
+        rect->y = center.y;
+
+        // reset mo
+        mo->tween.state = TWEENING;
+    }
+}
+
+void updateMo(Item *mo) {
+        if (mo->tween.state == TWEENING) {
+            mo->tween.frameCounter++;
+
+            // Tween
+            mo->bounds.x  = EaseElasticInOut(
+                (float) mo->tween.frameCounter,
+                mo->tween.startPosition.x,
+                mo->tween.targetPosition.x - mo->tween.startPosition.x,
+                mo->tween.duration
+            );
+
+            // Tween complete
+            if (mo->tween.frameCounter > mo->tween.duration) {
+                mo->tween.frameCounter = 0;
+                mo->tween.state = IDLE;
+
+
+                // Set final position
+                mo->bounds.x = mo->tween.startPosition.x;
+            }
+        }
+}
+
+void drawMo(Item mo) {
+    // Draw Mo
+    // DrawRectangleRec(mo.bounds, WHITE);
+    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
+    DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+}
+
+void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
+    // printf("rect => %p\n", rect);
+    if (*state == TWEENING) {
+
+        (*frameCounter)++;
+
+        rect->x  = EaseLinearIn((float) *frameCounter, start.x, end.x - start.x,  duration);
+        rect->y  = EaseLinearIn((float) *frameCounter, start.y, end.y - start.y,  duration);
+
+        if (*frameCounter > duration) {
+            *frameCounter = 0;
+            *state = IDLE;
+
+            rect->x = start.x;
+        }
+    }
+}
+
+void drawRect(Rectangle rect) {
+    // Draw a single rect
+    DrawRectangleRec(rect, ORANGE);
+    DrawRectangleLinesEx(rect, 2, WHITE);
+    DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), rect.x + 5, rect.y - 50, 20, WHITE);
 }
