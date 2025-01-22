@@ -37,6 +37,7 @@
 #define isDrawTray true
 #define isDrawCard false
 #define isTweenCard true
+#define isAnimateStars true
 
 #define isOff false   // global flag to turn all examples off
 
@@ -203,7 +204,7 @@ int main() {
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
         drawScore(score);
-        if (isAnimating) {
+        if (isAnimating && isAnimateStars && !isOff) {
             DrawTextureRec(stars, starsSheet.frameRec, starsPosition , WHITE);
         }
 
