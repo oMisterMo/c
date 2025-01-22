@@ -284,7 +284,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                     if (cards[i].hasTouchedEndZone) continue;
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
-                        ++score;
+                        ++(*score);
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
