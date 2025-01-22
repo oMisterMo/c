@@ -1,6 +1,9 @@
 #include "raylib.h"
+#include "reasings.h"
+
 #include <stdio.h>
 #include <stdbool.h>
+
 
 #define NO_OF_RECTS 1
 #define NO_OF_SPACES (NO_OF_RECTS + 1)
@@ -10,9 +13,7 @@
 #define TOTAL_WIDTH RECT_WIDTH * NO_OF_RECTS
 
 #define START_X 20
-#define START_Y 1024 / 2 - RECT_HEIGHT / 2
-#define END_X 300
-#define END_Y 300
+#define START_Y 100
 
 
 #define MAX(a, b) (a > b ? a : b)
@@ -21,6 +22,10 @@
 int normalize(int value, int min, int max);
 float lerp(float norm, int min, int max);
 void logger(int frameCounter);
+
+float linearTween(float currentTime, float start, float change, float duration) {
+    return change * currentTime / duration + start;
+}
 
 
 // typedef struct Sprite {
@@ -44,6 +49,8 @@ int main() {
     SetTargetFPS(60);
 
     int frameCounter = 0;
+    int state = 0;
+    int duration = 240;     // 60 * 4 = 4 seconds
 
     float t = 0;  // 0 < t < 1
     bool shouldAnimate = false;
@@ -55,43 +62,21 @@ int main() {
         // Handle Input
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             printf("yes\n");
-            isAnimating = true;
         }
 
         // Update
-        frameCounter++;
-        if (isAnimating) {
-            t += .005;
+        if (state == 0) {
+            frameCounter++;
+            position.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
+            position.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
 
-            float result = lerp(t, 0, 500);
-            position.x = result;
-            position.y = result;
-
-            // printf("time: %f\n", t);
-            printf("%.2f\n", result);
+            if (frameCounter > duration) {
+                frameCounter = 0;
+                state = 1;
+            }
         }
-
 
         // Collision
-        for (int i = 0; i < NO_OF_RECTS; ++i) {
-
-            int x = i * RECT_WIDTH + GAP * (i + 1);
-            if (CheckCollisionPointRec((Vector2) {GetMouseX(), GetMouseY()}, (Rectangle) {position.x, position.y, RECT_WIDTH, RECT_HEIGHT})) {
-                printf("yes %d\n", frameCounter);
-            }
-
-        }
-
-
-        if (t > 1) {
-            t = 0;
-            isAnimating = false;
-            shouldAnimate = false;
-            animationComplete = true;
-
-            position.x = START_X;
-            position.y = START_Y;
-        }
 
         // Draw
         BeginDrawing();
@@ -108,6 +93,8 @@ int main() {
         // Draw a single rect
         DrawRectangle(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, BLUE);
         DrawRectangleLines(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, WHITE);
+
+        DrawText(TextFormat("x %.1f\ny %.1f", position.x, position.y), 20, 20, 50, WHITE);
 
 
         EndDrawing();
