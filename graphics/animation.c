@@ -1,36 +1,41 @@
 #include "raylib.h"
 #include <stdio.h>
 
+#define NUM_FRAMES_BUNNY 9
+
+#define NUM_LINES_BUTTON 3
+
+#define NUM_FRAMES_SLIME 4
+#define NUM_LINES_SLIME 3
+
 typedef struct Spritesheet {
-    int totalFrames;
-    Rectangle frameRec;     // Draw a part of a texture defined by a rectangle
-    int currentFrame;       // The current frame, ranges from 0 to TOTAL_FRAMES - 1
+    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
+    int currentFrame;           // The current frame, x-axis
+    int currentLine;            // The current frame, y-axis
     int frameCounter;
     int frameSpeed;
 } Spritesheet;
-typedef struct SpritesheetGrid {
-    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
-    int currentFrame;           // The current frame, ranges from 0 to TOTAL_FRAMES - 1
-    int currentLine;            // The current frame, ranges from 0 to TOTAL_FRAMES - 1
-    int frameCounter;
-    int frameSpeed;
-} SpritesheetGrid;
 
 /**
  * Single row animation
  */
 void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
-    // printf("%p\n", bunnySheet);
     bunnySheet->frameCounter++;
 
+    // Slow down frame speed
     if (bunnySheet->frameCounter >= (60 / bunnySheet->frameSpeed)) {
+
+        // Time to update current frame index and reset counter
         bunnySheet->frameCounter = 0;
         bunnySheet->currentFrame++;
 
-        // I don't want to display the last frame so I subtract 2 and not 1
-        if (bunnySheet->currentFrame > bunnySheet->totalFrames - 2) bunnySheet->currentFrame = 0;
+        // Clamp index - I don't want to display the last frame so I subtract 2 and not 1
+        if (bunnySheet->currentFrame > NUM_FRAMES_BUNNY - 2) bunnySheet->currentFrame = 0;
 
-        bunnySheet->frameRec.x = (float) bunnySheet->currentFrame * (float) bunnyTexture.width / bunnySheet->totalFrames;
+        // Update source rect
+        bunnySheet->frameRec.x = (float) bunnySheet->currentFrame * (float) bunnyTexture.width / NUM_FRAMES_BUNNY;
+
+
     }
 }
 
@@ -38,37 +43,35 @@ void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
  * Single Column animation
  */
 void updateButton(Spritesheet *buttonSheet, Texture2D buttonTexture) {
-    // printf("%p\n", buttonSheet);
     buttonSheet->frameCounter++;
 
     if (buttonSheet->frameCounter >= (60 / buttonSheet->frameSpeed)) {
         buttonSheet->frameCounter = 0;
-        buttonSheet->currentFrame++;
+        buttonSheet->currentLine++;
 
-        if (buttonSheet->currentFrame > buttonSheet->totalFrames - 1) buttonSheet->currentFrame = 0;
+        if (buttonSheet->currentLine > NUM_LINES_BUTTON - 1) buttonSheet->currentLine = 0;
 
-        buttonSheet->frameRec.y = (float) buttonSheet->currentFrame * (float) buttonTexture.height / buttonSheet->totalFrames;
+        buttonSheet->frameRec.y = (float) buttonSheet->currentLine * (float) buttonTexture.height / NUM_LINES_BUTTON;
     }
 }
 
 /**
  * Grid animation
  */
-void updateSlime(SpritesheetGrid *slimeSheet, Texture2D slimeTexture, int xFrames, int yFrames) {
-    // printf("%p\n", slimeSheet);
+void updateSlime(Spritesheet *slimeSheet, Texture2D slimeTexture) {
     slimeSheet->frameCounter++;
 
-    float frameWidth = (float) (slimeTexture.width / xFrames);
-    float frameHeight = (float) (slimeTexture.height / yFrames);
+    float frameWidth = (float) (slimeTexture.width / NUM_FRAMES_SLIME);
+    float frameHeight = (float) (slimeTexture.height / NUM_LINES_SLIME);
 
     if (slimeSheet->frameCounter >= (60 / slimeSheet->frameSpeed)) {
 
         slimeSheet->currentFrame++;
 
-        if (slimeSheet->currentFrame >= xFrames) {
+        if (slimeSheet->currentFrame >= NUM_FRAMES_SLIME) {
             slimeSheet->currentFrame = 0;
             slimeSheet->currentLine++;
-            if (slimeSheet->currentLine >= yFrames) {
+            if (slimeSheet->currentLine >= NUM_LINES_SLIME) {
                 // DONE ANMATING ALL FRAMES
                 slimeSheet->currentLine = 0;
             }
@@ -95,25 +98,19 @@ int main() {
     slimeTexture.height *= 8;
 
     //============================
-    int TOTAL_FRAMES_BUNNY = 9;
     Spritesheet bunnySheet = {
-        TOTAL_FRAMES_BUNNY,
-        (Rectangle){ 0, 0, bunnyTexture.width / TOTAL_FRAMES_BUNNY, bunnyTexture.height },
-        0, 0, 5
+        (Rectangle){ 0, 0, bunnyTexture.width / NUM_FRAMES_BUNNY, bunnyTexture.height },
+        0, 0, 0, 5
     };
     //============================
-    int TOTAL_FRAMES_BUTTON = 3;
     Spritesheet buttonSheet = {
-        TOTAL_FRAMES_BUTTON,
-        (Rectangle){ 0, 0, buttonTexture.width, buttonTexture.height / TOTAL_FRAMES_BUTTON },
-        0, 0, 1
+        (Rectangle){ 0, 0, buttonTexture.width, buttonTexture.height / NUM_LINES_BUTTON },
+        0, 0, 0, 1
     };
     //============================
-    int TOTAL_X_FRAMES_SLIME = 4;
-    int TOTAL_Y_FRAMES_SLIME = 3;
-    float frameWidth = (float) (slimeTexture.width / TOTAL_X_FRAMES_SLIME);
-    float frameHeight = (float) (slimeTexture.height / TOTAL_Y_FRAMES_SLIME);
-    SpritesheetGrid slimeSheet = {
+    float frameWidth =  (float) (slimeTexture.width / NUM_FRAMES_SLIME);
+    float frameHeight = (float) (slimeTexture.height / NUM_LINES_SLIME);
+    Spritesheet slimeSheet = {
         (Rectangle){ 0, 0, frameWidth, frameHeight },
         0, 0, 0, 4
     };
@@ -126,14 +123,14 @@ int main() {
         // Update
         updateBunny(&bunnySheet, bunnyTexture);
         updateButton(&buttonSheet, buttonTexture);
-        updateSlime(&slimeSheet, slimeTexture, TOTAL_X_FRAMES_SLIME, TOTAL_Y_FRAMES_SLIME);
+        updateSlime(&slimeSheet, slimeTexture);
 
         // Draw
         BeginDrawing();
         ClearBackground(ORANGE);
 
         DrawTextureRec(bunnyTexture, bunnySheet.frameRec, (Vector2) { 0 } , WHITE);
-        DrawTextureRec(buttonTexture, buttonSheet.frameRec, (Vector2) { bunnyTexture.width / TOTAL_FRAMES_BUNNY, 0 } , WHITE);
+        DrawTextureRec(buttonTexture, buttonSheet.frameRec, (Vector2) { bunnyTexture.width / NUM_FRAMES_BUNNY, 0 } , WHITE);
         DrawTextureRec(slimeTexture, slimeSheet.frameRec, (Vector2) { 0, bunnyTexture.height } , WHITE);
 
         EndDrawing();
