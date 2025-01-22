@@ -308,7 +308,7 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
         cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
         cards[i].state = Still;
         cards[i].frameCounter = 0;
-        cards[i].duration = 30;    // Length in frame
+        cards[i].duration = 30;    // Length in frame (30 frame = 500ms)
         cards[i].currentPosition = (Vector2) { position.x, position.y };
     }
 }
@@ -324,8 +324,8 @@ void updateCards(struct Card cards[]) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             if (cards[i].state == Tween) {
                 cards[i].frameCounter++;
-
                 // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
+
 
                 cards[i].rect.x =
                     EaseSineOut(
@@ -345,6 +345,8 @@ void updateCards(struct Card cards[]) {
                     cards[i].frameCounter = 0;
                     cards[i].state = Still;
                 }
+
+
             }
         }
     }
