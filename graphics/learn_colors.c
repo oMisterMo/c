@@ -1,4 +1,6 @@
 #include "raylib.h"
+#include "reasings.h"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
@@ -34,24 +36,36 @@
 #define isShowCursor true
 #define isDrawTray true
 #define isDrawCard false
+#define isTweenCard true
 
 #define isOff false   // global flag to turn all examples off
 
 
-
+enum State {
+    Still,
+    Tween,
+};
 
 struct Card {
-    Vector2 originalPosition;
+    Vector2 originalPosition;   // End or target position, should be consts
     Rectangle rect;
     Color color;
     bool isDragging;
     bool hasTouchedEndZone;
     bool hasScore;
+
+    // tween
+    Vector2 currentPosition;    // Tween start position
+    int state;                  // Still | Tween
+    int frameCounter;           // Current time in tween
+    int duration;               // How long to tween
 };
 
 void initCards(struct Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
+
+void updateCards(struct Card cards[]);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
@@ -140,7 +154,6 @@ int main() {
     printf("-------------------\n");
 
     while(!WindowShouldClose()) {
-        frameCounter++;
         increment += 0.02 / 25;
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
@@ -204,8 +217,13 @@ int main() {
                         cards[i].hasScore = true;
                     } else {
                         printf("Reset Card...\n");
-                        cards[i].rect.x = cards[i].originalPosition.x;
-                        cards[i].rect.y = cards[i].originalPosition.y;
+                        if (isTweenCard) {
+                            cards[i].state = Tween;
+                            cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
+                        } else {
+                            cards[i].rect.x = cards[i].originalPosition.x;
+                            cards[i].rect.y = cards[i].originalPosition.y;
+                        }
                     }
 
                     // Have all cards been moved to the correct zone?
@@ -222,17 +240,10 @@ int main() {
             }
         }
 
-        // Collisions
-        // for (int i = 0; i < NO_OF_CARDS; ++i) {
-        //     for (int j = 0; j < NO_OF_TRAYS; ++j) {
-        //         if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
-        //             printf("HIT %d\n", counter);
-        //             break;
-        //         }
-        //     }
-        //     counter++;
-        // }
+        // Update
+        updateCards(cards);
 
+        // Draw
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
@@ -295,6 +306,10 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
         cards[i].hasTouchedEndZone = false;
         cards[i].hasScore = false;
         cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
+        cards[i].state = Still;
+        cards[i].frameCounter = 0;
+        cards[i].duration = 30;    // Length in frame
+        cards[i].currentPosition = (Vector2) { position.x, position.y };
     }
 }
 
@@ -302,6 +317,38 @@ void reset(int *score) {
     *score = 0;
 }
 
+
+// Update
+void updateCards(struct Card cards[]) {
+    if (isTweenCard) {
+        for (int i = 0; i < NO_OF_CARDS; ++i) {
+            if (cards[i].state == Tween) {
+                cards[i].frameCounter++;
+
+                // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
+
+                cards[i].rect.x =
+                    EaseSineOut(
+                        (float) cards[i].frameCounter,
+                        cards[i].currentPosition.x,
+                        cards[i].originalPosition.x - cards[i].currentPosition.x,
+                        cards[i].duration
+                    );
+                cards[i].rect.y =
+                    EaseSineOut(
+                        (float) cards[i].frameCounter,
+                        cards[i].currentPosition.y,
+                        cards[i].originalPosition.y - cards[i].currentPosition.y,
+                        cards[i].duration
+                    );
+                if (cards[i].frameCounter > cards[i].duration) {
+                    cards[i].frameCounter = 0;
+                    cards[i].state = Still;
+                }
+            }
+        }
+    }
+}
 
 // Draw
 void drawBackground(Texture2D layers[], double increment, int order[]) {
