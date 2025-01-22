@@ -48,13 +48,26 @@ float linearTween(float currentTime, float start, float change, float duration);
 void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         printf("left mouse pressed...\n");
+        if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
+            // reset mo
+            mo->tween.state = TWEENING;
+            return;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), *rect)) {
+            // reset rect
+            *state = TWEENING;
+            rect->x = 0;
+            rect->y = center.y;
+            return;
+        }
+
+        // Reset all
         // reset rect
         *state = TWEENING;
         rect->x = 0;
         rect->y = center.y;
 
         // reset mo
-        printf("=> %p\n", mo);
         mo->tween.state = TWEENING;
     }
 }
@@ -77,9 +90,8 @@ void updateMo(Item *mo) {
                 mo->tween.state = IDLE;
 
 
-                printf("Final pos x: %f\n", mo->bounds.x);
-                mo->bounds.x = mo->tween.targetPosition.x;
-                printf("Final pos x: %f\n", mo->bounds.x);
+                // Set final position
+                mo->bounds.x = mo->tween.startPosition.x;
             }
         }
 }
@@ -102,6 +114,8 @@ void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, 
         if (*frameCounter > duration) {
             *frameCounter = 0;
             *state = IDLE;
+
+            rect->x = start.x;
         }
     }
 }
