@@ -41,12 +41,12 @@
 #define isOff false   // global flag to turn all examples off
 
 
-enum State {
-    Still,
-    Tween,
-};
+typedef enum {
+    IDLE,
+    TWEEN,
+} State;
 
-struct Card {
+typedef struct Card {
     Rectangle rect;             // Actual position
     Vector2 targetPosition;     // Could be consts
     Color color;
@@ -56,20 +56,20 @@ struct Card {
 
     // tween
     Vector2 currentPosition;    // Tween start position
-    int state;                  // Still | Tween
+    int state;                  // IDLE | TWEEN
     int frameCounter;           // Current time in tween
     int duration;               // How long to tween
-};
+} Card;
 
-void initCards(struct Card cards[], int trayStartX, Color colors[]);
+void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
-void updateCards(struct Card cards[]);
+void updateCards(Card cards[]);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
-void drawCards(struct Card cards[], Texture2D check, Texture2D border);
+void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 void drawScore(int score);
 
@@ -120,7 +120,7 @@ int main() {
     double increment = 0.0;
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
-    struct Card cards[NO_OF_CARDS];
+    Card cards[NO_OF_CARDS];
 
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
@@ -218,7 +218,7 @@ int main() {
                     } else {
                         printf("Reset Card...\n");
                         if (isTweenCard) {
-                            cards[i].state = Tween;
+                            cards[i].state = TWEEN;
                             cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
                         } else {
                             cards[i].rect.x = cards[i].targetPosition.x;
@@ -287,7 +287,7 @@ void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray) {
     }
 }
 
-void initCards(struct Card cards[], int cardStartX, Color colors[]) {
+void initCards(Card cards[], int cardStartX, Color colors[]) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 position = {
             cardStartX + GetScreenWidth() / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
@@ -306,7 +306,7 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
         cards[i].hasTouchedEndZone = false;
         cards[i].hasScore = false;
         cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
-        cards[i].state = Still;
+        cards[i].state = IDLE;
         cards[i].frameCounter = 0;
         cards[i].duration = 30;    // Length in frame (30 frame = 500ms)
         cards[i].currentPosition = (Vector2) { position.x, position.y };
@@ -319,10 +319,10 @@ void reset(int *score) {
 
 
 // Update
-void updateCards(struct Card cards[]) {
+void updateCards(Card cards[]) {
     if (isTweenCard) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
-            if (cards[i].state == Tween) {
+            if (cards[i].state == TWEEN) {
                 cards[i].frameCounter++;
                 // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
 
@@ -343,7 +343,7 @@ void updateCards(struct Card cards[]) {
                     );
                 if (cards[i].frameCounter > cards[i].duration) {
                     cards[i].frameCounter = 0;
-                    cards[i].state = Still;
+                    cards[i].state = IDLE;
                 }
 
 
@@ -398,7 +398,7 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
     }
 }
 
-void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
+void drawCards(Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         if (isDrawCard) {
             DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
