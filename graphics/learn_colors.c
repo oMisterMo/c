@@ -47,8 +47,8 @@ enum State {
 };
 
 struct Card {
-    Vector2 originalPosition;   // End or target position, should be consts
-    Rectangle rect;
+    Rectangle rect;             // Actual position
+    Vector2 targetPosition;     // Could be consts
     Color color;
     bool isDragging;
     bool hasTouchedEndZone;
@@ -221,8 +221,8 @@ int main() {
                             cards[i].state = Tween;
                             cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
                         } else {
-                            cards[i].rect.x = cards[i].originalPosition.x;
-                            cards[i].rect.y = cards[i].originalPosition.y;
+                            cards[i].rect.x = cards[i].targetPosition.x;
+                            cards[i].rect.y = cards[i].targetPosition.y;
                         }
                     }
 
@@ -300,8 +300,8 @@ void initCards(struct Card cards[], int cardStartX, Color colors[]) {
             CARD_HEIGHT
         };
 
-        // cards[i].originalPosition = (Vector2) { position.x, position.y };
-        cards[i].originalPosition = position;
+        // cards[i].targetPosition = (Vector2) { position.x, position.y };
+        cards[i].targetPosition = position;
         cards[i].isDragging = false;
         cards[i].hasTouchedEndZone = false;
         cards[i].hasScore = false;
@@ -331,14 +331,14 @@ void updateCards(struct Card cards[]) {
                     EaseSineOut(
                         (float) cards[i].frameCounter,
                         cards[i].currentPosition.x,
-                        cards[i].originalPosition.x - cards[i].currentPosition.x,
+                        cards[i].targetPosition.x - cards[i].currentPosition.x,
                         cards[i].duration
                     );
                 cards[i].rect.y =
                     EaseSineOut(
                         (float) cards[i].frameCounter,
                         cards[i].currentPosition.y,
-                        cards[i].originalPosition.y - cards[i].currentPosition.y,
+                        cards[i].targetPosition.y - cards[i].currentPosition.y,
                         cards[i].duration
                     );
                 if (cards[i].frameCounter > cards[i].duration) {
@@ -404,18 +404,18 @@ void drawCards(struct Card cards[], Texture2D check, Texture2D border) {
             DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
             DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
             if (cards[i].hasTouchedEndZone) {
-                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
-                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+                int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
+                int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+                DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
                 DrawTexture(check, x, y, WHITE);
             }
         } else {
             DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
             DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
             if (cards[i].hasTouchedEndZone) {
-                int x = (cards[i].originalPosition.x + CARD_WIDTH / 2) - check.width / 2;
-                int y = (cards[i].originalPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-                DrawRectangleLines(cards[i].originalPosition.x, cards[i].originalPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+                int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
+                int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+                DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
                 DrawTexture(check, x, y, WHITE);
             }
         }
