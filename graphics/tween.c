@@ -10,8 +10,6 @@
 #define RECT_WIDTH 100
 #define RECT_HEIGHT 100
 #define TOTAL_WIDTH RECT_WIDTH * NO_OF_RECTS
-#define START_X 20
-#define START_Y 100
 #define MAX(a, b) (a > b ? a : b)
 #define MIN(a, b) (a < b ? a : b)
 
@@ -47,13 +45,13 @@ float lerp(float norm, int min, int max);
 void logger(int frameCounter);
 float linearTween(float currentTime, float start, float change, float duration);
 
-void handleInput(int *state, Rectangle rect, Vector2 center, Item *mo) {
+void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        printf("yes\n");
-        // reset original
-        *state = 0;
-        rect.x = 0;
-        rect.y = center.y;
+        printf("left mouse pressed...\n");
+        // reset rect
+        *state = TWEENING;
+        rect->x = 0;
+        rect->y = center.y;
 
         // reset mo
         printf("=> %p\n", mo);
@@ -91,6 +89,27 @@ void drawMo(Item mo) {
     DrawTextureV(mo.texture, mo.position, WHITE);
 }
 
+void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
+    // printf("rect => %p\n", rect);
+    if (*state == TWEENING) {
+
+        (*frameCounter)++;
+
+        rect->x  = EaseLinearIn((float) *frameCounter, start.x, end.x - start.x,  duration);
+        rect->y  = EaseLinearIn((float) *frameCounter, start.y, end.y - start.y,  duration);
+
+        if (*frameCounter > duration) {
+            *frameCounter = 0;
+            *state = IDLE;
+        }
+    }
+}
+void drawRect(Rectangle *rect) {
+    // Draw a single rect
+    DrawRectangleRec(*rect, BLUE);
+    DrawRectangleLinesEx(*rect, 2, WHITE);
+}
+
 int main() {
 
     // ---------------------------------------------
@@ -100,6 +119,7 @@ int main() {
     SetWindowMonitor(2);
     SetMousePosition(-1, -1);
     const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
+    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
 
 
     // ---------------------------------------------
@@ -107,9 +127,7 @@ int main() {
     // ---------------------------------------------
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
 
-    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
-    Rectangle rect = { START_X, START_Y, RECT_WIDTH, RECT_HEIGHT };
-
+    // Mo stuff
     Vector2 pos = { 0, center.y  - bunny.height / 2 };
     Tween leftToRight = {
             pos,                      // start
@@ -118,17 +136,18 @@ int main() {
             0,
             60 * 3                                                              // 3 seconds
          };
-
-
     Item mo = { bunny, pos, leftToRight };
-    printf("original => %p\n", &mo);
     
 
-
+    // Rectangle stuff
+    Vector2 startRect = { 20, GetScreenHeight() - RECT_HEIGHT - 20 };
+    Vector2 endRect = { GetScreenWidth() - RECT_WIDTH - 20, startRect.y };
+    Rectangle rect = { startRect.x, startRect.y, RECT_WIDTH, RECT_HEIGHT };
     int frameCounter = 0;
-    int state = 0;
+    int state = IDLE;
     int duration = 240;     // 60 * 4 = 4 seconds
     float t = 0;  // 0 < t < 1
+    printf("original rect => %p\n", &rect);
 
 
 
@@ -139,22 +158,12 @@ int main() {
         // ---------------------------------------------
         // Input
         // ---------------------------------------------
-        handleInput(&state, rect, center, &mo);
+        handleInput(&rect, &state, center, &mo);
 
         // ---------------------------------------------
         // Update
         // ---------------------------------------------
-        if (state == 0) {
-            frameCounter++;
-            rect.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
-            rect.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
-
-            if (frameCounter > duration) {
-                frameCounter = 0;
-                state = 1;
-            }
-        }
-
+        updateRect(&rect, startRect, endRect, &frameCounter, &state, center, duration);
         updateMo(&mo);
 
         // ---------------------------------------------
@@ -166,10 +175,7 @@ int main() {
 
 
 
-        // Draw a single rect
-        DrawRectangleRec(rect, BLUE);
-        DrawRectangleLinesEx(rect, 2, WHITE);
-
+        drawRect(&rect);
         drawMo(mo);
 
 
