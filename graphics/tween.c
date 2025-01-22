@@ -70,14 +70,10 @@ int main() {
 
     // Mo stuff
     Rectangle pos = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
-    Tween leftToRight = {
-            (Vector2) { pos.x, pos.y },                      // start
-            (Vector2) { (GetScreenWidth() - bunny.width) , center.y },      // end
-            IDLE,
-            0,
-            60 * 3                                                              // 3 seconds
-         };
-    Item mo = { bunny, pos, leftToRight };
+    Vector2 startMo = { pos.x, pos.y };
+    Vector2 endMo = { GetScreenWidth() - bunny.width , center.y };
+    Tween tween = { startMo, endMo, IDLE, 0, 60 * 3 };
+    Item mo = { bunny, pos, tween };
     
 
     // Rectangle stuff
@@ -113,22 +109,22 @@ int main() {
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
-
-
-
         drawRect(rect);
         drawMo(mo);
-
-
-
 
         EndDrawing();
     }
 
-
+    // ---------------------------------------------
+    // Destroy
+    // ---------------------------------------------
     UnloadTexture(bunny);
     CloseWindow();
 }
+
+
+
+
 
 void logger(int frameCounter) {
     printf("getFrameTime: %f\n", GetFrameTime());   // Time since last frame (dt)
