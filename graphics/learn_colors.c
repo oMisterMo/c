@@ -290,7 +290,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                     cards[i].hasScore = true;
                 } else {
                     printf("Reset Card...\n");
-                    if (isTweenCard) {
+                    if (isTweenCard && !isOff) {
                         cards[i].state = TWEEN;
                         cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
                     } else {
@@ -317,7 +317,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
 
 // Update
 void updateCards(Card cards[]) {
-    if (isTweenCard) {
+    if (isTweenCard && !isOff) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             if (cards[i].state == TWEEN) {
                 cards[i].frameCounter++;
@@ -397,7 +397,7 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
 
 void drawCards(Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
-        if (isDrawCard) {
+        if (isDrawCard && !isOff) {
             DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
             DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
             if (cards[i].hasTouchedEndZone) {
