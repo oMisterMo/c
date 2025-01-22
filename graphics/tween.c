@@ -36,7 +36,7 @@ typedef struct Sprite {
 
 typedef struct Item {
     Texture2D texture;
-    Vector2 position;
+    Rectangle bounds;
     Tween tween;
 } Item;
 
@@ -64,7 +64,7 @@ void updateMo(Item *mo) {
             mo->tween.frameCounter++;
 
             // Tween
-            mo->position.x  = EaseElasticInOut(
+            mo->bounds.x  = EaseElasticInOut(
                 (float) mo->tween.frameCounter,
                 mo->tween.startPosition.x,
                 mo->tween.targetPosition.x - mo->tween.startPosition.x,
@@ -77,16 +77,17 @@ void updateMo(Item *mo) {
                 mo->tween.state = IDLE;
 
 
-                printf("Final pos x: %f\n", mo->position.x);
-                mo->position.x = mo->tween.targetPosition.x;
-                printf("Final pos x: %f\n", mo->position.x);
+                printf("Final pos x: %f\n", mo->bounds.x);
+                mo->bounds.x = mo->tween.targetPosition.x;
+                printf("Final pos x: %f\n", mo->bounds.x);
             }
         }
 }
 void drawMo(Item mo) {
     // Draw Mo
-    DrawTextureV(mo.texture, mo.position, WHITE);
-    DrawText(TextFormat("x %.1f\ny %.1f", mo.position.x, mo.position.y), mo.position.x + mo.texture.width / 2 - 50, mo.position.y - 50, 20, WHITE);
+    DrawRectangleRec(mo.bounds, WHITE);
+    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
+    DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
 }
 
 void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
@@ -129,9 +130,9 @@ int main() {
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
 
     // Mo stuff
-    Vector2 pos = { 0, center.y  - bunny.height / 2 };
+    Rectangle pos = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Tween leftToRight = {
-            pos,                      // start
+            (Vector2) { pos.x, pos.y },                      // start
             (Vector2) { (GetScreenWidth() - bunny.width) , center.y },      // end
             IDLE,
             0,
