@@ -87,6 +87,7 @@ void updateMo(Item *mo) {
 void drawMo(Item mo) {
     // Draw Mo
     DrawTextureV(mo.texture, mo.position, WHITE);
+    DrawText(TextFormat("x %.1f\ny %.1f", mo.position.x, mo.position.y), mo.position.x + mo.texture.width / 2 - 50, mo.position.y - 50, 20, WHITE);
 }
 
 void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
@@ -104,10 +105,11 @@ void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, 
         }
     }
 }
-void drawRect(Rectangle *rect) {
+void drawRect(Rectangle rect) {
     // Draw a single rect
-    DrawRectangleRec(*rect, BLUE);
-    DrawRectangleLinesEx(*rect, 2, WHITE);
+    DrawRectangleRec(rect, BLUE);
+    DrawRectangleLinesEx(rect, 2, WHITE);
+    DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), rect.x + 5, rect.y - 50, 20, WHITE);
 }
 
 int main() {
@@ -175,13 +177,12 @@ int main() {
 
 
 
-        drawRect(&rect);
+        drawRect(rect);
         drawMo(mo);
 
 
 
 
-        DrawText(TextFormat("x %.1f\ny %.1f", rect.x, rect.y), 20, 20, 50, WHITE);
         EndDrawing();
     }
 
