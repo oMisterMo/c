@@ -9,66 +9,87 @@
 #define NO_OF_SPACES (NO_OF_RECTS + 1)
 #define RECT_WIDTH 100
 #define RECT_HEIGHT 100
-
 #define TOTAL_WIDTH RECT_WIDTH * NO_OF_RECTS
-
 #define START_X 20
 #define START_Y 100
-
-
 #define MAX(a, b) (a > b ? a : b)
 #define MIN(a, b) (a < b ? a : b)
 
 int normalize(int value, int min, int max);
 float lerp(float norm, int min, int max);
 void logger(int frameCounter);
+float linearTween(float currentTime, float start, float change, float duration);
 
-float linearTween(float currentTime, float start, float change, float duration) {
-    return change * currentTime / duration + start;
-}
+typedef enum {
+    FINISHED = 0,
+    TWEENING
+} TweenState;
 
+typedef struct Tween {
+    int state;                  // FINISHED | TWEENING
+    Vector2 targetPosition;     // Could be consts
+    Vector2 currentPosition;    // Tween start position
+    int frameCounter;           // Current time in tween
+    int duration;               // How long to tween
+} Tween;
 
-// typedef struct Sprite {
-//     Texture2D texture;
-//     Rectangle bounds;
-//     Vector2 velocity;
-//     // Vector2 acceleration;
-// };
+typedef struct Sprite {
+    Texture2D texture;
+    Rectangle bounds;
+    Vector2 velocity;
+    // Vector2 acceleration;
+    Tween tween;
+} Sprite;
 
 int main() {
-    
-    
-    InitWindow(1024, 768, "Gaps");
+
+    // ---------------------------------------------
+    // Setup
+    // ---------------------------------------------
+    InitWindow(1024, 768, "Tween");
     SetWindowMonitor(2);
     SetMousePosition(-1, -1);
-
-    Vector2 position = { START_X, START_Y };
-    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
     const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
 
-    SetTargetFPS(60);
+
+    // ---------------------------------------------
+    // Initialize
+    // ---------------------------------------------
+    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
+    Rectangle item = { START_X, START_Y, RECT_WIDTH, RECT_HEIGHT };
+    
+
+
+
 
     int frameCounter = 0;
     int state = 0;
     int duration = 240;     // 60 * 4 = 4 seconds
-
     float t = 0;  // 0 < t < 1
-    bool shouldAnimate = false;
-    bool animationComplete = false;
-    bool isAnimating = false;
+
+
+
+    SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
 
-        // Handle Input
+        // ---------------------------------------------
+        // Input
+        // ---------------------------------------------
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             printf("yes\n");
+            state = 0;
+            item.x = 0;
+            item.y = center.y;
         }
 
+        // ---------------------------------------------
         // Update
+        // ---------------------------------------------
         if (state == 0) {
             frameCounter++;
-            position.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
-            position.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
+            item.x  = EaseLinearIn((float) frameCounter, START_X, center.x - RECT_WIDTH / 2 - START_X,  duration);
+            item.y  = EaseLinearIn((float) frameCounter, START_Y, center.y - RECT_HEIGHT / 2 - START_Y,  duration);
 
             if (frameCounter > duration) {
                 frameCounter = 0;
@@ -76,27 +97,23 @@ int main() {
             }
         }
 
-        // Collision
-
+        // ---------------------------------------------
         // Draw
+        // ---------------------------------------------
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // int y = center.y - RECT_HEIGHT / 2;
-        // for (int i = 0; i < NO_OF_RECTS; ++i) {
-        //     position.x = i * RECT_WIDTH + GAP * (i + 1);
-        //     // DrawCircle(radius + i * radius * 2, center.y, radius, YELLOW);
-        //     DrawRectangle(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, BLUE);
-        //     DrawRectangleLines(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, WHITE);
-        // }
+
+
 
         // Draw a single rect
-        DrawRectangle(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, BLUE);
-        DrawRectangleLines(position.x, position.y, RECT_WIDTH, RECT_HEIGHT, WHITE);
-
-        DrawText(TextFormat("x %.1f\ny %.1f", position.x, position.y), 20, 20, 50, WHITE);
+        DrawRectangleRec(item, BLUE);
+        DrawRectangleLinesEx(item, 2, WHITE);
 
 
+
+
+        DrawText(TextFormat("x %.1f\ny %.1f", item.x, item.y), 20, 20, 50, WHITE);
         EndDrawing();
     }
 
@@ -118,4 +135,8 @@ int normalize(int value, int min, int max) {
 
 float lerp(float norm, int min, int max) {
     return (max - min) * norm + min;
+}
+
+float linearTween(float currentTime, float start, float change, float duration) {
+    return change * currentTime / duration + start;
 }
