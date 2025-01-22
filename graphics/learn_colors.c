@@ -73,9 +73,11 @@ void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter);
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
+Vector2 *starsPosition, bool *isAnimating, Texture2D stars);
 void updateCards(Card cards[]);
-void updateStars(Spritesheet *sheet, Texture2D texture) {
+void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating) {
+    if (!(*isAnimating)) return;
     sheet->frameCounter++;
 
     // Slow down frame speed
@@ -85,7 +87,10 @@ void updateStars(Spritesheet *sheet, Texture2D texture) {
         sheet->frameCounter = 0;
         sheet->currentFrame++;
 
-        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) sheet->currentFrame = 0;
+        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) {
+            sheet->currentFrame = 0;
+            *isAnimating = false;
+        }
 
         // Update source rect
         sheet->frameRec.x = (float) sheet->currentFrame * (float) texture.width / NUM_FRAMES_STARS;
@@ -147,6 +152,8 @@ int main() {
         (Rectangle){ 0, 0, stars.width / NUM_FRAMES_STARS, stars.height },
         0, 0, 0, 10
     };
+    Vector2 starsPosition = { GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
+    bool isAnimating = false;
 
 
     // Game vars
@@ -181,22 +188,24 @@ int main() {
         increment += 0.02 / 25;
 
         // Input
-        handleInput(trays, cards, colors, &score, cardStartX, &counter);
+        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &isAnimating, stars);
 
         // Update
         updateCards(cards);
-        updateStars(&starsSheet, stars);
+        updateStars(&starsSheet, stars, &isAnimating);
 
         // Draw
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // drawBackground(clouds, increment, order);
-        // drawTrays(trays, tray, colors);
-        // drawCards(cards, check, border);
-        // drawCursor(cursor, cursorPressed);
-        // drawScore(score);
-        DrawTextureRec(stars, starsSheet.frameRec, (Vector2) { GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 }, WHITE);
+        drawBackground(clouds, increment, order);
+        drawTrays(trays, tray, colors);
+        drawCards(cards, check, border);
+        drawCursor(cursor, cursorPressed);
+        drawScore(score);
+        if (isAnimating) {
+            DrawTextureRec(stars, starsSheet.frameRec, starsPosition , WHITE);
+        }
 
         EndDrawing();
 
@@ -265,7 +274,8 @@ void reset(int *score) {
 
 
 // Input
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter) {
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
+Vector2 *starsPosition, bool *isAnimating, Texture2D stars) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
@@ -321,6 +331,8 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
                         ++(*score);
+                        *starsPosition = (Vector2){ GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
+                        *isAnimating = true;
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
