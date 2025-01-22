@@ -65,6 +65,7 @@ void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter);
 void updateCards(Card cards[]);
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
@@ -98,7 +99,6 @@ int main() {
 
     // Initialization
 
-    // Textures
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
@@ -128,15 +128,6 @@ int main() {
     initTrays(trays, trayStartX, &tray);
     initCards(cards, cardStartX, colors);
 
-    // ================================================
-    Vector2 touchPosition = { 0, 0 };
-    int gesturesCount = 0;
-    int currentGesture = GESTURE_NONE;
-    char gestureStrings[MAX_GESTURE_STRINGS][32];
-    int lastGesture = GESTURE_NONE;
-    // ================================================
-
-
     int frameCounter = 0;
     int counter = 0;
     int score = 0;
@@ -156,89 +147,8 @@ int main() {
     while(!WindowShouldClose()) {
         increment += 0.02 / 25;
 
-        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-        if (IsKeyPressed(KEY_R)) {
-            reset(&score);
-            initCards(cards, cardStartX, colors);
-        }
-
-        lastGesture = currentGesture;
-        currentGesture = GetGestureDetected();
-        touchPosition = GetTouchPosition(0);
-
-        // Handle Tray
-        for (int i = 0; i < NO_OF_TRAYS; ++i) {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            }
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            }
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                // colors[i] = original[i];
-            }
-        }
-
-        // Handle Cards
-        for (int i = 0; i < NO_OF_CARDS; ++i) {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(touchPosition, cards[i].rect)) {
-                    cards[i].isDragging = true;
-                }
-            }
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                if (cards[i].isDragging) {
-                    cards[i].rect.x = touchPosition.x - cards[i].rect.width / 2;
-                    cards[i].rect.y = touchPosition.y - cards[i].rect.height / 2;
-                }
-            }
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-
-                if (cards[i].isDragging) {
-                    cards[i].isDragging = false;
-
-                    bool hit = false;
-                    int sum = 0;
-
-                    for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                        if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
-                            hit = true;
-                            ++counter;
-                            break;
-                        }
-                    }
-
-                    // Increment score or reset card position
-                    if (hit) {
-                        if (cards[i].hasTouchedEndZone) continue;
-                        printf("HIT %d\n", counter);
-                        if (!cards[i].hasScore) {
-                            ++score;
-                        }
-                        cards[i].hasTouchedEndZone = true;
-                        cards[i].hasScore = true;
-                    } else {
-                        printf("Reset Card...\n");
-                        if (isTweenCard) {
-                            cards[i].state = TWEEN;
-                            cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
-                        } else {
-                            cards[i].rect.x = cards[i].targetPosition.x;
-                            cards[i].rect.y = cards[i].targetPosition.y;
-                        }
-                    }
-
-                    // Have all cards been moved to the correct zone?
-                    for (int j = 0; j < NO_OF_CARDS; ++j) {
-                        sum += cards[j].hasTouchedEndZone;
-                    }
-
-                    // Yes? Reset cards
-                    if (sum >= NO_OF_CARDS) {
-                        initCards(cards, cardStartX, colors);
-                    }
-                }
-                    
-            }
-        }
+        // Input
+        handleInput(trays, cards, colors, &score, cardStartX, &counter);
 
         // Update
         updateCards(cards);
@@ -317,6 +227,93 @@ void reset(int *score) {
     *score = 0;
 }
 
+
+// Input
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter) {
+    if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+    if (IsKeyPressed(KEY_R)) {
+        reset(score);
+        initCards(cards, cardStartX, colors);
+    }
+
+
+    Vector2 touchPosition = GetTouchPosition(0);
+
+    // Handle Tray
+    for (int i = 0; i < NO_OF_TRAYS; ++i) {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            // colors[i] = original[i];
+        }
+    }
+
+    // Handle Cards
+    for (int i = 0; i < NO_OF_CARDS; ++i) {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointRec(GetTouchPosition(0), cards[i].rect)) {
+                cards[i].isDragging = true;
+            }
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (cards[i].isDragging) {
+                cards[i].rect.x = touchPosition.x - cards[i].rect.width / 2;
+                cards[i].rect.y = touchPosition.y - cards[i].rect.height / 2;
+            }
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+
+            if (cards[i].isDragging) {
+                cards[i].isDragging = false;
+
+                bool hit = false;
+                int sum = 0;
+
+                for (int j = 0; j < NO_OF_TRAYS; ++j) {
+                    if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
+                        hit = true;
+                        ++(*counter);
+                        break;
+                    }
+                }
+
+                // Increment score or reset card position
+                if (hit) {
+                    if (cards[i].hasTouchedEndZone) continue;
+                    printf("HIT %d\n", *counter);
+                    if (!cards[i].hasScore) {
+                        ++score;
+                    }
+                    cards[i].hasTouchedEndZone = true;
+                    cards[i].hasScore = true;
+                } else {
+                    printf("Reset Card...\n");
+                    if (isTweenCard) {
+                        cards[i].state = TWEEN;
+                        cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
+                    } else {
+                        cards[i].rect.x = cards[i].targetPosition.x;
+                        cards[i].rect.y = cards[i].targetPosition.y;
+                    }
+                }
+
+                // Have all cards been moved to the correct zone?
+                for (int j = 0; j < NO_OF_CARDS; ++j) {
+                    sum += cards[j].hasTouchedEndZone;
+                }
+
+                // Yes? Reset cards
+                if (sum >= NO_OF_CARDS) {
+                    initCards(cards, cardStartX, colors);
+                }
+            }
+
+        }
+    }
+
+}
 
 // Update
 void updateCards(Card cards[]) {
