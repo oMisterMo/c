@@ -21,14 +21,14 @@ void logger(int frameCounter);
 float linearTween(float currentTime, float start, float change, float duration);
 
 typedef enum {
-    FINISHED = 0,
+    IDLE = 0,
     TWEENING
 } TweenState;
 
 typedef struct Tween {
-    int state;                  // FINISHED | TWEENING
-    Vector2 targetPosition;     // Could be consts
-    Vector2 currentPosition;    // Tween start position
+    Vector2 startPosition;    // Tween start
+    Vector2 targetPosition;     // Tween end [could be consts]
+    int state;                  // IDLE | TWEENING
     int frameCounter;           // Current time in tween
     int duration;               // How long to tween
 } Tween;
@@ -40,6 +40,13 @@ typedef struct Sprite {
     // Vector2 acceleration;
     Tween tween;
 } Sprite;
+
+typedef struct Item {
+    Texture2D texture;
+    Vector2 position;
+    Tween tween;
+} Item;
+
 
 int main() {
 
@@ -55,8 +62,22 @@ int main() {
     // ---------------------------------------------
     // Initialize
     // ---------------------------------------------
+    Texture2D bunny = LoadTexture("resources/sprites/piece.png");
+
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
     Rectangle item = { START_X, START_Y, RECT_WIDTH, RECT_HEIGHT };
+
+    Vector2 pos = { 0, center.y  - bunny.height / 2 };
+    Tween leftToRight = {
+            pos,                      // start
+            (Vector2) { (GetScreenWidth() - bunny.width) , center.y },      // end
+            IDLE,
+            0,
+            60 * 3                                                              // 3 seconds
+         };
+
+
+    Item mo = { bunny, pos, leftToRight };
     
 
 
@@ -78,9 +99,13 @@ int main() {
         // ---------------------------------------------
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             printf("yes\n");
+            // reset original
             state = 0;
             item.x = 0;
             item.y = center.y;
+
+            // reset mo
+            mo.tween.state = TWEENING;
         }
 
         // ---------------------------------------------
@@ -97,6 +122,29 @@ int main() {
             }
         }
 
+        if (mo.tween.state == TWEENING) {
+            mo.tween.frameCounter++;
+
+            // Tween
+            mo.position.x  = EaseElasticInOut(
+                (float) mo.tween.frameCounter,
+                mo.tween.startPosition.x,
+                mo.tween.targetPosition.x - mo.tween.startPosition.x,
+                mo.tween.duration
+            );
+
+            // Tween complete
+            if (mo.tween.frameCounter > mo.tween.duration) {
+                mo.tween.frameCounter = 0;
+                mo.tween.state = IDLE;
+
+
+                printf("Final pos x: %f\n", mo.position.x);
+                mo.position.x = mo.tween.targetPosition.x;
+                printf("Final pos x: %f\n", mo.position.x);
+            }
+        }
+
         // ---------------------------------------------
         // Draw
         // ---------------------------------------------
@@ -110,6 +158,9 @@ int main() {
         DrawRectangleRec(item, BLUE);
         DrawRectangleLinesEx(item, 2, WHITE);
 
+        // Draw Mo
+        DrawTextureV(mo.texture, mo.position, WHITE);
+
 
 
 
@@ -118,6 +169,7 @@ int main() {
     }
 
 
+    UnloadTexture(bunny);
     CloseWindow();
 }
 
