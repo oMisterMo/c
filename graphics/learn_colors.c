@@ -19,7 +19,7 @@
 
 #define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
-
+#define NUM_FRAMES_STARS 8
 
 
 
@@ -61,18 +61,45 @@ typedef struct Card {
     int duration;               // How long to tween
 } Card;
 
+typedef struct Spritesheet {
+    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
+    int currentFrame;           // The current frame, x-axis
+    int currentLine;            // The current frame, y-axis
+    int frameCounter;
+    int frameSpeed;
+} Spritesheet;
+
 void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter);
 void updateCards(Card cards[]);
+void updateStars(Spritesheet *sheet, Texture2D texture) {
+    sheet->frameCounter++;
+
+    // Slow down frame speed
+    if (sheet->frameCounter >= (60 / sheet->frameSpeed)) {
+
+        // Time to update current frame index and reset counter
+        sheet->frameCounter = 0;
+        sheet->currentFrame++;
+
+        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) sheet->currentFrame = 0;
+
+        // Update source rect
+        sheet->frameRec.x = (float) sheet->currentFrame * (float) texture.width / NUM_FRAMES_STARS;
+
+    }
+}
+
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 void drawScore(int score);
+
 
 int main() {
 
@@ -115,6 +142,12 @@ int main() {
     border.height /= 4;
     // tray.width = TRAY_WIDTH * 1.5;
     // tray.height = TRAY_HEIGHT * 1.5;
+    Texture2D stars = LoadTexture("resources/ui/medal_stars.png");
+    Spritesheet starsSheet = {
+        (Rectangle){ 0, 0, stars.width / NUM_FRAMES_STARS, stars.height },
+        0, 0, 0, 10
+    };
+
 
     // Game vars
     double increment = 0.0;
@@ -152,16 +185,18 @@ int main() {
 
         // Update
         updateCards(cards);
+        updateStars(&starsSheet, stars);
 
         // Draw
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds, increment, order);
-        drawTrays(trays, tray, colors);
-        drawCards(cards, check, border);
-        drawCursor(cursor, cursorPressed);
-        drawScore(score);
+        // drawBackground(clouds, increment, order);
+        // drawTrays(trays, tray, colors);
+        // drawCards(cards, check, border);
+        // drawCursor(cursor, cursorPressed);
+        // drawScore(score);
+        DrawTextureRec(stars, starsSheet.frameRec, (Vector2) { GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 }, WHITE);
 
         EndDrawing();
 
@@ -178,6 +213,7 @@ int main() {
     UnloadTexture(cursorPressed);
     UnloadTexture(tray);
     UnloadTexture(border);
+    UnloadTexture(stars);
     CloseWindow();
 
 
