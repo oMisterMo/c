@@ -38,7 +38,7 @@ void declare() {
     list[0] = 'a';
     list[2] = 'c';
 
-    // Print the ints in nums
+    // Initialize all values to 0
     for(int i = 0; i < 10; ++i) {
         nums[i] = 0;
     }
@@ -60,7 +60,8 @@ void declare_initialize() {
     char str[6] = {'H', 'e', 'l', 'l', 'o'};        // 5 characters + 1 null terminator
 
     // Double quotes
-    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\0"; // 26 characters + 1 null terminator
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\0";   // 26 characters + 1 null terminator = 27 bytes = 26 length
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";     // 26 characters + 1 null terminator = 27 bytes = 26 length
 
 
     printf("\n");
