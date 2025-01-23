@@ -70,34 +70,16 @@ typedef struct Spritesheet {
     int frameSpeed;
 } Spritesheet;
 
+
 void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
+
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
 Vector2 *starsPosition, bool *isAnimating, Texture2D stars);
 void updateCards(Card cards[]);
-void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating) {
-    if (!(*isAnimating)) return;
-    sheet->frameCounter++;
-
-    // Slow down frame speed
-    if (sheet->frameCounter >= (60 / sheet->frameSpeed)) {
-
-        // Time to update current frame index and reset counter
-        sheet->frameCounter = 0;
-        sheet->currentFrame++;
-
-        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) {
-            sheet->currentFrame = 0;
-            *isAnimating = false;
-        }
-
-        // Update source rect
-        sheet->frameRec.x = (float) sheet->currentFrame * (float) texture.width / NUM_FRAMES_STARS;
-
-    }
-}
+void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating);
 
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
@@ -395,6 +377,28 @@ void updateCards(Card cards[]) {
 
             }
         }
+    }
+}
+
+void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating) {
+    if (!(*isAnimating)) return;
+    sheet->frameCounter++;
+
+    // Slow down frame speed
+    if (sheet->frameCounter >= (60 / sheet->frameSpeed)) {
+
+        // Time to update current frame index and reset counter
+        sheet->frameCounter = 0;
+        sheet->currentFrame++;
+
+        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) {
+            sheet->currentFrame = 0;
+            *isAnimating = false;
+        }
+
+        // Update source rect
+        sheet->frameRec.x = (float) sheet->currentFrame * (float) texture.width / NUM_FRAMES_STARS;
+
     }
 }
 
