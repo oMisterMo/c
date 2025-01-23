@@ -78,7 +78,7 @@ void reset(int *score);
 
 
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, Spritesheet *sheet, Texture2D stars);
+Vector2 *starsPosition, Spritesheet *sheet, Texture2D starsTexture);
 void updateCards(Card cards[]);
 void updateStars(Spritesheet *sheet, Texture2D texture);
 
@@ -131,12 +131,15 @@ int main() {
     border.height /= 4;
     // tray.width = TRAY_WIDTH * 1.5;
     // tray.height = TRAY_HEIGHT * 1.5;
-    Texture2D stars = LoadTexture("resources/ui/medal_stars.png");
+    Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
+
+
     Spritesheet starsSheet = {
-        (Rectangle){ 0, 0, stars.width / NUM_FRAMES_STARS, stars.height },
+        (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
         0, 0, 0, 10, false
     };
-    Vector2 starsPosition = { GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
+    Vector2 starsPosition = { GetTouchX() - starsTexture.width / NUM_FRAMES_STARS / 2, GetTouchY() - starsTexture.height / 2 };
+
 
 
     // Game vars
@@ -171,11 +174,11 @@ int main() {
         increment += 0.02 / 25;
 
         // Input
-        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &starsSheet, stars);
+        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &starsSheet, starsTexture);
 
         // Update
         updateCards(cards);
-        updateStars(&starsSheet, stars);
+        updateStars(&starsSheet, starsTexture);
 
         // Draw
         BeginDrawing();
@@ -187,7 +190,7 @@ int main() {
         drawCursor(cursor, cursorPressed);
         drawScore(score);
         if (starsSheet.isAnimating && isAnimateStars && !isOff) {
-            DrawTextureRec(stars, starsSheet.frameRec, starsPosition , WHITE);
+            DrawTextureRec(starsTexture, starsSheet.frameRec, starsPosition , WHITE);
         }
 
         EndDrawing();
@@ -205,7 +208,7 @@ int main() {
     UnloadTexture(cursorPressed);
     UnloadTexture(tray);
     UnloadTexture(border);
-    UnloadTexture(stars);
+    UnloadTexture(starsTexture);
     CloseWindow();
 
 
@@ -258,7 +261,7 @@ void reset(int *score) {
 
 // Input
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, Spritesheet *sheet, Texture2D stars) {
+Vector2 *starsPosition, Spritesheet *sheet, Texture2D starsTexture) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
@@ -315,7 +318,7 @@ Vector2 *starsPosition, Spritesheet *sheet, Texture2D stars) {
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
                         ++(*score);
-                        *starsPosition = (Vector2){ GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
+                        *starsPosition = (Vector2){ GetTouchX() - starsTexture.width / NUM_FRAMES_STARS / 2, GetTouchY() - starsTexture.height / 2 };
                         sheet->isAnimating = true;
                     }
                     cards[i].hasTouchedEndZone = true;
