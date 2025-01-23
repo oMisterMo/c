@@ -30,21 +30,6 @@ typedef enum {
     TWEEN,
 } State;
 
-typedef struct Card {
-    Rectangle rect;             // Actual position
-    Vector2 targetPosition;     // Could be consts
-    Color color;
-    bool isDragging;
-    bool hasTouchedEndZone;
-    bool hasScore;
-
-    // tween
-    Vector2 currentPosition;    // Tween start position
-    int state;                  // IDLE | TWEEN
-    int frameCounter;           // Current time in tween
-    int duration;               // How long to tween
-} Card;
-
 typedef struct Spritesheet {
     Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
@@ -60,22 +45,36 @@ typedef struct Animation {
     Spritesheet sheet;
 } Animation;
 
+typedef struct Card {
+    Rectangle rect;             // Actual position
+    Vector2 targetPosition;     // Could be consts
+    Color color;
+    bool isDragging;
+    bool hasTouchedEndZone;
+    bool hasScore;
+
+    // tween
+    Vector2 currentPosition;    // Tween start position
+    int state;                  // IDLE | TWEEN
+    int frameCounter;           // Current time in tween
+    int duration;               // How long to tween
+} Card;
+
 
 void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
-
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars);
 void updateCards(Card cards[]);
 void updateStars(Animation *stars);
-
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 void drawScore(int score);
+
 
 
 int main() {
@@ -201,6 +200,9 @@ int main() {
     return 0;
 }
 
+
+
+//Init
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray) {
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         trays[i] = (Rectangle) {
@@ -243,7 +245,6 @@ void initCards(Card cards[], int cardStartX, Color colors[]) {
 void reset(int *score) {
     *score = 0;
 }
-
 
 // Input
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars) {
