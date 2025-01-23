@@ -28,7 +28,7 @@
 typedef enum {
     IDLE = 0,
     TWEEN,
-} State;
+} TweenState;
 
 typedef struct Spritesheet {
     Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
