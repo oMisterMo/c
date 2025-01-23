@@ -371,8 +371,7 @@ void updateStars(Animation *stars) {
     stars->sheet.frameCounter++;
 
     // Slow down frame speed
-    if (stars->sheet.frameCounter >= (60 / stars->sheet.frameSpeed)) {
-
+    if (stars->sheet.frameCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
         // Time to update current frame index and reset counter
         stars->sheet.frameCounter = 0;
         stars->sheet.currentFrame++;
@@ -383,7 +382,7 @@ void updateStars(Animation *stars) {
             stars->sheet.isAnimating = false;
         }
 
-        // Update source rect
+        // Update source rect (index * width)
         stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) stars->texture.width / NUM_FRAMES_STARS;
 
     }
