@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "reasings.h"
+#include "presentation.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -21,26 +22,8 @@
 #define PADDING 70          // Space above & below
 #define NUM_FRAMES_STARS 8
 
-
-
-
 #define MIN_NO_OF_TRAYS 2   // unused
 #define MAX_NO_OF_TRAYS 8   // unused
-
-
-
-
-// Presentation
-#define isDrawBackground true
-#define isPrarallaxBackground true
-#define isShowCursor true
-#define isDrawTray true
-#define isDrawCard false
-#define isTweenCard true
-#define isAnimateStars true
-
-#define isOff false   // global flag to turn all examples off
-
 
 typedef enum {
     IDLE,
