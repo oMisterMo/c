@@ -64,10 +64,11 @@ typedef struct Card {
 
 typedef struct Spritesheet {
     Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
-    int currentFrame;           // The current frame, x-axis
-    int currentLine;            // The current frame, y-axis
+    int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
+    int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
     int frameCounter;
     int frameSpeed;
+    bool isAnimating;
 } Spritesheet;
 
 
@@ -77,9 +78,9 @@ void reset(int *score);
 
 
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, bool *isAnimating, Texture2D stars);
+Vector2 *starsPosition, Spritesheet *sheet, Texture2D stars);
 void updateCards(Card cards[]);
-void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating);
+void updateStars(Spritesheet *sheet, Texture2D texture);
 
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
@@ -133,10 +134,9 @@ int main() {
     Texture2D stars = LoadTexture("resources/ui/medal_stars.png");
     Spritesheet starsSheet = {
         (Rectangle){ 0, 0, stars.width / NUM_FRAMES_STARS, stars.height },
-        0, 0, 0, 10
+        0, 0, 0, 10, false
     };
     Vector2 starsPosition = { GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
-    bool isAnimating = false;
 
 
     // Game vars
@@ -171,11 +171,11 @@ int main() {
         increment += 0.02 / 25;
 
         // Input
-        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &isAnimating, stars);
+        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &starsSheet, stars);
 
         // Update
         updateCards(cards);
-        updateStars(&starsSheet, stars, &isAnimating);
+        updateStars(&starsSheet, stars);
 
         // Draw
         BeginDrawing();
@@ -186,7 +186,7 @@ int main() {
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
         drawScore(score);
-        if (isAnimating && isAnimateStars && !isOff) {
+        if (starsSheet.isAnimating && isAnimateStars && !isOff) {
             DrawTextureRec(stars, starsSheet.frameRec, starsPosition , WHITE);
         }
 
@@ -258,7 +258,7 @@ void reset(int *score) {
 
 // Input
 void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, bool *isAnimating, Texture2D stars) {
+Vector2 *starsPosition, Spritesheet *sheet, Texture2D stars) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
@@ -308,18 +308,20 @@ Vector2 *starsPosition, bool *isAnimating, Texture2D stars) {
                     }
                 }
 
-                // Increment score or reset card position
+                // Did the card enter the correct tray?
                 if (hit) {
+                    // Well done, but has it already entered the zone?
                     if (cards[i].hasTouchedEndZone) continue;
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
                         ++(*score);
                         *starsPosition = (Vector2){ GetTouchX() - stars.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars.height / 2 };
-                        *isAnimating = true;
+                        sheet->isAnimating = true;
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
                 } else {
+                    // No, tween the card back to its original position
                     printf("Reset Card...\n");
                     if (isTweenCard && !isOff) {
                         cards[i].state = TWEEN;
@@ -380,8 +382,8 @@ void updateCards(Card cards[]) {
     }
 }
 
-void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating) {
-    if (!(*isAnimating)) return;
+void updateStars(Spritesheet *sheet, Texture2D texture) {
+    if (!(sheet->isAnimating)) return;
     sheet->frameCounter++;
 
     // Slow down frame speed
@@ -391,9 +393,10 @@ void updateStars(Spritesheet *sheet, Texture2D texture, bool *isAnimating) {
         sheet->frameCounter = 0;
         sheet->currentFrame++;
 
+        // Ensure frame index stays within bounds
         if (sheet->currentFrame > NUM_FRAMES_STARS - 1) {
             sheet->currentFrame = 0;
-            *isAnimating = false;
+            sheet->isAnimating = false;
         }
 
         // Update source rect
