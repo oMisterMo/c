@@ -26,7 +26,7 @@
 #define MAX_NO_OF_TRAYS 8   // unused
 
 typedef enum {
-    IDLE,
+    IDLE = 0,
     TWEEN,
 } State;
 
