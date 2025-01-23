@@ -7,4 +7,4 @@
 #define isTweenCard true
 #define isAnimateStars true
 
-#define isOff true   // global flag to turn all examples off
+#define isOff false   // global flag to turn all examples off
