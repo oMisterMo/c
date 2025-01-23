@@ -71,16 +71,21 @@ typedef struct Spritesheet {
     bool isAnimating;
 } Spritesheet;
 
+typedef struct Animation {
+    Texture2D texture;
+    Vector2 position;
+    Spritesheet sheet;
+} Animation;
+
 
 void initCards(Card cards[], int trayStartX, Color colors[]);
 void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
 void reset(int *score);
 
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, Spritesheet *sheet, Texture2D starsTexture);
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars);
 void updateCards(Card cards[]);
-void updateStars(Spritesheet *sheet, Texture2D texture);
+void updateStars(Animation *stars);
 
 
 void drawBackground(Texture2D clouds[], double increment, int order[]);
@@ -133,13 +138,11 @@ int main() {
     // tray.height = TRAY_HEIGHT * 1.5;
     Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
 
-
     Spritesheet starsSheet = {
         (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
         0, 0, 0, 10, false
     };
-    Vector2 starsPosition = { GetTouchX() - starsTexture.width / NUM_FRAMES_STARS / 2, GetTouchY() - starsTexture.height / 2 };
-
+    Animation stars = { starsTexture, (Vector2) { 0 }, starsSheet };
 
 
     // Game vars
@@ -174,11 +177,11 @@ int main() {
         increment += 0.02 / 25;
 
         // Input
-        handleInput(trays, cards, colors, &score, cardStartX, &counter, &starsPosition, &starsSheet, starsTexture);
+        handleInput(trays, cards, colors, &score, cardStartX, &counter, &stars);
 
         // Update
         updateCards(cards);
-        updateStars(&starsSheet, starsTexture);
+        updateStars(&stars);
 
         // Draw
         BeginDrawing();
@@ -189,8 +192,8 @@ int main() {
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
         drawScore(score);
-        if (starsSheet.isAnimating && isAnimateStars && !isOff) {
-            DrawTextureRec(starsTexture, starsSheet.frameRec, starsPosition , WHITE);
+        if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
+            DrawTextureRec(starsTexture, stars.sheet.frameRec, stars.position , WHITE);
         }
 
         EndDrawing();
@@ -260,8 +263,7 @@ void reset(int *score) {
 
 
 // Input
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter,
-Vector2 *starsPosition, Spritesheet *sheet, Texture2D starsTexture) {
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
@@ -318,8 +320,8 @@ Vector2 *starsPosition, Spritesheet *sheet, Texture2D starsTexture) {
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
                         ++(*score);
-                        *starsPosition = (Vector2){ GetTouchX() - starsTexture.width / NUM_FRAMES_STARS / 2, GetTouchY() - starsTexture.height / 2 };
-                        sheet->isAnimating = true;
+                        stars->position = (Vector2){ GetTouchX() - stars->texture.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars->texture.height / 2 };
+                        stars->sheet.isAnimating = true;
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
@@ -385,25 +387,25 @@ void updateCards(Card cards[]) {
     }
 }
 
-void updateStars(Spritesheet *sheet, Texture2D texture) {
-    if (!(sheet->isAnimating)) return;
-    sheet->frameCounter++;
+void updateStars(Animation *stars) {
+    if (!(stars->sheet.isAnimating)) return;
+    stars->sheet.frameCounter++;
 
     // Slow down frame speed
-    if (sheet->frameCounter >= (60 / sheet->frameSpeed)) {
+    if (stars->sheet.frameCounter >= (60 / stars->sheet.frameSpeed)) {
 
         // Time to update current frame index and reset counter
-        sheet->frameCounter = 0;
-        sheet->currentFrame++;
+        stars->sheet.frameCounter = 0;
+        stars->sheet.currentFrame++;
 
         // Ensure frame index stays within bounds
-        if (sheet->currentFrame > NUM_FRAMES_STARS - 1) {
-            sheet->currentFrame = 0;
-            sheet->isAnimating = false;
+        if (stars->sheet.currentFrame > NUM_FRAMES_STARS - 1) {
+            stars->sheet.currentFrame = 0;
+            stars->sheet.isAnimating = false;
         }
 
         // Update source rect
-        sheet->frameRec.x = (float) sheet->currentFrame * (float) texture.width / NUM_FRAMES_STARS;
+        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) stars->texture.width / NUM_FRAMES_STARS;
 
     }
 }
