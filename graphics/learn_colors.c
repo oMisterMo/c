@@ -80,18 +80,15 @@ void drawScore(int score);
 int main() {
 
     // Setup config
-    // int screenWidth = 1024 * 1.5;
-    // int screenHeight = 768;
-    int screenWidth = 960;
-    int screenHeight = 600;
-    // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     printf("-------------------\n");
     printf("INIT WINDOW\n");
     printf("-------------------\n");
+    int screenWidth = 960;
+    int screenHeight = 600;
+    // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
     SetMousePosition(0, 0);
-
     if (isShowCursor) {
         // Cursor stuff not working :(
         // HideCursor();
@@ -101,7 +98,6 @@ int main() {
     }
 
     // Initialization
-
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
@@ -114,11 +110,10 @@ int main() {
     Texture2D cursorPressed = LoadTexture("resources/ui/icon_hand_2.png");
     Texture2D tray = LoadTexture("resources/sprites/tray.png");
     Texture2D border = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
+    Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
+
     border.width /= 4;
     border.height /= 4;
-    // tray.width = TRAY_WIDTH * 1.5;
-    // tray.height = TRAY_HEIGHT * 1.5;
-    Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
 
     Spritesheet starsSheet = {
         (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
@@ -143,17 +138,17 @@ int main() {
     int counter = 0;
     int score = 0;
 
-    int order[20];
+    int order[20];      // Random value used to displace the backgrounds velocity
     for (int i = 0; i < 20; i++) {
         order[i] = GetRandomValue(0, 3);
-        // printf("order[i]: %d\n", order[i]);
     }
 
-    SetTargetFPS(60);
 
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
+
+    SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
         increment += 0.02 / 25;
