@@ -88,7 +88,7 @@ int main() {
     // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetWindowMonitor(2);
-    SetMousePosition(0, 0);
+    SetMousePosition(-10, -10);
     if (isShowCursor) {
         // Cursor stuff not working :(
         // HideCursor();
