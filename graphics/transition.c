@@ -43,7 +43,9 @@ char* screenName(GameScreen screen) {
 
 void switchScreens(GameScreen *current, GameScreen next) {
     assert(next >= 0 && next <= 6);
-    printf("Switch screen to %s\n", screenName(next));
+    printf("------------------------------\n");
+    printf("Switch screen: %s\n", screenName(next));
+    printf("------------------------------\n");
 
     *current = next;
 }
@@ -58,8 +60,7 @@ void handleInput(GameScreen *currentScreen) {
         break;
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                // printf("Menu\n");
-                // *currentScreen = LEVEL;
+
 
                 switchScreens(currentScreen, LEVEL);
             }
@@ -95,14 +96,6 @@ void update(GameScreen *currentScreen, int *framesCounter) {
             if (currentTime >= LOGO_DELAY_SECS) {
                 switchScreens(currentScreen, MENU);
             }
-
-            // // Previous way
-            // (*framesCounter)++;    // Count frames
-
-            // // Wait for 3 seconds (180 frames) before jumping to TITLE screen
-            // if (*framesCounter > 180) {
-            //     switchScreens(currentScreen, MENU);
-            // }
         }
         break;
         case MENU: {
@@ -234,7 +227,7 @@ int main() {
 
     Vector2 textPosition = { 40, 40 };
     Vector2 textOrigin = { 0 };
-    GameScreen currentScreen = LOGO;
+    GameScreen currentScreen = MENU;
 
 
 
