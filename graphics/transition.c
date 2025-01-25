@@ -18,6 +18,15 @@ typedef enum {
 } GameScreen;
 
 typedef enum {
+    UI_BACK = 0,
+    UI_RETRY,
+    UI_RANDOM,
+    UI_SKIP,
+    UI_LEFT,
+    UI_RIGHT
+} UIButtons;
+
+typedef enum {
     IDLE = 0,
     TWEENING
 } TweenState;
@@ -148,10 +157,17 @@ void update(GameScreen *currentScreen, int *framesCounter) {
     }
 }
 
-void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
+
+void drawButtons(Texture2D buttonsTexture, Rectangle buttons[]) {
+    float BUTTON_WIDTH = buttonsTexture.width / 6;
+    float BUTTON_HEIGHT = buttonsTexture.height / 2;
+
+    DrawTextureRec(buttonsTexture, buttons[UI_LEFT], (Vector2) { 0, (GetScreenHeight() - BUTTON_HEIGHT) / 2 }, WHITE);
+    DrawTextureRec(buttonsTexture, buttons[UI_RIGHT], (Vector2) { GetScreenWidth() - BUTTON_WIDTH, (GetScreenHeight() - BUTTON_HEIGHT / 2) / 2 }, WHITE);
+}
+void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D buttonsTexture, Rectangle buttons[]) {
     BeginDrawing();
     // ClearBackground(WHITE);
-
 
     switch (currentScreen) {
         case LOGO: {
@@ -172,6 +188,7 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
         case MENU: {
             ClearBackground(BLUE);
             DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
+            drawButtons(buttonsTexture, buttons);
         }
         break;
         case LEVEL: {
@@ -224,6 +241,31 @@ int main() {
     Rectangle destRect = { screenWidth / 2, screenHeight / 2, transitionTexture.width, transitionTexture.height };
     Vector2 origin = { (float) transitionTexture.width / 2, (float) transitionTexture.height / 2 };
 
+    // Buttons
+    Texture2D buttonsTexture = LoadTexture("resources/ui/buttons_navigation.png");
+    buttonsTexture.width *= 0.3;
+    buttonsTexture.height *= 0.3;
+    Rectangle buttons[12];
+    // Regular buttons
+    for (int i = 0; i < 6; i++) {
+        buttons[i] = (Rectangle) {
+            (float) i * buttonsTexture.width / 6,
+            0,
+            (float) buttonsTexture.width / 6,
+            (float) buttonsTexture.height / 2
+        };
+    }
+    // Hover button (i + 6)
+    for (int i = 6; i < 12; i++) {
+        buttons[i] = (Rectangle) {
+            (float) i * buttonsTexture.width / 6,
+            buttonsTexture.height / 2,
+            (float) buttonsTexture.width / 6,
+            (float) buttonsTexture.height / 2
+        };
+    }
+
+
     // Tween
     Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
     int frameCounter = 0;
@@ -245,11 +287,12 @@ int main() {
         update(&currentScreen, &frameCounter);
 
         // Draw
-        draw(currentScreen, textPosition, textOrigin);
+        draw(currentScreen, textPosition, textOrigin, buttonsTexture, buttons);
     }
 
 
     UnloadTexture(transitionTexture);
+    UnloadTexture(buttonsTexture);
     CloseWindow();
     return 0;
 }
