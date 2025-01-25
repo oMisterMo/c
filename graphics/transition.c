@@ -10,8 +10,10 @@ typedef enum {
     MENU,
     LEVEL,
     GAME,
-    GAMEOVER
-} State;
+    GAMEOVER,
+    TRANSITION_OUT,
+    TRANSITION_IN
+} GameScreen;
 
 typedef enum {
     IDLE = 0,
@@ -25,6 +27,143 @@ typedef struct Tween {
     int frameCounter;           // Current time in tween
     int duration;               // How long to tween
 } Tween;
+
+
+void handleInput(int currentScreen) {
+    // printf("currentScreen: %d\n", currentScreen);
+
+    switch (currentScreen) {
+        case LOGO: {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("Logo\n");
+            }
+        }
+        break;
+        case MENU: {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("Menu\n");
+            }
+        }
+        break;
+        case LEVEL: {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("Level\n");
+            }
+        }
+        break;
+        case GAME: {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("Game\n");
+            }
+        }
+        break;
+        case GAMEOVER: {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("Gameover\n");
+            }
+        }
+        break;
+        default: break;
+    }
+}
+
+void update(int currentScreen) {
+    switch (currentScreen) {
+        case LOGO: {
+
+        }
+        break;
+        case MENU: {
+
+        }
+        break;
+        case LEVEL: {
+
+        }
+        break;
+        case GAME: {
+        }
+        break;
+        case GAMEOVER: {
+
+        }
+        break;
+        default: break;
+    }
+
+    if (TRANSITION_IN) {
+        // if (state == TWEENING) {
+        //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
+        //     destRect.width  += scale;
+        //     destRect.height += scale;
+        //     origin.x = (float) destRect.width / 2;
+        //     origin.y = (float) destRect.height / 2;
+        //     // printf("%.1f,%.1f\n", destRect.width, destRect.height);
+        //     printf("scale: %f\n", scale);
+        //     if (frameCounter > duration) {
+        //         frameCounter = 0;
+        //         scale = 70.0;
+        //         state = IDLE;
+        //         printf("scale: %f\n", scale);
+        //         printf("Done.\n");
+        //     }
+        // }
+        // if (state == IDLE) {
+
+        // }
+    }
+    if (TRANSITION_OUT) {
+
+    }
+}
+
+void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
+    BeginDrawing();
+    ClearBackground(WHITE);
+
+
+    switch (currentScreen) {
+        case LOGO: {
+            ClearBackground(WHITE);
+            DrawTextPro(GetFontDefault(), "Logo", textPosition, textOrigin, 0, 40, 20, BLACK);
+        }
+        break;
+        case MENU: {
+            ClearBackground(BLUE);
+            DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
+        }
+        break;
+        case LEVEL: {
+            ClearBackground(RED);
+            DrawTextPro(GetFontDefault(), "Level", textPosition, textOrigin, 0, 40, 20, BLACK);
+        }
+        break;
+        case GAME: {
+            ClearBackground(GREEN);
+            DrawTextPro(GetFontDefault(), "Game", textPosition, textOrigin, 0, 40, 20, BLACK);
+        }
+        break;
+        case GAMEOVER: {
+            ClearBackground(YELLOW);
+            DrawTextPro(GetFontDefault(), "Gameover", textPosition, textOrigin, 0, 40, 20, BLACK);
+        }
+        break;
+        default: break;
+    }
+
+    // Transition
+    if (TRANSITION_IN) {
+        // DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
+        // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
+        // DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);
+    }
+    if (TRANSITION_OUT) {
+
+    }
+
+    EndDrawing();
+}
+
 
 int main() {
 
@@ -50,48 +189,24 @@ int main() {
     float duration = 60 * 1.5;
     int state = TWEENING;
 
+    Vector2 textPosition = { 40, 40 };
+    Vector2 textOrigin = { 0 };
+    int currentScreen = MENU;
+
 
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         frameCounter++;
-        // Handle input
 
+        // Handle input
+        handleInput(currentScreen);
 
         // Update
-        if (state == TWEENING) {
-            scale = EaseSineOut((float)frameCounter, 0, 70, duration);
-            destRect.width  += scale;
-            destRect.height += scale;
-            origin.x = (float) destRect.width / 2;
-            origin.y = (float) destRect.height / 2;
-            // printf("%.1f,%.1f\n", destRect.width, destRect.height);
-            printf("scale: %f\n", scale);
-            if (frameCounter > duration) {
-                frameCounter = 0;
-                scale = 70.0;
-                state = IDLE;
-                printf("scale: %f\n", scale);
-                printf("Done.\n");
-            }
-        }
-        if (state == IDLE) {
-
-        }
-
-
-
+        update(currentScreen);
 
         // Draw
-        BeginDrawing();
-        ClearBackground(ORANGE);
-
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
-        DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
-        DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);
-
-
-        EndDrawing();
+        draw(currentScreen, textPosition, textOrigin);
     }
 
 
