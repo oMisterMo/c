@@ -158,14 +158,14 @@ void update(GameScreen *currentScreen, int *framesCounter) {
 }
 
 
-void drawButtons(Texture2D buttonsTexture, Rectangle buttons[]) {
+void drawButtons(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
     float BUTTON_WIDTH = buttonsTexture.width / 6;
     float BUTTON_HEIGHT = buttonsTexture.height / 2;
 
-    DrawTextureRec(buttonsTexture, buttons[UI_LEFT], (Vector2) { 0, (GetScreenHeight() - BUTTON_HEIGHT) / 2 }, WHITE);
-    DrawTextureRec(buttonsTexture, buttons[UI_RIGHT], (Vector2) { GetScreenWidth() - BUTTON_WIDTH, (GetScreenHeight() - BUTTON_HEIGHT / 2) / 2 }, WHITE);
+    DrawTexturePro(buttonsTexture, buttons[UI_LEFT], buttonLeftDest, (Vector2) {0}, 0, WHITE);
+    DrawTexturePro(buttonsTexture, buttons[UI_RIGHT], buttonRightDest, (Vector2) {0}, 0, WHITE);
 }
-void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D buttonsTexture, Rectangle buttons[]) {
+void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
@@ -188,22 +188,25 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D
         case MENU: {
             ClearBackground(BLUE);
             DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtons(buttonsTexture, buttons);
+            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
         }
         break;
         case LEVEL: {
             ClearBackground(RED);
             DrawTextPro(GetFontDefault(), "Level", textPosition, textOrigin, 0, 40, 20, BLACK);
+            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
         }
         break;
         case GAME: {
             ClearBackground(GREEN);
             DrawTextPro(GetFontDefault(), "Game", textPosition, textOrigin, 0, 40, 20, BLACK);
+            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
         }
         break;
         case GAMEOVER: {
             ClearBackground(YELLOW);
             DrawTextPro(GetFontDefault(), "Gameover", textPosition, textOrigin, 0, 40, 20, BLACK);
+            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
         }
         break;
         default: break;
@@ -245,6 +248,8 @@ int main() {
     Texture2D buttonsTexture = LoadTexture("resources/ui/buttons_navigation.png");
     buttonsTexture.width *= 0.3;
     buttonsTexture.height *= 0.3;
+    int BUTTON_W = buttonsTexture.width / 6;
+    int BUTTON_H = buttonsTexture.height / 2;
     Rectangle buttons[12];
     // Regular buttons
     for (int i = 0; i < 6; i++) {
@@ -264,7 +269,8 @@ int main() {
             (float) buttonsTexture.height / 2
         };
     }
-
+    Rectangle buttonLeftDest = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
+    Rectangle buttonRightDest = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
 
     // Tween
     Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
@@ -287,7 +293,7 @@ int main() {
         update(&currentScreen, &frameCounter);
 
         // Draw
-        draw(currentScreen, textPosition, textOrigin, buttonsTexture, buttons);
+        draw(currentScreen, textPosition, textOrigin, buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
     }
 
 
