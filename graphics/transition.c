@@ -24,7 +24,7 @@ typedef enum {
     UI_SKIP,
     UI_LEFT,
     UI_RIGHT
-} UIButtons;
+} UIButton;
 
 typedef enum {
     IDLE = 0,
@@ -38,6 +38,12 @@ typedef struct Tween {
     int frameCounter;           // Current time in tween
     int duration;               // How long to tween
 } Tween;
+
+typedef struct UIButtons {
+    Texture2D texture;
+    Rectangle src;
+    Rectangle dest;
+} UIButtons;
 
 char* screenName(GameScreen screen) {
     if (screen == 0) return "Logo";
@@ -175,18 +181,15 @@ void update(GameScreen *currentScreen, int *framesCounter) {
     }
 }
 
-void drawButtonLeft(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest) {
-    DrawTexturePro(buttonsTexture, buttons[UI_LEFT], buttonLeftDest, (Vector2) {0}, 0, WHITE);
+void drawButtonButton(UIButtons button) {
+    DrawTexturePro(button.texture, button.src, button.dest, (Vector2) {0}, 0, WHITE);
 }
-void drawButtonRight(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonRightDest) {
-    DrawTexturePro(buttonsTexture, buttons[UI_RIGHT], buttonRightDest, (Vector2) {0}, 0, WHITE);
-}
-void drawButtons(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
-    drawButtonLeft(buttonsTexture, buttons, buttonLeftDest);
-    drawButtonRight(buttonsTexture, buttons, buttonRightDest);
+void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
+    drawButtonButton(buttonLeft);
+    drawButtonButton(buttonRight);
 }
 
-void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
+void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
@@ -209,25 +212,25 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D
         case MENU: {
             ClearBackground(BLUE);
             DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtonRight(buttonsTexture, buttons, buttonRightDest);
+            drawButtonButton(buttonRight);
         }
         break;
         case LEVEL: {
             ClearBackground(RED);
             DrawTextPro(GetFontDefault(), "Level", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
+            drawButtons(buttonLeft, buttonRight);
         }
         break;
         case GAME: {
             ClearBackground(GREEN);
             DrawTextPro(GetFontDefault(), "Game", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
+            drawButtons(buttonLeft, buttonRight);
         }
         break;
         case GAMEOVER: {
             ClearBackground(YELLOW);
             DrawTextPro(GetFontDefault(), "Gameover", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtonLeft(buttonsTexture, buttons, buttonLeftDest);
+            drawButtonButton(buttonLeft);
         }
         break;
         default: break;
@@ -292,6 +295,8 @@ int main() {
     }
     Rectangle buttonLeftDest = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
     Rectangle buttonRightDest = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
+    UIButtons buttonLeft = { buttonsTexture, buttons[UI_LEFT], buttonLeftDest };
+    UIButtons buttonRight = { buttonsTexture, buttons[UI_RIGHT], buttonRightDest };
 
     // Tween
     Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
@@ -314,7 +319,7 @@ int main() {
         update(&currentScreen, &frameCounter);
 
         // Draw
-        draw(currentScreen, textPosition, textOrigin, buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
+        draw(currentScreen, textPosition, textOrigin, buttonLeft, buttonRight);
     }
 
 
