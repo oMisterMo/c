@@ -29,7 +29,7 @@ typedef struct Tween {
 } Tween;
 
 
-void handleInput(int *currentScreen) {
+void handleInput(GameScreen *currentScreen) {
     // printf("currentScreen: %d\n", currentScreen);
 
     switch (*currentScreen) {
@@ -72,10 +72,15 @@ void handleInput(int *currentScreen) {
     }
 }
 
-void update(int currentScreen) {
-    switch (currentScreen) {
+void update(GameScreen *currentScreen, int *framesCounter) {
+    switch (*currentScreen) {
         case LOGO: {
+            (*framesCounter)++;    // Count frames
 
+            // Wait for 3 seconds (180 frames) before jumping to TITLE screen
+            if (*framesCounter > 180) {
+                *currentScreen = MENU;
+            }
         }
         break;
         case MENU: {
@@ -197,19 +202,17 @@ int main() {
 
     Vector2 textPosition = { 40, 40 };
     Vector2 textOrigin = { 0 };
-    int currentScreen = LOGO;
+    GameScreen currentScreen = LOGO;
 
 
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
-        frameCounter++;
-
         // Handle input
         handleInput(&currentScreen);
 
         // Update
-        update(currentScreen);
+        update(&currentScreen, &frameCounter);
 
         // Draw
         draw(currentScreen, textPosition, textOrigin);
