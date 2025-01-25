@@ -1,7 +1,9 @@
 #include "raylib.h"
 #include "reasings.h"
 #include <stdio.h>
+#include <assert.h>
 
+#define LOGO_DELAY_SECS 3
 #define MIN_SCALE 0
 #define MAX_SCALE 2
 
@@ -28,43 +30,56 @@ typedef struct Tween {
     int duration;               // How long to tween
 } Tween;
 
+char* screenName(GameScreen screen) {
+    if (screen == 0) return "Logo";
+    if (screen == 1) return "Menu";
+    if (screen == 2) return "Level";
+    if (screen == 3) return "Game";
+    if (screen == 4) return "GameOver";
+    if (screen == 5) return "Transition Out";
+    if (screen == 6) return "Transition In";
+    return "Error";
+}
+
+void switchScreens(GameScreen *current, GameScreen next) {
+    assert(next >= 0 && next <= 6);
+    printf("Switch screen to %s\n", screenName(next));
+
+    *current = next;
+}
 
 void handleInput(GameScreen *currentScreen) {
     // printf("currentScreen: %d\n", currentScreen);
 
     switch (*currentScreen) {
         case LOGO: {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                printf("Logo\n");
-                *currentScreen = MENU;
-            }
+            // Do nothing or click to skip?
         }
         break;
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                printf("Menu\n");
-                *currentScreen = LEVEL;
+                // printf("Menu\n");
+                // *currentScreen = LEVEL;
+
+                switchScreens(currentScreen, LEVEL);
             }
         }
         break;
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                printf("Level\n");
-                *currentScreen = GAME;
+                switchScreens(currentScreen, GAME);
             }
         }
         break;
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                printf("Game\n");
-                *currentScreen = GAMEOVER;
+                switchScreens(currentScreen, GAMEOVER);
             }
         }
         break;
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                printf("Gameover\n");
-                *currentScreen = MENU;
+                switchScreens(currentScreen, MENU);
             }
         }
         break;
@@ -75,12 +90,19 @@ void handleInput(GameScreen *currentScreen) {
 void update(GameScreen *currentScreen, int *framesCounter) {
     switch (*currentScreen) {
         case LOGO: {
-            (*framesCounter)++;    // Count frames
+            double currentTime = GetTime();
 
-            // Wait for 3 seconds (180 frames) before jumping to TITLE screen
-            if (*framesCounter > 180) {
-                *currentScreen = MENU;
+            if (currentTime >= LOGO_DELAY_SECS) {
+                switchScreens(currentScreen, MENU);
             }
+
+            // // Previous way
+            // (*framesCounter)++;    // Count frames
+
+            // // Wait for 3 seconds (180 frames) before jumping to TITLE screen
+            // if (*framesCounter > 180) {
+            //     switchScreens(currentScreen, MENU);
+            // }
         }
         break;
         case MENU: {
@@ -136,7 +158,17 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
     switch (currentScreen) {
         case LOGO: {
             ClearBackground(WHITE);
+            int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
+            int fontSize = 240;
+            // char *num = 48 + countdown;
+            int textW = MeasureText(TextFormat("%d", countdown), fontSize);
+            int fontX = (GetScreenWidth() - textW) / 2;
+            int fontY = GetScreenHeight() / 2 - 100;
+
+            // Draw screen name
             DrawTextPro(GetFontDefault(), "Logo", textPosition, textOrigin, 0, 40, 20, BLACK);
+            // Draw countdown
+            DrawText(TextFormat("%d", countdown), fontX, fontY, fontSize, BLACK);
         }
         break;
         case MENU: {
