@@ -59,7 +59,7 @@ void switchScreens(GameScreen *current, GameScreen next) {
     *current = next;
 }
 
-void handleInput(GameScreen *currentScreen) {
+void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle buttonRightDest) {
     // printf("currentScreen: %d\n", currentScreen);
 
     if (*currentScreen == TRANSITION_IN || *currentScreen == TRANSITION_OUT) {
@@ -74,27 +74,45 @@ void handleInput(GameScreen *currentScreen) {
         break;
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-
-
-                switchScreens(currentScreen, LEVEL);
+                if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
+                    // switchScreens(currentScreen, LEVEL);
+                }
+                if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
+                    switchScreens(currentScreen, LEVEL);
+                }
             }
         }
         break;
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                switchScreens(currentScreen, GAME);
+                if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
+                    switchScreens(currentScreen, MENU);
+                }
+                if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
+                    switchScreens(currentScreen, GAME);
+                }
             }
         }
         break;
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                switchScreens(currentScreen, GAMEOVER);
+                if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
+                    switchScreens(currentScreen, LEVEL);
+                }
+                if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
+                    switchScreens(currentScreen, GAMEOVER);
+                }
             }
         }
         break;
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                switchScreens(currentScreen, MENU);
+                if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
+                    switchScreens(currentScreen, GAME);
+                }
+                if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
+                    // switchScreens(currentScreen, MENU);
+                }
             }
         }
         break;
@@ -157,14 +175,17 @@ void update(GameScreen *currentScreen, int *framesCounter) {
     }
 }
 
-
-void drawButtons(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
-    float BUTTON_WIDTH = buttonsTexture.width / 6;
-    float BUTTON_HEIGHT = buttonsTexture.height / 2;
-
+void drawButtonLeft(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest) {
     DrawTexturePro(buttonsTexture, buttons[UI_LEFT], buttonLeftDest, (Vector2) {0}, 0, WHITE);
+}
+void drawButtonRight(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonRightDest) {
     DrawTexturePro(buttonsTexture, buttons[UI_RIGHT], buttonRightDest, (Vector2) {0}, 0, WHITE);
 }
+void drawButtons(Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
+    drawButtonLeft(buttonsTexture, buttons, buttonLeftDest);
+    drawButtonRight(buttonsTexture, buttons, buttonRightDest);
+}
+
 void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D buttonsTexture, Rectangle buttons[], Rectangle buttonLeftDest, Rectangle buttonRightDest) {
     BeginDrawing();
     // ClearBackground(WHITE);
@@ -188,7 +209,7 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D
         case MENU: {
             ClearBackground(BLUE);
             DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
+            drawButtonRight(buttonsTexture, buttons, buttonRightDest);
         }
         break;
         case LEVEL: {
@@ -206,7 +227,7 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, Texture2D
         case GAMEOVER: {
             ClearBackground(YELLOW);
             DrawTextPro(GetFontDefault(), "Gameover", textPosition, textOrigin, 0, 40, 20, BLACK);
-            drawButtons(buttonsTexture, buttons, buttonLeftDest, buttonRightDest);
+            drawButtonLeft(buttonsTexture, buttons, buttonLeftDest);
         }
         break;
         default: break;
@@ -287,7 +308,7 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&currentScreen);
+        handleInput(&currentScreen, buttonLeftDest, buttonRightDest);
 
         // Update
         update(&currentScreen, &frameCounter);
