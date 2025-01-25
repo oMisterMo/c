@@ -29,37 +29,42 @@ typedef struct Tween {
 } Tween;
 
 
-void handleInput(int currentScreen) {
+void handleInput(int *currentScreen) {
     // printf("currentScreen: %d\n", currentScreen);
 
-    switch (currentScreen) {
+    switch (*currentScreen) {
         case LOGO: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("Logo\n");
+                *currentScreen = MENU;
             }
         }
         break;
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("Menu\n");
+                *currentScreen = LEVEL;
             }
         }
         break;
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("Level\n");
+                *currentScreen = GAME;
             }
         }
         break;
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("Game\n");
+                *currentScreen = GAMEOVER;
             }
         }
         break;
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("Gameover\n");
+                *currentScreen = MENU;
             }
         }
         break;
@@ -82,6 +87,7 @@ void update(int currentScreen) {
         }
         break;
         case GAME: {
+
         }
         break;
         case GAMEOVER: {
@@ -191,7 +197,7 @@ int main() {
 
     Vector2 textPosition = { 40, 40 };
     Vector2 textOrigin = { 0 };
-    int currentScreen = MENU;
+    int currentScreen = LOGO;
 
 
 
@@ -200,7 +206,7 @@ int main() {
         frameCounter++;
 
         // Handle input
-        handleInput(currentScreen);
+        handleInput(&currentScreen);
 
         // Update
         update(currentScreen);
