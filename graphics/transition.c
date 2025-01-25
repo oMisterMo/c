@@ -53,6 +53,11 @@ void switchScreens(GameScreen *current, GameScreen next) {
 void handleInput(GameScreen *currentScreen) {
     // printf("currentScreen: %d\n", currentScreen);
 
+    if (*currentScreen == TRANSITION_IN || *currentScreen == TRANSITION_OUT) {
+        printf("No Touching...!\n");
+        return;
+    }
+
     switch (*currentScreen) {
         case LOGO: {
             // Do nothing or click to skip?
@@ -117,7 +122,7 @@ void update(GameScreen *currentScreen, int *framesCounter) {
         default: break;
     }
 
-    if (TRANSITION_IN) {
+    if (*currentScreen == TRANSITION_IN) {
         // if (state == TWEENING) {
         //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
         //     destRect.width  += scale;
@@ -138,14 +143,14 @@ void update(GameScreen *currentScreen, int *framesCounter) {
 
         // }
     }
-    if (TRANSITION_OUT) {
+    if (*currentScreen == TRANSITION_OUT) {
 
     }
 }
 
 void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
     BeginDrawing();
-    ClearBackground(WHITE);
+    // ClearBackground(WHITE);
 
 
     switch (currentScreen) {
@@ -188,13 +193,13 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin) {
     }
 
     // Transition
-    if (TRANSITION_IN) {
-        // DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
+    if (currentScreen == TRANSITION_IN) {
+        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
         // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
         // DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);
     }
-    if (TRANSITION_OUT) {
-
+    if (currentScreen == TRANSITION_OUT) {
+        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), PINK);
     }
 
     EndDrawing();
