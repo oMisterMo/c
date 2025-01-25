@@ -13,8 +13,8 @@ typedef enum {
     LEVEL,
     GAME,
     GAMEOVER,
-    TRANSITION_OUT,
-    TRANSITION_IN
+    TRANSITION_START,
+    TRANSITION_END
 } GameScreen;
 
 typedef enum {
@@ -68,8 +68,8 @@ void switchScreens(GameScreen *current, GameScreen next) {
 void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle buttonRightDest) {
     // printf("currentScreen: %d\n", currentScreen);
 
-    if (*currentScreen == TRANSITION_IN || *currentScreen == TRANSITION_OUT) {
-        printf("No Touching...!\n");
+    if (*currentScreen == TRANSITION_START || *currentScreen == TRANSITION_END) {
+        // printf("No Touching...!\n");
         return;
     }
 
@@ -84,7 +84,8 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
                     // switchScreens(currentScreen, LEVEL);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
-                    switchScreens(currentScreen, LEVEL);
+                    switchScreens(currentScreen, TRANSITION_START);
+                    // switchScreens(currentScreen, LEVEL);
                 }
             }
         }
@@ -155,7 +156,10 @@ void update(GameScreen *currentScreen, int *framesCounter) {
         default: break;
     }
 
-    if (*currentScreen == TRANSITION_IN) {
+    if (*currentScreen == TRANSITION_START) {
+
+    }
+    if (*currentScreen == TRANSITION_END) {
         // if (state == TWEENING) {
         //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
         //     destRect.width  += scale;
@@ -175,9 +179,6 @@ void update(GameScreen *currentScreen, int *framesCounter) {
         // if (state == IDLE) {
 
         // }
-    }
-    if (*currentScreen == TRANSITION_OUT) {
-
     }
 }
 
@@ -237,13 +238,13 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, UIButtons
     }
 
     // Transition
-    if (currentScreen == TRANSITION_IN) {
+    if (currentScreen == TRANSITION_START) {
+        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), PINK);
+    }
+    if (currentScreen == TRANSITION_END) {
         DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
         // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
         // DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);
-    }
-    if (currentScreen == TRANSITION_OUT) {
-        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), PINK);
     }
 
     EndDrawing();
