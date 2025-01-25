@@ -1,49 +1,12 @@
 #include "raylib.h"
 #include "reasings.h"
+#include "transition.h"
 #include <stdio.h>
 #include <assert.h>
 
 #define LOGO_DELAY_SECS 3
 #define MIN_SCALE 0
 #define MAX_SCALE 2
-
-typedef enum {
-    LOGO = 0,
-    MENU,
-    LEVEL,
-    GAME,
-    GAMEOVER,
-    TRANSITION_START,
-    TRANSITION_END
-} GameScreen;
-
-typedef enum {
-    UI_BACK = 0,
-    UI_RETRY,
-    UI_RANDOM,
-    UI_SKIP,
-    UI_LEFT,
-    UI_RIGHT
-} UIButton;
-
-typedef enum {
-    IDLE = 0,
-    TWEENING
-} TweenState;
-
-typedef struct Tween {
-    Vector2 startPosition;      // Tween start
-    Vector2 targetPosition;     // Tween end [could be consts]
-    int state;                  // IDLE | TWEENING
-    int frameCounter;           // Current time in tween
-    int duration;               // How long to tween
-} Tween;
-
-typedef struct UIButtons {
-    Texture2D texture;
-    Rectangle src;
-    Rectangle dest;
-} UIButtons;
 
 char* screenName(GameScreen screen) {
     if (screen == 0) return "Logo";
@@ -56,16 +19,16 @@ char* screenName(GameScreen screen) {
     return "Error";
 }
 
-void switchScreens(GameScreen *current, GameScreen next) {
+void switchScreens(GameScreen *current, GameScreen next, int *framesCounter) {
     assert(next >= 0 && next <= 6);
     printf("------------------------------\n");
     printf("Switch screen: %s\n", screenName(next));
     printf("------------------------------\n");
-
+    *framesCounter = 0;
     *current = next;
 }
 
-void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle buttonRightDest) {
+void handleInput(GameScreen *currentScreen, int *framesCounter, Rectangle buttonLeftDest, Rectangle buttonRightDest, Rectangle *bg) {
     // printf("currentScreen: %d\n", currentScreen);
 
     if (*currentScreen == TRANSITION_START || *currentScreen == TRANSITION_END) {
@@ -81,11 +44,11 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
-                    // switchScreens(currentScreen, LEVEL);
+                    // switchScreens(currentScreen, LEVEL, framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
-                    switchScreens(currentScreen, TRANSITION_START);
-                    // switchScreens(currentScreen, LEVEL);
+                    switchScreens(currentScreen, LEVEL, framesCounter);
+                    // switchScreens(currentScreen, LEVEL, framesCounter);
                 }
             }
         }
@@ -93,10 +56,10 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
-                    switchScreens(currentScreen, MENU);
+                    switchScreens(currentScreen, MENU, framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
-                    switchScreens(currentScreen, GAME);
+                    switchScreens(currentScreen, GAME, framesCounter);
                 }
             }
         }
@@ -104,10 +67,10 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
-                    switchScreens(currentScreen, LEVEL);
+                    switchScreens(currentScreen, LEVEL, framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
-                    switchScreens(currentScreen, GAMEOVER);
+                    switchScreens(currentScreen, GAMEOVER, framesCounter);
                 }
             }
         }
@@ -115,10 +78,10 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeftDest)) {
-                    switchScreens(currentScreen, GAME);
+                    switchScreens(currentScreen, GAME, framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRightDest)) {
-                    // switchScreens(currentScreen, MENU);
+                    // switchScreens(currentScreen, MENU, framesCounter);
                 }
             }
         }
@@ -127,49 +90,53 @@ void handleInput(GameScreen *currentScreen, Rectangle buttonLeftDest, Rectangle 
     }
 }
 
-void update(GameScreen *currentScreen, int *framesCounter) {
+void update(GameScreen *currentScreen, int *framesCounter, Rectangle *bg) {
     switch (*currentScreen) {
         case LOGO: {
+            (*framesCounter)++;
+
+
             double currentTime = GetTime();
 
             if (currentTime >= LOGO_DELAY_SECS) {
-                switchScreens(currentScreen, MENU);
+                switchScreens(currentScreen, MENU, framesCounter);
             }
         }
         break;
         case MENU: {
-
+            (*framesCounter)++;
         }
         break;
         case LEVEL: {
-
+            (*framesCounter)++;
         }
         break;
         case GAME: {
-
+            (*framesCounter)++;
         }
         break;
         case GAMEOVER: {
-
+            (*framesCounter)++;
         }
         break;
         default: break;
     }
 
     if (*currentScreen == TRANSITION_START) {
-
+        (*framesCounter)++;
     }
     if (*currentScreen == TRANSITION_END) {
+        (*framesCounter)++;
         // if (state == TWEENING) {
-        //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
+        //     scale = EaseSineOut((float)framesCounter, 0, 70, duration);
         //     destRect.width  += scale;
         //     destRect.height += scale;
         //     origin.x = (float) destRect.width / 2;
         //     origin.y = (float) destRect.height / 2;
         //     // printf("%.1f,%.1f\n", destRect.width, destRect.height);
         //     printf("scale: %f\n", scale);
-        //     if (frameCounter > duration) {
-        //         frameCounter = 0;
+        //     if (framesCounter > duration) {
+        //         framesCounter = 0;
         //         scale = 70.0;
         //         state = IDLE;
         //         printf("scale: %f\n", scale);
@@ -190,9 +157,11 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonRight);
 }
 
-void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight) {
+void draw(int currentScreen, int *framesCounter, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
     BeginDrawing();
     // ClearBackground(WHITE);
+
+    printf("%d\n", *framesCounter);
 
     switch (currentScreen) {
         case LOGO: {
@@ -239,10 +208,11 @@ void draw(int currentScreen, Vector2 textPosition, Vector2 textOrigin, UIButtons
 
     // Transition
     if (currentScreen == TRANSITION_START) {
-        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), PINK);
+        DrawRectangle(bg.x, bg.y, bg.width, bg.height, PINK);
     }
     if (currentScreen == TRANSITION_END) {
-        DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
+        // DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
+        DrawRectangle(bg.x, bg.y, bg.width, bg.height, ORANGE);
         // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
         // DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);
     }
@@ -301,9 +271,11 @@ int main() {
 
     // Tween
     Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
-    int frameCounter = 0;
+    int framesCounter = 0;
     float duration = 60 * 1.5;
     int state = TWEENING;
+    Rectangle bg = { 0, 0, GetScreenWidth(), GetScreenHeight() };
+    float screenEnterTime = 0;
 
     Vector2 textPosition = { 40, 40 };
     Vector2 textOrigin = { 0 };
@@ -314,13 +286,13 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&currentScreen, buttonLeftDest, buttonRightDest);
+        handleInput(&currentScreen, &framesCounter, buttonLeftDest, buttonRightDest, &bg);
 
         // Update
-        update(&currentScreen, &frameCounter);
+        update(&currentScreen, &framesCounter, &bg);
 
         // Draw
-        draw(currentScreen, textPosition, textOrigin, buttonLeft, buttonRight);
+        draw(currentScreen, &framesCounter, textPosition, textOrigin, buttonLeft, buttonRight, bg);
     }
 
 
