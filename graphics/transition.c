@@ -54,8 +54,8 @@ int main() {
     }
     Rectangle buttonDestLeft = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
     Rectangle buttonDestRight = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
-    UIButtons buttonLeft = { buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false };
-    UIButtons buttonRight = { buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false };
+    UIButtons buttonLeft = { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false };
+    UIButtons buttonRight = { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false };
     printf("--------------\n");
     printf("Original address: %p\n", &buttonsTexture);
 
@@ -73,7 +73,7 @@ int main() {
     GameScreen currentScreen = MENU;
 
     printf("--------------\n");
-    printf("ButtonLeft address: %p\n", &buttonLeft.texture);
+    printf("ButtonLeft address: %p\n", (buttonLeft.texture));
     printf("--------------\n");
     SetTargetFPS(60);
     while (!WindowShouldClose()) {

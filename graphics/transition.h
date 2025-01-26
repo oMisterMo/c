@@ -41,7 +41,7 @@ typedef struct Tween {
 } Tween;
 
 typedef struct UIButtons {
-    Texture2D texture;
+    Texture2D *texture;
     Rectangle src;
     Rectangle hoverSrc;
     Rectangle dest;
@@ -237,9 +237,9 @@ void update(GameScreen *currentScreen, TransitionState *currentTransition, int *
 
 void drawButtonButton(UIButtons button) {
     if (button.hover) {
-        DrawTexturePro(button.texture, button.hoverSrc, button.dest, (Vector2) {0}, 0, WHITE);
+        DrawTexturePro(*button.texture, button.hoverSrc, button.dest, (Vector2) {0}, 0, WHITE);
     } else {
-        DrawTexturePro(button.texture, button.src, button.dest, (Vector2) {0}, 0, WHITE);
+        DrawTexturePro(*button.texture, button.src, button.dest, (Vector2) {0}, 0, WHITE);
     }
 }
 void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
