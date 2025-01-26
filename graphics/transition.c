@@ -61,7 +61,6 @@ int main() {
 
     // Tween
     Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
-    int framesCounter = 0;
     float duration = 60 * 1.5;
     int state = TWEENING;
     Rectangle bg = { 0, 0, GetScreenWidth(), GetScreenHeight() };
@@ -69,8 +68,8 @@ int main() {
 
     Vector2 textPosition = { 40, 40 };
     Vector2 textOrigin = { 0 };
-    TransitionState currentTransition = IDLE;
-    GameScreen currentScreen = MENU;
+
+    Game game = { MENU, IDLE, 0 };
 
     printf("--------------\n");
     printf("ButtonLeft address: %p\n", (buttonLeft.texture));
@@ -78,13 +77,13 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&currentScreen, &currentTransition, &framesCounter, buttonLeft, buttonRight, &bg);
+        handleInput(&game, buttonLeft, buttonRight, &bg);
 
         // Update
-        update(&currentScreen, &currentTransition, &framesCounter, &buttonLeft, &buttonRight, &bg);
+        update(&game, &buttonLeft, &buttonRight, &bg);
 
         // Draw
-        draw(currentScreen, currentTransition, framesCounter, textPosition, textOrigin, buttonLeft, buttonRight, bg);
+        draw(game, textPosition, textOrigin, buttonLeft, buttonRight, bg);
     }
 
 

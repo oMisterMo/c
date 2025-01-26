@@ -48,6 +48,12 @@ typedef struct UIButtons {
     bool hover;
 } UIButtons;
 
+typedef struct Game {
+    GameScreen currentScreen;
+    TransitionState currentTransition;
+    int framesCounter;
+} Game;
+
 char* screenName(GameScreen screen) {
     if (screen == 0) return "Loading";
     if (screen == 1) return "Logo";
@@ -69,15 +75,15 @@ void switchScreens(GameScreen *current, GameScreen next, int *framesCounter) {
     *current = next;
 }
 
-void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, int *framesCounter, UIButtons buttonLeft, UIButtons buttonRight, Rectangle *bg) {
+void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle *bg) {
     // printf("currentScreen: %d\n", currentScreen);
 
-    if (*currentTransition == TRANSITION_START || *currentTransition == TRANSITION_END) {
+    if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
         printf("No Touching...!\n");
         return;
     }
 
-    switch (*currentScreen) {
+    switch (game->currentScreen) {
         case LOGO: {
             // Do nothing or click to skip?
         }
@@ -85,11 +91,10 @@ void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, 
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
-                    // switchScreens(currentScreen, LEVEL, framesCounter);
+                    // Do nothing
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
-                    switchScreens(currentScreen, LEVEL, framesCounter);
-                    // switchScreens(currentScreen, LEVEL, framesCounter);
+                    switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
                 }
             }
 
@@ -105,10 +110,10 @@ void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, 
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
-                    switchScreens(currentScreen, MENU, framesCounter);
+                    switchScreens(&game->currentScreen, MENU, &game->framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
-                    switchScreens(currentScreen, GAME, framesCounter);
+                    switchScreens(&game->currentScreen, GAME, &game->framesCounter);
                 }
             }
         }
@@ -116,10 +121,10 @@ void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, 
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
-                    switchScreens(currentScreen, LEVEL, framesCounter);
+                    switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
-                    switchScreens(currentScreen, GAMEOVER, framesCounter);
+                    switchScreens(&game->currentScreen, GAMEOVER, &game->framesCounter);
                 }
             }
         }
@@ -127,10 +132,10 @@ void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, 
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
-                    switchScreens(currentScreen, GAME, framesCounter);
+                    switchScreens(&game->currentScreen, GAME, &game->framesCounter);
                 }
                 if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
-                    // switchScreens(currentScreen, MENU, framesCounter);
+                    // Do nothing
                 }
             }
         }
@@ -139,21 +144,21 @@ void handleInput(GameScreen *currentScreen, TransitionState *currentTransition, 
     }
 }
 
-void update(GameScreen *currentScreen, TransitionState *currentTransition, int *framesCounter, UIButtons *buttonLeft, UIButtons *buttonRight, Rectangle *bg) {
-    switch (*currentScreen) {
+void update(Game *game, UIButtons *buttonLeft, UIButtons *buttonRight, Rectangle *bg) {
+    switch (game->currentScreen) {
         case LOGO: {
-            (*framesCounter)++;
+            (game->framesCounter)++;
 
 
             double currentTime = GetTime();
 
             if (currentTime >= LOGO_DELAY_SECS) {
-                switchScreens(currentScreen, MENU, framesCounter);
+                switchScreens(&game->currentScreen, MENU, &game->framesCounter);
             }
         }
         break;
         case MENU: {
-            (*framesCounter)++;
+            (game->framesCounter)++;
 
 
             if (CheckCollisionPointRec(GetMousePosition(), buttonRight->dest)) {
@@ -164,7 +169,7 @@ void update(GameScreen *currentScreen, TransitionState *currentTransition, int *
         }
         break;
         case LEVEL: {
-            (*framesCounter)++;
+            (game->framesCounter)++;
 
             if (CheckCollisionPointRec(GetMousePosition(), buttonLeft->dest)) {
                 buttonLeft->hover = true;
@@ -179,7 +184,7 @@ void update(GameScreen *currentScreen, TransitionState *currentTransition, int *
         }
         break;
         case GAME: {
-            (*framesCounter)++;
+            (game->framesCounter)++;
 
 
 
@@ -196,7 +201,7 @@ void update(GameScreen *currentScreen, TransitionState *currentTransition, int *
         }
         break;
         case GAMEOVER: {
-            (*framesCounter)++;
+            (game->framesCounter)++;
 
             if (CheckCollisionPointRec(GetMousePosition(), buttonLeft->dest)) {
                 buttonLeft->hover = true;
@@ -247,13 +252,13 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonRight);
 }
 
-void draw(int currentScreen, TransitionState currentTransition, int framesCounter, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
+void draw(Game game, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
     // printf("%d\n", *framesCounter);
 
-    switch (currentScreen) {
+    switch (game.currentScreen) {
         case LOGO: {
             ClearBackground(WHITE);
             int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
@@ -293,17 +298,17 @@ void draw(int currentScreen, TransitionState currentTransition, int framesCounte
             drawButtonButton(buttonLeft);
 
             // Draw blinking text
-            if (((framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
+            if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
         }
         break;
         default: break;
     }
 
     // Transition
-    if (currentTransition == TRANSITION_START) {
+    if (game.currentTransition == TRANSITION_START) {
         DrawRectangle(bg.x, bg.y, bg.width, bg.height, PINK);
     }
-    if (currentTransition == TRANSITION_END) {
+    if (game.currentTransition == TRANSITION_END) {
         DrawRectangle(bg.x, bg.y, bg.width, bg.height, ORANGE);
         // DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
         // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
