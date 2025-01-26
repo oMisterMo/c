@@ -65,7 +65,7 @@ int main() {
     // Tween
     Rectangle tweenBG = { 0, 0, GetScreenWidth(), GetScreenHeight() };
 
-    Game game = { MENU, IDLE, 0 };
+    Game game = { LOADING, IDLE, 0, 0 };
 
     printf("--------------\n");
     printf("ButtonLeft.texture: %p\n", (gameUI.left.texture));

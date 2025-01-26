@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#define LOADING_DELAY 2.5f
 #define LOGO_DELAY_SECS 3
 
 typedef enum {
@@ -57,6 +58,7 @@ typedef struct Game {
     GameScreen currentScreen;
     TransitionState currentTransition;
     int framesCounter;
+    float logoCounter;
 } Game;
 
 char* screenName(GameScreen screen) {
@@ -170,12 +172,28 @@ void updateHoverButtonState(UIButtons *button) {
         button->hover = false;
     }
 }
+void updateLoading(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+    (game->logoCounter)++;
+
+    // Load logo screen after a few seconds
+    if (game->logoCounter > 60 * LOADING_DELAY) {
+        switchScreens(&game->currentScreen, LOGO, &game->framesCounter);
+    }
+
+    // Reset frames counter to get the loading balls effect
+    if (game->framesCounter > 150) {
+        game->framesCounter = 0;
+    }
+}
 void updateLogo(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
-
-    double currentTime = GetTime();
-    if (currentTime >= LOGO_DELAY_SECS) {
+    // double currentTime = GetTime();
+    // if (currentTime >= LOGO_DELAY_SECS) {
+    //     switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+    // }
+    if (game->framesCounter >= 60 * LOGO_DELAY_SECS) {
         switchScreens(&game->currentScreen, MENU, &game->framesCounter);
     }
 }
@@ -204,6 +222,10 @@ void updateGameover(Game *game, GameUI *gameUI) {
 }
 void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     switch (game->currentScreen) {
+        case LOADING: {
+            updateLoading(game, gameUI);
+        }
+        break;
         case LOGO: {
             updateLogo(game, gameUI);
         }
@@ -267,9 +289,32 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonLeft);
     drawButtonButton(buttonRight);
 }
-void drawLogo() {
+void drawLoading(Game game) {
+    ClearBackground(BLACK);
+
+    float radius = 5;
+    float pad = 30;
+    int fontSize = 20;
+    float textW = MeasureText("Loading", fontSize) * 1.4;
+    float posX =  pad + radius;
+    float posY = GetScreenHeight() - pad - radius;
+    float spaceBetween = radius * 2 + 10;
+    Color color = WHITE;
+
+    DrawText("Loading", posX, posY - fontSize / 2, fontSize, color);
+    if (game.framesCounter > 30) {
+        DrawCircle(textW + posX, posY, radius, color);
+    }
+    if (game.framesCounter > 60) {
+        DrawCircle(textW + posX + spaceBetween, posY, radius, color);
+    }
+    if (game.framesCounter > 120) {
+        DrawCircle(textW + posX + spaceBetween * 2, posY, radius, color);
+    }
+}
+void drawLogo(Game game) {
     ClearBackground(WHITE);
-    int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
+    int countdown = LOGO_DELAY_SECS - (game.framesCounter / 60);
     int fontSize = 240;
     // char *num = 48 + countdown;
     int textW = MeasureText(TextFormat("%d", countdown), fontSize);
@@ -311,8 +356,12 @@ void draw(Game game, GameUI gameUI, Rectangle bg) {
     // printf("%d\n", *framesCounter);
 
     switch (game.currentScreen) {
+        case LOADING: {
+            drawLoading(game);
+        }
+        break;
         case LOGO: {
-            drawLogo();
+            drawLogo(game);
         }
         break;
         case MENU: {
