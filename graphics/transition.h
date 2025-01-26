@@ -58,7 +58,8 @@ typedef struct Game {
     GameScreen currentScreen;
     TransitionState currentTransition;
     int framesCounter;
-    float logoCounter;
+    float frameEntered;
+    float logoCounter;      // I do not need this now that I have frameEntered
 } Game;
 
 char* screenName(GameScreen screen) {
@@ -67,19 +68,22 @@ char* screenName(GameScreen screen) {
     if (screen == 2) return "Menu";
     if (screen == 3) return "Level";
     if (screen == 4) return "Game";
-    if (screen == 5) return "GameOver";
+    if (screen == 5) return "Game Over";
     // if (screen == 5) return "Transition Out";
     // if (screen == 6) return "Transition In";
     return "Error";
 }
 
-void switchScreens(GameScreen *current, GameScreen next, int *framesCounter) {
-    assert(next >= 0 && next <= 6);
+void switchScreens(Game *game, GameScreen next) {
+    assert(next >= LOADING && next <= GAMEOVER);
     printf("------------------------------\n");
     printf("Switch screen: %s\n", screenName(next));
+    printf("Entered at %.2f\n", GetTime());
     printf("------------------------------\n");
-    *framesCounter = 0;
-    *current = next;
+
+    game->framesCounter = 0;
+    game->frameEntered = GetTime();
+    game->currentScreen = next;
 }
 
 
@@ -89,7 +93,7 @@ void inputMenu(Game *game, GameUI gameUI) {
             // Do nothing
         }
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-            switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
+            switchScreens(game, LEVEL);
         }
     }
 
@@ -104,27 +108,27 @@ void inputMenu(Game *game, GameUI gameUI) {
 void inputLevel(Game *game, GameUI gameUI) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-            switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+            switchScreens(game, MENU);
         }
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-            switchScreens(&game->currentScreen, GAME, &game->framesCounter);
+            switchScreens(game, GAME);
         }
     }
 }
 void inputGame(Game *game, GameUI gameUI) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-            switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
+            switchScreens(game, LEVEL);
         }
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-            switchScreens(&game->currentScreen, GAMEOVER, &game->framesCounter);
+            switchScreens(game, GAMEOVER);
         }
     }
 }
 void inputGameover(Game *game, GameUI gameUI) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-            switchScreens(&game->currentScreen, GAME, &game->framesCounter);
+            switchScreens(game, GAME);
         }
         if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
             // Do nothing
@@ -178,7 +182,7 @@ void updateLoading(Game *game, GameUI *gameUI) {
 
     // Load logo screen after a few seconds
     if (game->logoCounter > 60 * LOADING_DELAY) {
-        switchScreens(&game->currentScreen, LOGO, &game->framesCounter);
+        switchScreens(game, LOGO);
     }
 
     // Reset frames counter to get the loading balls effect
@@ -191,10 +195,10 @@ void updateLogo(Game *game, GameUI *gameUI) {
 
     // double currentTime = GetTime();
     // if (currentTime >= LOGO_DELAY_SECS) {
-    //     switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+    //     switchScreens(game, MENU);
     // }
     if (game->framesCounter >= 60 * LOGO_DELAY_SECS) {
-        switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+        switchScreens(game, MENU);
     }
 }
 void updateMenu(Game *game, GameUI *gameUI) {
