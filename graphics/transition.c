@@ -39,18 +39,18 @@ int main() {
     int BUTTON_H = buttonsTexture.height / 2;
     Rectangle buttonsSrc[12];
     // Regular buttonsSrc
-    for (int i = 0; i < 6; i++) {
-        buttonsSrc[i] = (Rectangle) {
-            (float) i * buttonsTexture.width / 6,
+    for (int x = 0; x < 6; x++) {
+        buttonsSrc[x] = (Rectangle) {
+            (float) x * buttonsTexture.width / 6,
             0,
             (float) buttonsTexture.width / 6,
             (float) buttonsTexture.height / 2
         };
     }
     // Hover button (i + 6)
-    for (int i = 6; i < 12; i++) {
+    for (int x = 0, i = 6; x < 6; i++, x++) {
         buttonsSrc[i] = (Rectangle) {
-            (float) i * buttonsTexture.width / 6,
+            (float) x * buttonsTexture.width / 6,
             buttonsTexture.height / 2,
             (float) buttonsTexture.width / 6,
             (float) buttonsTexture.height / 2
