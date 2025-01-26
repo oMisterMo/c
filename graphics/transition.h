@@ -252,7 +252,7 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonRight);
 }
 
-void draw(Game game, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
+void draw(Game game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
@@ -269,32 +269,32 @@ void draw(Game game, Vector2 textPosition, Vector2 textOrigin, UIButtons buttonL
             int fontY = GetScreenHeight() / 2 - 100;
 
             // Draw screen name
-            DrawTextPro(GetFontDefault(), "Logo", textPosition, textOrigin, 0, 40, 20, BLACK);
+            DrawTextPro(GetFontDefault(), "Logo", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
             // Draw countdown
             DrawText(TextFormat("%d", countdown), fontX, fontY, fontSize, BLACK);
         }
         break;
         case MENU: {
             ClearBackground(BLUE);
-            DrawTextPro(GetFontDefault(), "Menu", textPosition, textOrigin, 0, 40, 20, BLACK);
+            DrawTextPro(GetFontDefault(), "Menu", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
             drawButtonButton(buttonRight);
         }
         break;
         case LEVEL: {
             ClearBackground(RED);
-            DrawTextPro(GetFontDefault(), "Level", textPosition, textOrigin, 0, 40, 20, BLACK);
+            DrawTextPro(GetFontDefault(), "Level", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
             drawButtons(buttonLeft, buttonRight);
         }
         break;
         case GAME: {
             ClearBackground(GREEN);
-            DrawTextPro(GetFontDefault(), "Game", textPosition, textOrigin, 0, 40, 20, BLACK);
+            DrawTextPro(GetFontDefault(), "Game", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
             drawButtons(buttonLeft, buttonRight);
         }
         break;
         case GAMEOVER: {
             ClearBackground(YELLOW);
-            DrawTextPro(GetFontDefault(), "Gameover", textPosition, textOrigin, 0, 40, 20, BLACK);
+            DrawTextPro(GetFontDefault(), "Gameover", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
             drawButtonButton(buttonLeft);
 
             // Draw blinking text

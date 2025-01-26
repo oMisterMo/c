@@ -17,9 +17,11 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Transition");
     SetWindowMonitor(2);
 
-    // Texture
+    // Load Textures
     Texture2D transitionTexture = LoadTexture("resources/ui/transition.png");
-    int rotation = 0;
+    Texture2D buttonsTexture = LoadTexture("resources/ui/buttons_navigation.png");
+
+    // Set texture attribute
     float scale = 0.01;
     transitionTexture.width *= scale;
     transitionTexture.height *= scale;
@@ -27,8 +29,7 @@ int main() {
     Rectangle destRect = { screenWidth / 2, screenHeight / 2, transitionTexture.width, transitionTexture.height };
     Vector2 origin = { (float) transitionTexture.width / 2, (float) transitionTexture.height / 2 };
 
-    // Buttons
-    Texture2D buttonsTexture = LoadTexture("resources/ui/buttons_navigation.png");
+    // Set buttons attrubutes
     buttonsTexture.width *= 0.3;
     buttonsTexture.height *= 0.3;
     int BUTTON_W = buttonsTexture.width / 6;
@@ -57,33 +58,29 @@ int main() {
     UIButtons buttonLeft = { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false };
     UIButtons buttonRight = { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false };
     printf("--------------\n");
-    printf("Original address: %p\n", &buttonsTexture);
+    printf("buttonsTexture: %p\n", &buttonsTexture);
 
     // Tween
-    Tween tween = { (Vector2) {}, (Vector2) {}, TWEENING, 0, 60 * 3 };
-    float duration = 60 * 1.5;
-    int state = TWEENING;
-    Rectangle bg = { 0, 0, GetScreenWidth(), GetScreenHeight() };
-    float screenEnterTime = 0;
-
-    Vector2 textPosition = { 40, 40 };
-    Vector2 textOrigin = { 0 };
+    Rectangle tweenBG = { 0, 0, GetScreenWidth(), GetScreenHeight() };
 
     Game game = { MENU, IDLE, 0 };
 
     printf("--------------\n");
-    printf("ButtonLeft address: %p\n", (buttonLeft.texture));
+    printf("ButtonLeft.texture: %p\n", (buttonLeft.texture));
     printf("--------------\n");
+
+
+
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&game, buttonLeft, buttonRight, &bg);
+        handleInput(&game, buttonLeft, buttonRight, &tweenBG);
 
         // Update
-        update(&game, &buttonLeft, &buttonRight, &bg);
+        update(&game, &buttonLeft, &buttonRight, &tweenBG);
 
         // Draw
-        draw(game, textPosition, textOrigin, buttonLeft, buttonRight, bg);
+        draw(game, buttonLeft, buttonRight, tweenBG);
     }
 
 
