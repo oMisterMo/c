@@ -52,6 +52,7 @@ typedef struct UIButtons {
 typedef struct GameUI {
     UIButtons left;
     UIButtons right;
+    Texture2D *flower;
 } GameUI;
 
 typedef struct Game {
@@ -293,27 +294,38 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonLeft);
     drawButtonButton(buttonRight);
 }
-void drawLoading(Game game) {
+void drawLoading(Game game, GameUI gameUI) {
     ClearBackground(BLACK);
 
-    float radius = 5;
-    float pad = 30;
-    int fontSize = 20;
-    float textW = MeasureText("Loading", fontSize) * 1.4;
-    float posX =  pad + radius;
-    float posY = GetScreenHeight() - pad - radius;
-    float spaceBetween = radius * 2 + 10;
+    int fontSize = 30;
+    float radius = 5, pad = 30, textW = MeasureText("Loading", fontSize);
+    float posX =  pad + radius, posY = GetScreenHeight() - pad - radius;
+    float spaceBetween = radius * 2;
+    float flowerW = gameUI.flower->width;
     Color color = WHITE;
+    float flowers = true;
 
     DrawText("Loading", posX, posY - fontSize / 2, fontSize, color);
     if (game.framesCounter > 30) {
-        DrawCircle(textW + posX, posY, radius, color);
+        if (flowers) {
+            DrawTexture(*gameUI.flower, textW + spaceBetween + posX , posY - gameUI.flower->height / 2, WHITE);
+        } else {
+            DrawCircle(textW + posX, posY, radius, color);
+        }
     }
     if (game.framesCounter > 60) {
-        DrawCircle(textW + posX + spaceBetween, posY, radius, color);
+        if (flowers) {
+            DrawTexture(*gameUI.flower, textW + spaceBetween + posX + flowerW , posY - gameUI.flower->height / 2, WHITE);
+        } else {
+            DrawCircle(textW + posX + spaceBetween, posY, radius, color);
+        }
     }
     if (game.framesCounter > 120) {
-        DrawCircle(textW + posX + spaceBetween * 2, posY, radius, color);
+        if (flowers) {
+            DrawTexture(*gameUI.flower, textW + spaceBetween + posX + flowerW * 2, posY - gameUI.flower->height / 2, WHITE);
+        } else {
+            DrawCircle(textW + posX + spaceBetween * 2, posY, radius, color);
+        }
     }
 }
 void drawLogo(Game game) {
@@ -361,7 +373,7 @@ void draw(Game game, GameUI gameUI, Rectangle bg) {
 
     switch (game.currentScreen) {
         case LOADING: {
-            drawLoading(game);
+            drawLoading(game, gameUI);
         }
         break;
         case LOGO: {

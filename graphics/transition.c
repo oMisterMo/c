@@ -20,6 +20,9 @@ int main() {
     // Load Textures
     Texture2D transitionTexture = LoadTexture("resources/ui/transition.png");
     Texture2D buttonsTexture = LoadTexture("resources/ui/buttons_navigation.png");
+    Texture2D flowerTexture = LoadTexture("resources/ui/icon_flower.png");
+    flowerTexture.width *= 0.3;
+    flowerTexture.height *= 0.3;
 
     // Set texture attribute
     float scale = 0.01;
@@ -57,7 +60,8 @@ int main() {
     Rectangle buttonDestRight = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
     GameUI gameUI = { 
         { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false },
-        { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false }
+        { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false },
+        &flowerTexture
     };
     printf("--------------\n");
     printf("buttonsTexture: %p\n", &buttonsTexture);
@@ -88,6 +92,7 @@ int main() {
 
     UnloadTexture(transitionTexture);
     UnloadTexture(buttonsTexture);
+    UnloadTexture(flowerTexture);
     CloseWindow();
     return 0;
 }
