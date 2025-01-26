@@ -164,70 +164,84 @@ void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
 
 
 
+void updateLogo(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+
+
+    double currentTime = GetTime();
+    if (currentTime >= LOGO_DELAY_SECS) {
+        switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+    }
+}
+void updateMenu(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+
+
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+        gameUI->right.hover = true;
+    } else {
+        gameUI->right.hover = false;
+    }
+}
+void updateLevel(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+        gameUI->left.hover = true;
+    } else {
+        gameUI->left.hover = false;
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+        gameUI->right.hover = true;
+    } else {
+        gameUI->right.hover = false;
+    }
+}
+void updateGame(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+
+
+
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+        gameUI->left.hover = true;
+    } else {
+        gameUI->left.hover = false;
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+        gameUI->right.hover = true;
+    } else {
+        gameUI->right.hover = false;
+    }
+}
+void updateGameover(Game *game, GameUI *gameUI) {
+    (game->framesCounter)++;
+
+    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+        gameUI->left.hover = true;
+    } else {
+        gameUI->left.hover = false;
+    }
+}
 void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     switch (game->currentScreen) {
         case LOGO: {
-            (game->framesCounter)++;
-
-
-            double currentTime = GetTime();
-
-            if (currentTime >= LOGO_DELAY_SECS) {
-                switchScreens(&game->currentScreen, MENU, &game->framesCounter);
-            }
+            updateLogo(game, gameUI);
         }
         break;
         case MENU: {
-            (game->framesCounter)++;
-
-
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-                gameUI->right.hover = true;
-            } else {
-                gameUI->right.hover = false;
-            }
+            updateMenu(game, gameUI);
         }
         break;
         case LEVEL: {
-            (game->framesCounter)++;
-
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-                gameUI->left.hover = true;
-            } else {
-                gameUI->left.hover = false;
-            }
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-                gameUI->right.hover = true;
-            } else {
-                gameUI->right.hover = false;
-            }
+            updateLevel(game, gameUI);
         }
         break;
         case GAME: {
-            (game->framesCounter)++;
-
-
-
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-                gameUI->left.hover = true;
-            } else {
-                gameUI->left.hover = false;
-            }
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-                gameUI->right.hover = true;
-            } else {
-                gameUI->right.hover = false;
-            }
+            updateGame(game, gameUI);
         }
         break;
         case GAMEOVER: {
-            (game->framesCounter)++;
-
-            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-                gameUI->left.hover = true;
-            } else {
-                gameUI->left.hover = false;
-            }
+            updateGameover(game, gameUI);
         }
         break;
         default: break;
