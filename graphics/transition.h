@@ -80,6 +80,55 @@ void switchScreens(GameScreen *current, GameScreen next, int *framesCounter) {
     *current = next;
 }
 
+
+void inputMenu(Game *game, GameUI gameUI) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
+            // Do nothing
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
+            switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
+        }
+    }
+
+    if (IsKeyPressed(KEY_Q)) {
+        printf("Q\n");
+    }
+    if (IsKeyPressed(KEY_W)) {
+        printf("W\n");
+
+    }
+}
+void inputLevel(Game *game, GameUI gameUI) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
+            switchScreens(&game->currentScreen, MENU, &game->framesCounter);
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
+            switchScreens(&game->currentScreen, GAME, &game->framesCounter);
+        }
+    }
+}
+void inputGame(Game *game, GameUI gameUI) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
+            switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
+            switchScreens(&game->currentScreen, GAMEOVER, &game->framesCounter);
+        }
+    }
+}
+void inputGameover(Game *game, GameUI gameUI) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
+            switchScreens(&game->currentScreen, GAME, &game->framesCounter);
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
+            // Do nothing
+        }
+    }
+}
 void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
     // printf("currentScreen: %d\n", currentScreen);
 
@@ -94,60 +143,26 @@ void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
         }
         break;
         case MENU: {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-                    // Do nothing
-                }
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-                    switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
-                }
-            }
-
-            if (IsKeyPressed(KEY_Q)) {
-                printf("Q\n");
-            }
-            if (IsKeyPressed(KEY_W)) {
-                printf("W\n");
-
-            }
+            inputMenu(game, gameUI);
         }
         break;
         case LEVEL: {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-                    switchScreens(&game->currentScreen, MENU, &game->framesCounter);
-                }
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-                    switchScreens(&game->currentScreen, GAME, &game->framesCounter);
-                }
-            }
+            inputLevel(game, gameUI);
         }
         break;
         case GAME: {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-                    switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
-                }
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-                    switchScreens(&game->currentScreen, GAMEOVER, &game->framesCounter);
-                }
-            }
+            inputGame(game, gameUI);
         }
         break;
         case GAMEOVER: {
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
-                    switchScreens(&game->currentScreen, GAME, &game->framesCounter);
-                }
-                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
-                    // Do nothing
-                }
-            }
+            inputGameover(game, gameUI);
         }
         break;
         default: break;
     }
 }
+
+
 
 void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     switch (game->currentScreen) {
@@ -245,6 +260,8 @@ void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     // }
 }
 
+
+
 void drawButtonButton(UIButtons button) {
     if (button.hover) {
         DrawTexturePro(*button.texture, button.hoverSrc, button.dest, (Vector2) {0}, 0, WHITE);
@@ -256,8 +273,6 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonLeft);
     drawButtonButton(buttonRight);
 }
-
-
 void drawLogo() {
     ClearBackground(WHITE);
     int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
