@@ -163,7 +163,13 @@ void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
 }
 
 
-
+void updateHoverButtonState(UIButtons *button) {
+    if (CheckCollisionPointRec(GetMousePosition(), button->dest)) {
+        button->hover = true;
+    } else {
+        button->hover = false;
+    }
+}
 void updateLogo(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
@@ -177,50 +183,24 @@ void updateMenu(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
 
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-        gameUI->right.hover = true;
-    } else {
-        gameUI->right.hover = false;
-    }
+    updateHoverButtonState(&gameUI->right);
 }
 void updateLevel(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-        gameUI->left.hover = true;
-    } else {
-        gameUI->left.hover = false;
-    }
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-        gameUI->right.hover = true;
-    } else {
-        gameUI->right.hover = false;
-    }
+    updateHoverButtonState(&gameUI->left);
+    updateHoverButtonState(&gameUI->right);
 }
 void updateGame(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
-
-
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-        gameUI->left.hover = true;
-    } else {
-        gameUI->left.hover = false;
-    }
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
-        gameUI->right.hover = true;
-    } else {
-        gameUI->right.hover = false;
-    }
+    updateHoverButtonState(&gameUI->left);
+    updateHoverButtonState(&gameUI->right);
 }
 void updateGameover(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
-    if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
-        gameUI->left.hover = true;
-    } else {
-        gameUI->left.hover = false;
-    }
+    updateHoverButtonState(&gameUI->left);
 }
 void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     switch (game->currentScreen) {
