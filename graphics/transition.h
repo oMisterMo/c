@@ -48,6 +48,11 @@ typedef struct UIButtons {
     bool hover;
 } UIButtons;
 
+typedef struct GameUI {
+    UIButtons left;
+    UIButtons right;
+} GameUI;
+
 typedef struct Game {
     GameScreen currentScreen;
     TransitionState currentTransition;
@@ -75,7 +80,7 @@ void switchScreens(GameScreen *current, GameScreen next, int *framesCounter) {
     *current = next;
 }
 
-void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle *bg) {
+void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
     // printf("currentScreen: %d\n", currentScreen);
 
     if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
@@ -90,10 +95,10 @@ void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectan
         break;
         case MENU: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
                     // Do nothing
                 }
-                if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
                     switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
                 }
             }
@@ -109,10 +114,10 @@ void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectan
         break;
         case LEVEL: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
                     switchScreens(&game->currentScreen, MENU, &game->framesCounter);
                 }
-                if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
                     switchScreens(&game->currentScreen, GAME, &game->framesCounter);
                 }
             }
@@ -120,10 +125,10 @@ void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectan
         break;
         case GAME: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
                     switchScreens(&game->currentScreen, LEVEL, &game->framesCounter);
                 }
-                if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
                     switchScreens(&game->currentScreen, GAMEOVER, &game->framesCounter);
                 }
             }
@@ -131,10 +136,10 @@ void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectan
         break;
         case GAMEOVER: {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (CheckCollisionPointRec(GetMousePosition(), buttonLeft.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.left.dest)) {
                     switchScreens(&game->currentScreen, GAME, &game->framesCounter);
                 }
-                if (CheckCollisionPointRec(GetMousePosition(), buttonRight.dest)) {
+                if (CheckCollisionPointRec(GetMousePosition(), gameUI.right.dest)) {
                     // Do nothing
                 }
             }
@@ -144,7 +149,7 @@ void handleInput(Game *game, UIButtons buttonLeft, UIButtons buttonRight, Rectan
     }
 }
 
-void update(Game *game, UIButtons *buttonLeft, UIButtons *buttonRight, Rectangle *bg) {
+void update(Game *game, GameUI *gameUI, Rectangle *bg) {
     switch (game->currentScreen) {
         case LOGO: {
             (game->framesCounter)++;
@@ -161,25 +166,25 @@ void update(Game *game, UIButtons *buttonLeft, UIButtons *buttonRight, Rectangle
             (game->framesCounter)++;
 
 
-            if (CheckCollisionPointRec(GetMousePosition(), buttonRight->dest)) {
-                buttonRight->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+                gameUI->right.hover = true;
             } else {
-                buttonRight->hover = false;
+                gameUI->right.hover = false;
             }
         }
         break;
         case LEVEL: {
             (game->framesCounter)++;
 
-            if (CheckCollisionPointRec(GetMousePosition(), buttonLeft->dest)) {
-                buttonLeft->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+                gameUI->left.hover = true;
             } else {
-                buttonLeft->hover = false;
+                gameUI->left.hover = false;
             }
-            if (CheckCollisionPointRec(GetMousePosition(), buttonRight->dest)) {
-                buttonRight->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+                gameUI->right.hover = true;
             } else {
-                buttonRight->hover = false;
+                gameUI->right.hover = false;
             }
         }
         break;
@@ -188,25 +193,25 @@ void update(Game *game, UIButtons *buttonLeft, UIButtons *buttonRight, Rectangle
 
 
 
-            if (CheckCollisionPointRec(GetMousePosition(), buttonLeft->dest)) {
-                buttonLeft->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+                gameUI->left.hover = true;
             } else {
-                buttonLeft->hover = false;
+                gameUI->left.hover = false;
             }
-            if (CheckCollisionPointRec(GetMousePosition(), buttonRight->dest)) {
-                buttonRight->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->right.dest)) {
+                gameUI->right.hover = true;
             } else {
-                buttonRight->hover = false;
+                gameUI->right.hover = false;
             }
         }
         break;
         case GAMEOVER: {
             (game->framesCounter)++;
 
-            if (CheckCollisionPointRec(GetMousePosition(), buttonLeft->dest)) {
-                buttonLeft->hover = true;
+            if (CheckCollisionPointRec(GetMousePosition(), gameUI->left.dest)) {
+                gameUI->left.hover = true;
             } else {
-                buttonLeft->hover = false;
+                gameUI->left.hover = false;
             }
         }
         break;
@@ -290,7 +295,7 @@ void drawGameover(Game game, UIButtons buttonLeft) {
     // Draw blinking text
     if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
 }
-void draw(Game game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
+void draw(Game game, GameUI gameUI, Rectangle bg) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
@@ -302,19 +307,19 @@ void draw(Game game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) 
         }
         break;
         case MENU: {
-            drawMenu(buttonRight);
+            drawMenu(gameUI.right);
         }
         break;
         case LEVEL: {
-            drawLevel(buttonLeft, buttonRight);
+            drawLevel(gameUI.left, gameUI.right);
         }
         break;
         case GAME: {
-            drawGame(buttonLeft, buttonRight);
+            drawGame(gameUI.left, gameUI.right);
         }
         break;
         case GAMEOVER: {
-            drawGameover(game, buttonLeft);
+            drawGameover(game, gameUI.left);
         }
         break;
         default: break;

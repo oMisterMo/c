@@ -55,8 +55,10 @@ int main() {
     }
     Rectangle buttonDestLeft = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
     Rectangle buttonDestRight = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
-    UIButtons buttonLeft = { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false };
-    UIButtons buttonRight = { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false };
+    GameUI gameUI = { 
+        { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false },
+        { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false }
+    };
     printf("--------------\n");
     printf("buttonsTexture: %p\n", &buttonsTexture);
 
@@ -66,7 +68,7 @@ int main() {
     Game game = { MENU, IDLE, 0 };
 
     printf("--------------\n");
-    printf("ButtonLeft.texture: %p\n", (buttonLeft.texture));
+    printf("ButtonLeft.texture: %p\n", (gameUI.left.texture));
     printf("--------------\n");
 
 
@@ -74,13 +76,13 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&game, buttonLeft, buttonRight, &tweenBG);
+        handleInput(&game, gameUI, &tweenBG);
 
         // Update
-        update(&game, &buttonLeft, &buttonRight, &tweenBG);
+        update(&game, &gameUI, &tweenBG);
 
         // Draw
-        draw(game, buttonLeft, buttonRight, tweenBG);
+        draw(game, gameUI, tweenBG);
     }
 
 
