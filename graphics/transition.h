@@ -252,6 +252,44 @@ void drawButtons(UIButtons buttonLeft, UIButtons buttonRight) {
     drawButtonButton(buttonRight);
 }
 
+
+void drawLogo() {
+    ClearBackground(WHITE);
+    int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
+    int fontSize = 240;
+    // char *num = 48 + countdown;
+    int textW = MeasureText(TextFormat("%d", countdown), fontSize);
+    int fontX = (GetScreenWidth() - textW) / 2;
+    int fontY = GetScreenHeight() / 2 - 100;
+
+    // Draw screen name
+    DrawTextPro(GetFontDefault(), "Logo", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
+    // Draw countdown
+    DrawText(TextFormat("%d", countdown), fontX, fontY, fontSize, BLACK);
+}
+void drawMenu(UIButtons buttonRight) {
+    ClearBackground(BLUE);
+    DrawTextPro(GetFontDefault(), "Menu", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
+    drawButtonButton(buttonRight);
+}
+void drawLevel(UIButtons buttonLeft, UIButtons buttonRight) {
+    ClearBackground(RED);
+    DrawTextPro(GetFontDefault(), "Level", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
+    drawButtons(buttonLeft, buttonRight);
+}
+void drawGame(UIButtons buttonLeft, UIButtons buttonRight) {
+    ClearBackground(GREEN);
+    DrawTextPro(GetFontDefault(), "Game", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
+    drawButtons(buttonLeft, buttonRight);
+}
+void drawGameover(Game game, UIButtons buttonLeft) {
+    ClearBackground(YELLOW);
+    DrawTextPro(GetFontDefault(), "Gameover", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
+    drawButtonButton(buttonLeft);
+
+    // Draw blinking text
+    if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
+}
 void draw(Game game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) {
     BeginDrawing();
     // ClearBackground(WHITE);
@@ -260,45 +298,23 @@ void draw(Game game, UIButtons buttonLeft, UIButtons buttonRight, Rectangle bg) 
 
     switch (game.currentScreen) {
         case LOGO: {
-            ClearBackground(WHITE);
-            int countdown = (int)(LOGO_DELAY_SECS - GetTime()) + 1;
-            int fontSize = 240;
-            // char *num = 48 + countdown;
-            int textW = MeasureText(TextFormat("%d", countdown), fontSize);
-            int fontX = (GetScreenWidth() - textW) / 2;
-            int fontY = GetScreenHeight() / 2 - 100;
-
-            // Draw screen name
-            DrawTextPro(GetFontDefault(), "Logo", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
-            // Draw countdown
-            DrawText(TextFormat("%d", countdown), fontX, fontY, fontSize, BLACK);
+            drawLogo();
         }
         break;
         case MENU: {
-            ClearBackground(BLUE);
-            DrawTextPro(GetFontDefault(), "Menu", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
-            drawButtonButton(buttonRight);
+            drawMenu(buttonRight);
         }
         break;
         case LEVEL: {
-            ClearBackground(RED);
-            DrawTextPro(GetFontDefault(), "Level", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
-            drawButtons(buttonLeft, buttonRight);
+            drawLevel(buttonLeft, buttonRight);
         }
         break;
         case GAME: {
-            ClearBackground(GREEN);
-            DrawTextPro(GetFontDefault(), "Game", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
-            drawButtons(buttonLeft, buttonRight);
+            drawGame(buttonLeft, buttonRight);
         }
         break;
         case GAMEOVER: {
-            ClearBackground(YELLOW);
-            DrawTextPro(GetFontDefault(), "Gameover", (Vector2) { 40, 40 }, (Vector2) { 0 }, 0, 40, 20, BLACK);
-            drawButtonButton(buttonLeft);
-
-            // Draw blinking text
-            if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
+            drawGameover(game, buttonLeft);
         }
         break;
         default: break;
