@@ -189,7 +189,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 
-                        PlaySound(soundArray[0]);  // CLICK
+                        if (isAudio && !isOff) PlaySound(soundArray[0]);  // CLICK
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
@@ -204,7 +204,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                         cards[i].rect.y = cards[i].targetPosition.y;
                     }
 
-                    PlaySound(soundArray[2]);  // STOP
+                    if (isAudio && !isOff) PlaySound(soundArray[2]);  // STOP
                 }
 
                 // Have all cards been moved to the correct zone?
@@ -216,7 +216,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                 if (sum >= NO_OF_CARDS) {
                     initCards(cards, cardStartX, colors);
 
-                    PlaySound(soundArray[3]);  // CHIME
+                    if (isAudio && !isOff) PlaySound(soundArray[3]);  // CHIME
                 }
             }
 

@@ -68,20 +68,17 @@ int main() {
     }
 
     // Audio
-    printf("-------------------\n");
-    printf("LOAD AUDIO\n");
-    printf("-------------------\n");
-    InitAudioDevice();
     if (isAudio && !isOff) {
-        SetMasterVolume(1.0f);
-    } else {
-        SetMasterVolume(0.0f);
+        printf("-------------------\n");
+        printf("LOAD AUDIO\n");
+        printf("-------------------\n");
+        InitAudioDevice();
+        soundArray[0] = LoadSound("resources/sfx/button_click.wav");
+        soundArray[1] = LoadSound("resources/sfx/piece_select.wav");
+        soundArray[2] = LoadSound("resources/sfx/piece_stop.wav");
+        soundArray[3] = LoadSound("resources/sfx/popup.wav");
+        currentSound = 0;
     }
-    soundArray[0] = LoadSound("resources/sfx/button_click.wav");
-    soundArray[1] = LoadSound("resources/sfx/piece_select.wav");
-    soundArray[2] = LoadSound("resources/sfx/piece_stop.wav");
-    soundArray[3] = LoadSound("resources/sfx/popup.wav");
-    currentSound = 0;
 
 
     printf("-------------------\n");
@@ -128,10 +125,12 @@ int main() {
     UnloadTexture(starsTexture);
 
     // Audio
-    for (int i = 0; i < MAX_SOUNDS; ++i) {
-        UnloadSound(soundArray[i]);
+    if (isAudio && !isOff) {
+        for (int i = 0; i < MAX_SOUNDS; ++i) {
+            UnloadSound(soundArray[i]);
+        }
+        CloseAudioDevice();
     }
-    CloseAudioDevice();
 
     CloseWindow();
 
