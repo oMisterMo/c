@@ -69,7 +69,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
 void updateCards(Card cards[]);
 void updateStars(Animation *stars);
 
-void drawBackground(Texture2D clouds[], double increment, int order[]);
+void drawBackground(Texture2D clouds[], double *increment, int order[]);
 void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
@@ -152,8 +152,6 @@ int main() {
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
-        increment += 0.02 / 25;
-
         // Input
         handleInput(trays, cards, colors, &score, cardStartX, &counter, &stars);
 
@@ -165,7 +163,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds, increment, order);
+        drawBackground(clouds, &increment, order);
         drawTrays(trays, tray, colors);
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
@@ -388,8 +386,10 @@ void updateStars(Animation *stars) {
 }
 
 // Draw
-void drawBackground(Texture2D layers[], double increment, int order[]) {
+void drawBackground(Texture2D layers[], double *increment, int order[]) {
     if (isDrawBackground && !isOff) {
+        (*increment) += 0.02 / 25;
+
         int width = layers[0].width;
         int height = layers[0].height;
         int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
@@ -406,7 +406,7 @@ void drawBackground(Texture2D layers[], double increment, int order[]) {
             int speed = 0;
 
             if (isPrarallaxBackground && !isOff) {
-                speed = (sin(increment * index) * clampedW) + clampedW; // 0 < speed < 900
+                speed = (sin(*increment * index) * clampedW) + clampedW; // 0 < speed < 900
             }
 
             int xPos = startX - speed;
