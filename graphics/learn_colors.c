@@ -6,6 +6,10 @@
 #include <stdbool.h>
 #include <math.h>
 
+#define MAX_SOUNDS 10
+Sound soundArray[MAX_SOUNDS] = { 0 };
+int currentSound;
+
 #define MAX_TOUCH_POINTS 10
 #define MAX_GESTURE_STRINGS   20
 
@@ -144,6 +148,22 @@ int main() {
         order[i] = GetRandomValue(0, 3);
     }
 
+    // Audio
+    printf("-------------------\n");
+    printf("LOAD AUDIO\n");
+    printf("-------------------\n");
+    InitAudioDevice();
+    if (isAudio && !isOff) {
+        SetMasterVolume(1.0f);
+    } else {
+        SetMasterVolume(0.0f);
+    }
+    soundArray[0] = LoadSound("resources/sfx/button_click.wav");
+    soundArray[1] = LoadSound("resources/sfx/piece_select.wav");
+    soundArray[2] = LoadSound("resources/sfx/piece_stop.wav");
+    soundArray[3] = LoadSound("resources/sfx/popup.wav");
+    currentSound = 0;
+
 
     printf("-------------------\n");
     printf("GAME\n");
@@ -177,6 +197,7 @@ int main() {
     printf("-------------------\n");
     printf("DESTROY\n");
     printf("-------------------\n");
+    // Textures
     UnloadTexture(check);
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
         UnloadTexture(clouds[i]);
@@ -186,6 +207,13 @@ int main() {
     UnloadTexture(tray);
     UnloadTexture(border);
     UnloadTexture(starsTexture);
+
+    // Audio
+    for (int i = 0; i < MAX_SOUNDS; ++i) {
+        UnloadSound(soundArray[i]);
+    }
+    CloseAudioDevice();
+
     CloseWindow();
 
 
@@ -298,6 +326,8 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                         ++(*score);
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
+
+                        PlaySound(soundArray[0]);  // CLICK
                     }
                     cards[i].hasTouchedEndZone = true;
                     cards[i].hasScore = true;
@@ -311,6 +341,8 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                         cards[i].rect.x = cards[i].targetPosition.x;
                         cards[i].rect.y = cards[i].targetPosition.y;
                     }
+
+                    PlaySound(soundArray[2]);  // STOP
                 }
 
                 // Have all cards been moved to the correct zone?
@@ -321,6 +353,8 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                 // Yes? Reset cards
                 if (sum >= NO_OF_CARDS) {
                     initCards(cards, cardStartX, colors);
+
+                    PlaySound(soundArray[3]);  // CHIME
                 }
             }
 
