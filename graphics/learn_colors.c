@@ -40,7 +40,7 @@ typedef struct Spritesheet {
 } Spritesheet;
 
 typedef struct Animation {
-    Texture2D texture;
+    Texture2D *texture;
     Vector2 position;
     Spritesheet sheet;
 } Animation;
@@ -120,7 +120,7 @@ int main() {
         (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
         0, 0, 0, 10, false
     };
-    Animation stars = { starsTexture, (Vector2) { 0 }, starsSheet };
+    Animation stars = { &starsTexture, (Vector2) { 0 }, starsSheet };
 
 
     // Game vars
@@ -296,7 +296,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                     printf("HIT %d\n", *counter);
                     if (!cards[i].hasScore) {
                         ++(*score);
-                        stars->position = (Vector2){ GetTouchX() - stars->texture.width / NUM_FRAMES_STARS / 2, GetTouchY() - stars->texture.height / 2 };
+                        stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
                     }
                     cards[i].hasTouchedEndZone = true;
@@ -380,7 +380,7 @@ void updateStars(Animation *stars) {
         }
 
         // Update source rect (index * width)
-        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) stars->texture.width / NUM_FRAMES_STARS;
+        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) (*stars->texture).width / NUM_FRAMES_STARS;
 
     }
 }
@@ -473,6 +473,6 @@ void drawScore(int score) {
 
 void drawStars(Animation stars) {
     if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
-        DrawTextureRec(stars.texture, stars.sheet.frameRec, stars.position , WHITE);
+        DrawTextureRec(*stars.texture, stars.sheet.frameRec, stars.position , WHITE);
     }
 }
