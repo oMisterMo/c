@@ -74,6 +74,7 @@ void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
 void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 void drawScore(int score);
+void drawStars(Animation stars);
 
 
 
@@ -169,9 +170,7 @@ int main() {
         drawCards(cards, check, border);
         drawCursor(cursor, cursorPressed);
         drawScore(score);
-        if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
-            DrawTextureRec(starsTexture, stars.sheet.frameRec, stars.position , WHITE);
-        }
+        drawStars(stars);
 
         EndDrawing();
 
@@ -470,4 +469,10 @@ void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
 
 void drawScore(int score) {
     DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
+}
+
+void drawStars(Animation stars) {
+    if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
+        DrawTextureRec(stars.texture, stars.sheet.frameRec, stars.position , WHITE);
+    }
 }
