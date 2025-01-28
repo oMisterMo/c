@@ -72,7 +72,7 @@ int main() {
     Rectangle pos = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Vector2 startMo = { pos.x, pos.y };
     Vector2 endMo = { GetScreenWidth() - bunny.width , center.y };
-    Tween tween = { startMo, endMo, IDLE, 0, 60 * 3 };
+    Tween tween = { startMo, endMo, IDLE, 0, 60 * 2 };
     Item mo = { bunny, pos, tween };
     
 
@@ -82,7 +82,7 @@ int main() {
     Rectangle rect = { startRect.x, startRect.y, RECT_WIDTH, RECT_HEIGHT };
     int frameCounter = 0;
     int state = IDLE;
-    int duration = 240;     // 60 * 4 = 4 seconds
+    int duration = 60 * 4;     // 60 * 4 = 4 seconds
     float t = 0;  // 0 < t < 1
     printf("original rect => %p\n", &rect);
 
@@ -178,7 +178,7 @@ void updateMo(Item *mo) {
             mo->tween.frameCounter++;
 
             // Tween
-            mo->bounds.x  = EaseElasticInOut(
+            mo->bounds.x  = EaseElasticOut(
                 (float) mo->tween.frameCounter,
                 mo->tween.startPosition.x,
                 mo->tween.targetPosition.x - mo->tween.startPosition.x,
@@ -186,7 +186,7 @@ void updateMo(Item *mo) {
             );
 
             // Tween complete
-            if (mo->tween.frameCounter > mo->tween.duration) {
+            if (mo->tween.frameCounter >= mo->tween.duration) {
                 mo->tween.frameCounter = 0;
                 mo->tween.state = IDLE;
 
@@ -210,10 +210,10 @@ void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, 
 
         (*frameCounter)++;
 
-        rect->x  = EaseLinearIn((float) *frameCounter, start.x, end.x - start.x,  duration);
-        rect->y  = EaseLinearIn((float) *frameCounter, start.y, end.y - start.y,  duration);
+        rect->x  = EaseCircIn((float) *frameCounter, start.x, end.x - start.x,  duration);
+        rect->y  = EaseCircIn((float) *frameCounter, start.y, end.y - start.y,  duration);
 
-        if (*frameCounter > duration) {
+        if (*frameCounter >= duration) {
             *frameCounter = 0;
             *state = IDLE;
 
