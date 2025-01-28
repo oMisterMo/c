@@ -52,11 +52,8 @@ int main() {
     Rectangle trays[NO_OF_TRAYS];
     Card cards[NO_OF_CARDS];
 
-    int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
-    int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
-
-    initTrays(trays, trayStartX, &trayTexture);
-    initCards(cards, cardStartX, colors);
+    initTrays(trays, &trayTexture);
+    initCards(cards, colors);
 
     int frameCounter = 0;
     int counter = 0;
@@ -89,7 +86,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(trays, cards, colors, &score, cardStartX, &counter, &stars);
+        handleInput(trays, cards, colors, &score, &counter, &stars);
 
         // Update
         updateCards(cards);

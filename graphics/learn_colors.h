@@ -68,11 +68,11 @@ typedef struct Card {
 // ---------------------------
 // Function Definition
 // ---------------------------
-void initCards(Card cards[], int trayStartX, Color colors[]);
-void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray);
+void initCards(Card cards[], Color colors[]);
+void initTrays(Rectangle trays[], Texture2D *tray);
 void reset(int *score);
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars);
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars);
 
 void updateCards(Card cards[]);
 void updateStars(Animation *stars);
@@ -88,7 +88,8 @@ void drawStars(Animation stars);
 // Implementation
 // ---------------------------
 
-void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray) {
+void initTrays(Rectangle trays[], Texture2D *tray) {
+    int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         trays[i] = (Rectangle) {
             trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
@@ -100,7 +101,8 @@ void initTrays(Rectangle trays[], int trayStartX, Texture2D *tray) {
         tray->height = TRAY_HEIGHT;
     }
 }
-void initCards(Card cards[], int cardStartX, Color colors[]) {
+void initCards(Card cards[], Color colors[]) {
+    int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 position = {
             cardStartX + GetScreenWidth() / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
@@ -129,11 +131,11 @@ void reset(int *score) {
     *score = 0;
 }
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int cardStartX, int *counter, Animation *stars) {
+void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
-        initCards(cards, cardStartX, colors);
+        initCards(cards, colors);
     }
 
 
@@ -214,7 +216,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
 
                 // Yes? Reset cards
                 if (sum >= NO_OF_CARDS) {
-                    initCards(cards, cardStartX, colors);
+                    initCards(cards, colors);
 
                     if (isAudio && !isOff) PlaySound(soundArray[3]);  // CHIME
                 }
