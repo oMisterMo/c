@@ -61,7 +61,7 @@ typedef struct Card {
     Vector2 currentPosition;    // Tween start position
     int state;                  // IDLE | TWEEN
     int frameCounter;           // Current time in tween
-    int duration;               // How long to tween
+    float duration;             // How long to tween
 } Card;
 
 
@@ -121,7 +121,7 @@ void initCards(Card cards[], int cardStartX, Color colors[]) {
         cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
         cards[i].state = IDLE;
         cards[i].frameCounter = 0;
-        cards[i].duration = 30;    // Length in frame (30 frame = 500ms)
+        cards[i].duration = 30.0f;    // Length in frame (30 frame = 500ms)
         cards[i].currentPosition = (Vector2) { position.x, position.y };
     }
 }
@@ -233,23 +233,27 @@ void updateCards(Card cards[]) {
                 // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
 
 
-                cards[i].rect.x =
-                    EaseSineOut(
+                float x = EaseBackOut(
                         (float) cards[i].frameCounter,
                         cards[i].currentPosition.x,
                         cards[i].targetPosition.x - cards[i].currentPosition.x,
                         cards[i].duration
                     );
-                cards[i].rect.y =
-                    EaseSineOut(
+                float y = EaseBackOut(
                         (float) cards[i].frameCounter,
                         cards[i].currentPosition.y,
                         cards[i].targetPosition.y - cards[i].currentPosition.y,
                         cards[i].duration
                     );
-                if (cards[i].frameCounter > cards[i].duration) {
+
+                cards[i].rect.x = x;
+                cards[i].rect.y = y;
+
+                if (cards[i].frameCounter >= cards[i].duration) {
                     cards[i].frameCounter = 0;
                     cards[i].state = IDLE;
+                    cards[i].rect.x = cards[i].targetPosition.x;
+                    cards[i].rect.y = cards[i].targetPosition.y;
                 }
 
 
