@@ -274,36 +274,34 @@ void updateFade(Game *game, float *fadeAmount) {
 void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
     if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
         updateFade(game, fadeAmount);
-    } else {
-
-        switch (game->currentScreen) {
-            case LOADING: {
-                updateLoading(game, gameUI);
-            }
-            break;
-            case LOGO: {
-                updateLogo(game, gameUI);
-            }
-            break;
-            case MENU: {
-                updateMenu(game, gameUI);
-            }
-            break;
-            case LEVEL: {
-                updateLevel(game, gameUI);
-            }
-            break;
-            case GAME: {
-                updateGame(game, gameUI);
-            }
-            break;
-            case GAMEOVER: {
-                updateGameover(game, gameUI);
-            }
-            break;
-            default: break;
+        return;
+    }
+    switch (game->currentScreen) {
+        case LOADING: {
+            updateLoading(game, gameUI);
         }
-
+        break;
+        case LOGO: {
+            updateLogo(game, gameUI);
+        }
+        break;
+        case MENU: {
+            updateMenu(game, gameUI);
+        }
+        break;
+        case LEVEL: {
+            updateLevel(game, gameUI);
+        }
+        break;
+        case GAME: {
+            updateGame(game, gameUI);
+        }
+        break;
+        case GAMEOVER: {
+            updateGameover(game, gameUI);
+        }
+        break;
+        default: break;
     }
 
     // if (*currentScreen == TRANSITION_START) {
