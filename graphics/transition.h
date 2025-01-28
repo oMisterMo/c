@@ -4,6 +4,9 @@
 #define LOADING_DELAY 2.5f
 #define LOGO_DELAY_SECS 3
 
+#define FADE_TIME 1.5f
+#define FADE_INCREMENT 0.05f        // Base increment for linear fade
+
 typedef enum {
     LOADING = 0,
     LOGO,
@@ -57,6 +60,7 @@ typedef struct GameUI {
 
 typedef struct Game {
     GameScreen currentScreen;
+    GameScreen nextScreen;
     TransitionState currentTransition;
     int framesCounter;
     float frameEntered;
@@ -82,9 +86,12 @@ void switchScreens(Game *game, GameScreen next) {
     printf("Entered at %.2f\n", GetTime());
     printf("------------------------------\n");
 
-    game->framesCounter = 0;
-    game->frameEntered = GetTime();
-    game->currentScreen = next;
+    // game->framesCounter = 0; // But I need this, think about it
+    // game->frameEntered = GetTime();
+    // game->currentScreen = next;  // I dont need to trasision statight away
+
+    game->currentTransition = TRANSITION_START;
+    game->nextScreen = next;
 }
 
 
@@ -136,11 +143,11 @@ void inputGameover(Game *game, GameUI gameUI) {
         }
     }
 }
-void handleInput(Game *game, GameUI gameUI, Rectangle *bg) {
+void handleInput(Game *game, GameUI gameUI, Rectangle *bg, float *fadeAmount) {
     // printf("currentScreen: %d\n", currentScreen);
 
     if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
-        printf("No Touching...!\n");
+        // printf("No Touching...!\n");
         return;
     }
 
@@ -181,7 +188,7 @@ void updateLoading(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
     (game->logoCounter)++;
 
-    // Load logo screen after a few seconds
+    // Load logo screen after a 2.5 seconds
     if (game->logoCounter > 60 * LOADING_DELAY) {
         switchScreens(game, LOGO);
     }
@@ -195,12 +202,14 @@ void updateLogo(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
 
     // double currentTime = GetTime();
-    // if (currentTime >= LOGO_DELAY_SECS) {
+    // if (currentTime - game->frameEntered >= LOGO_DELAY_SECS + 1) {
     //     switchScreens(game, MENU);
     // }
+    // printf("%d\n", game->framesCounter);
     if (game->framesCounter >= 60 * LOGO_DELAY_SECS) {
         switchScreens(game, MENU);
     }
+
 }
 void updateMenu(Game *game, GameUI *gameUI) {
     (game->framesCounter)++;
@@ -225,33 +234,76 @@ void updateGameover(Game *game, GameUI *gameUI) {
 
     updateHoverButtonState(&gameUI->left);
 }
-void update(Game *game, GameUI *gameUI, Rectangle *bg) {
-    switch (game->currentScreen) {
-        case LOADING: {
-            updateLoading(game, gameUI);
+void updateFade(Game *game, float *fadeAmount) {
+    // printf("currentFadeType: %d\n", currentFadeType);
+    if (game->currentTransition == IDLE) {
+        printf("idle\n");
+    }
+    if (game->currentTransition == TRANSITION_START) {
+
+        // GO FULLY BLACK
+        *fadeAmount += FADE_INCREMENT;
+        printf("fade out (black)...\n");
+
+        // Wait 3 SECONDS AND CHANGE SCREENS
+        if (*fadeAmount >= FADE_TIME) {
+            *fadeAmount = FADE_TIME;
+
+            // USER CAN NOT SEE NOW
+            game->currentScreen = game->nextScreen;
+            game->currentTransition = TRANSITION_END;
         }
-        break;
-        case LOGO: {
-            updateLogo(game, gameUI);
+
+    }
+    if (game->currentTransition == TRANSITION_END) {
+
+        printf("fade in (visible)...\n");
+        *fadeAmount -= FADE_INCREMENT;
+        if (*fadeAmount <= 0.0f) {
+            *fadeAmount = 0.0f;
+            game->currentTransition = IDLE;
+
+            // NEXT SCENE FULLY VISIABLE
+            game->framesCounter = 0;
+            game->frameEntered = GetTime();
         }
-        break;
-        case MENU: {
-            updateMenu(game, gameUI);
+
+    }
+
+}
+void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
+    if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
+        updateFade(game, fadeAmount);
+    } else {
+
+        switch (game->currentScreen) {
+            case LOADING: {
+                updateLoading(game, gameUI);
+            }
+            break;
+            case LOGO: {
+                updateLogo(game, gameUI);
+            }
+            break;
+            case MENU: {
+                updateMenu(game, gameUI);
+            }
+            break;
+            case LEVEL: {
+                updateLevel(game, gameUI);
+            }
+            break;
+            case GAME: {
+                updateGame(game, gameUI);
+            }
+            break;
+            case GAMEOVER: {
+                updateGameover(game, gameUI);
+            }
+            break;
+            default: break;
         }
-        break;
-        case LEVEL: {
-            updateLevel(game, gameUI);
-        }
-        break;
-        case GAME: {
-            updateGame(game, gameUI);
-        }
-        break;
-        case GAMEOVER: {
-            updateGameover(game, gameUI);
-        }
-        break;
-        default: break;
+
     }
 
     // if (*currentScreen == TRANSITION_START) {
@@ -331,6 +383,7 @@ void drawLoading(Game game, GameUI gameUI) {
 void drawLogo(Game game) {
     ClearBackground(WHITE);
     int countdown = LOGO_DELAY_SECS - (game.framesCounter / 60);
+    // int countdown = (LOGO_DELAY_SECS + 1) -  (GetTime() - game.frameEntered);
     int fontSize = 240;
     // char *num = 48 + countdown;
     int textW = MeasureText(TextFormat("%d", countdown), fontSize);
@@ -365,7 +418,7 @@ void drawGameover(Game game, UIButtons buttonLeft) {
     // Draw blinking text
     if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
 }
-void draw(Game game, GameUI gameUI, Rectangle bg) {
+void draw(Game game, GameUI gameUI, Rectangle bg, float fadeAmount) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
@@ -401,10 +454,12 @@ void draw(Game game, GameUI gameUI, Rectangle bg) {
 
     // Transition
     if (game.currentTransition == TRANSITION_START) {
-        DrawRectangle(bg.x, bg.y, bg.width, bg.height, PINK);
+        // DrawRectangle(bg.x, bg.y, bg.width, bg.height, Fade(PINK, fadeAmount));
+        DrawRectangle(bg.x, bg.y, bg.width, bg.height, Fade(BLACK, fadeAmount));
     }
     if (game.currentTransition == TRANSITION_END) {
-        DrawRectangle(bg.x, bg.y, bg.width, bg.height, ORANGE);
+        // DrawRectangle(bg.x, bg.y, bg.width, bg.height, Fade(ORANGE, fadeAmount));
+        DrawRectangle(bg.x, bg.y, bg.width, bg.height, Fade(BLACK, fadeAmount));
         // DrawRectangle(GetScreenWidth() / 2, 0, GetScreenWidth(), GetScreenHeight(), ORANGE);
         // DrawRectanglePro((Rectangle) {destRect.x, destRect.y, destRect.width, destRect.height}, origin, 0, WHITE);
         // DrawTexturePro(transitionTexture, sourceRec, destRect, origin, rotation, ORANGE);

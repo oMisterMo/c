@@ -14,6 +14,7 @@ int main() {
     int screenWidth = 960;
     int screenHeight = 600;
 
+    SetConfigFlags(FLAG_WINDOW_UNDECORATED);
     InitWindow(screenWidth, screenHeight, "Transition");
     SetWindowMonitor(2);
 
@@ -68,8 +69,9 @@ int main() {
 
     // Tween
     Rectangle tweenBG = { 0, 0, GetScreenWidth(), GetScreenHeight() };
+    float fadeAmount = 0.0f;
 
-    Game game = { LOADING, IDLE, 0, 0, 0 };
+    Game game = { LOADING, LOADING, IDLE, 0, 0, 0 };
 
     printf("--------------\n");
     printf("ButtonLeft.texture: %p\n", (gameUI.left.texture));
@@ -80,13 +82,13 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&game, gameUI, &tweenBG);
+        handleInput(&game, gameUI, &tweenBG, &fadeAmount);
 
         // Update
-        update(&game, &gameUI, &tweenBG);
+        update(&game, &gameUI, &tweenBG, &fadeAmount);
 
         // Draw
-        draw(game, gameUI, tweenBG);
+        draw(game, gameUI, tweenBG, fadeAmount);
     }
 
 
