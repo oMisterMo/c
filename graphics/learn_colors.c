@@ -25,19 +25,19 @@ int main() {
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
-    Texture2D check = LoadTexture("resources/sprites/check.png");
-    Texture2D clouds[NO_OF_CLOUDS];
+    Texture2D checkTexture = LoadTexture("resources/sprites/check.png");
+    Texture2D cloudsTexture[NO_OF_CLOUDS];
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
-        clouds[i] = LoadTexture(TextFormat("resources/backgrounds/clouds_%d.png", i + 1));
+        cloudsTexture[i] = LoadTexture(TextFormat("resources/backgrounds/clouds_%d.png", i + 1));
     }
-    Texture2D cursor = LoadTexture("resources/ui/icon_hand_1.png");
-    Texture2D cursorPressed = LoadTexture("resources/ui/icon_hand_2.png");
-    Texture2D tray = LoadTexture("resources/sprites/tray.png");
-    Texture2D border = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
+    Texture2D cursorTexture = LoadTexture("resources/ui/icon_hand_1.png");
+    Texture2D cursorPressedTexture = LoadTexture("resources/ui/icon_hand_2.png");
+    Texture2D trayTexture = LoadTexture("resources/sprites/tray.png");
+    Texture2D borderTexture = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
     Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
 
-    border.width /= 4;
-    border.height /= 4;
+    borderTexture.width /= 4;
+    borderTexture.height /= 4;
 
     Spritesheet starsSheet = {
         (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
@@ -55,7 +55,7 @@ int main() {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
 
-    initTrays(trays, trayStartX, &tray);
+    initTrays(trays, trayStartX, &trayTexture);
     initCards(cards, cardStartX, colors);
 
     int frameCounter = 0;
@@ -99,10 +99,10 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(clouds, &increment, order);
-        drawTrays(trays, tray, colors);
-        drawCards(cards, check, border);
-        drawCursor(cursor, cursorPressed);
+        drawBackground(cloudsTexture, &increment, order);
+        drawTrays(trays, trayTexture, colors);
+        drawCards(cards, checkTexture, borderTexture);
+        drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(score);
         drawStars(stars);
 
@@ -114,14 +114,14 @@ int main() {
     printf("DESTROY\n");
     printf("-------------------\n");
     // Textures
-    UnloadTexture(check);
+    UnloadTexture(checkTexture);
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
-        UnloadTexture(clouds[i]);
+        UnloadTexture(cloudsTexture[i]);
     }
-    UnloadTexture(cursor);
-    UnloadTexture(cursorPressed);
-    UnloadTexture(tray);
-    UnloadTexture(border);
+    UnloadTexture(cursorTexture);
+    UnloadTexture(cursorPressedTexture);
+    UnloadTexture(trayTexture);
+    UnloadTexture(borderTexture);
     UnloadTexture(starsTexture);
 
     // Audio
