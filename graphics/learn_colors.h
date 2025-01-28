@@ -51,7 +51,6 @@ typedef struct Animation {
 
 typedef struct Card {
     Rectangle rect;             // Actual position
-    Vector2 targetPosition;     // Could be consts
     Color color;
     bool isDragging;
     bool hasTouchedEndZone;
@@ -59,6 +58,7 @@ typedef struct Card {
 
     // tween
     Vector2 currentPosition;    // Tween start position
+    Vector2 targetPosition;     // Could be consts
     int state;                  // IDLE | TWEEN
     int frameCounter;           // Current time in tween
     float duration;             // How long to tween
@@ -104,27 +104,29 @@ void initTrays(Rectangle trays[], Texture2D *tray) {
 void initCards(Card cards[], Color colors[]) {
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
-        Vector2 position = {
+        Vector2 startPosition = {
             cardStartX + GetScreenWidth() / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
             PADDING
         };
         cards[i].rect = (Rectangle) {
-            position.x,
-            position.y, 
+            startPosition.x,
+            startPosition.y,
             CARD_WIDTH,
             CARD_HEIGHT
         };
+        cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
 
-        // cards[i].targetPosition = (Vector2) { position.x, position.y };
-        cards[i].targetPosition = position;
+        // flags
         cards[i].isDragging = false;
         cards[i].hasTouchedEndZone = false;
         cards[i].hasScore = false;
-        cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
+
+        // tween
+        cards[i].currentPosition = startPosition;   // This is set to the mousePosition at runtime
+        cards[i].targetPosition = startPosition;
         cards[i].state = IDLE;
         cards[i].frameCounter = 0;
-        cards[i].duration = 30.0f;    // Length in frame (30 frame = 500ms)
-        cards[i].currentPosition = (Vector2) { position.x, position.y };
+        cards[i].duration = 30.0f;                  // Length in frame (30 frame = 500ms)
     }
 }
 void reset(int *score) {
