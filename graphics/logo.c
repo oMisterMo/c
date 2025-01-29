@@ -20,7 +20,7 @@ int main() {
     printf("---------initwin------------\n");
     InitWindow(screenWidth, screenHeight, "Logo");
     printf("---------setwinmin----------\n");
-    // SetWindowMonitor(0);
+    SetWindowMonitor(2);
     SetWindowMinSize(320, 240);
     printf("---------rest---------------\n");
     //After window creation

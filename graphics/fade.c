@@ -34,13 +34,13 @@ void updateFade(Screen *currentScreen, Transition *currentTransition, float *fad
     // printf("currentFadeType: %d\n", currentFadeType);
 
     if (*currentTransition == IDLE) {
-        printf("idle\n");
+        // printf("idle\n");
     }
     if (*currentTransition == FADE_START) {
 
         // GO FULLY BLACK
         *fadeAmount += FADE_INCREMENT;
-        printf("fade to black...\n");
+        // printf("fade to black...\n");
 
         // Wait 3 SECONDS AND CHANGE SCREENS
         if (*fadeAmount >= FADE_TIME) {
@@ -52,7 +52,7 @@ void updateFade(Screen *currentScreen, Transition *currentTransition, float *fad
         }
     }
     if (*currentTransition == FADE_END) {
-        printf("fade out...\n");
+        // printf("fade out...\n");
         *fadeAmount -= FADE_INCREMENT;
         if (*fadeAmount <= 0.0f) {
             *fadeAmount = 0.0f;
@@ -71,6 +71,7 @@ void drawFadeTransition(Transition currentTransition, float *fadeAmount) {
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Fade Transition Example");
+    SetWindowMonitor(2);
 
 
     // variables

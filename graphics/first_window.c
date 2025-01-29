@@ -4,7 +4,7 @@ int main() {
 
 
     InitWindow(800, 400, "First Window");
-
+    SetWindowMonitor(2);
 
     SetTargetFPS(60);
 

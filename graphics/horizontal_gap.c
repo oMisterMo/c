@@ -11,6 +11,7 @@ int main() {
     
     
     InitWindow(800, 600, "Gaps");
+    SetWindowMonitor(2);
 
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
     const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;

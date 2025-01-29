@@ -23,7 +23,7 @@ int main() {
 
 
     InitWindow(screenWidth, screenHeight, "Mo Man");
-
+    SetWindowMonitor(2);
     SetTargetFPS(60);
 
     // TODO: Initialize all required variables and load all required data here!
