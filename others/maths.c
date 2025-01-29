@@ -1,5 +1,5 @@
 #include <stdio.h> // printf
-#include <math.h> // malloc, free
+#include <math.h>
 
 int main() {
     // Pi
