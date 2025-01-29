@@ -237,13 +237,13 @@ void updateGameover(Game *game, GameUI *gameUI) {
 void updateFade(Game *game, float *fadeAmount) {
     // printf("currentFadeType: %d\n", currentFadeType);
     if (game->currentTransition == IDLE) {
-        printf("idle\n");
+        // printf("idle\n");
     }
     if (game->currentTransition == TRANSITION_START) {
 
         // GO FULLY BLACK
         *fadeAmount += FADE_INCREMENT;
-        printf("fade out (black)...\n");
+        // printf("fade out (black)...\n");
 
         // Wait 3 SECONDS AND CHANGE SCREENS
         if (*fadeAmount >= FADE_TIME) {
@@ -257,7 +257,7 @@ void updateFade(Game *game, float *fadeAmount) {
     }
     if (game->currentTransition == TRANSITION_END) {
 
-        printf("fade in (visible)...\n");
+        // printf("fade in (visible)...\n");
         *fadeAmount -= FADE_INCREMENT;
         if (*fadeAmount <= 0.0f) {
             *fadeAmount = 0.0f;
