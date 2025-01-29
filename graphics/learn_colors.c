@@ -1,5 +1,11 @@
 #include "learn_colors.h"
 
+typedef struct Game {
+    int framesCounter;
+    Card cards[NO_OF_CARDS];
+} Game;
+
+
 
 int main() {
 
@@ -47,15 +53,14 @@ int main() {
 
 
     // Game vars
+    Game game = { 0, { 0 } };
     double increment = 0.0;
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     Rectangle trays[NO_OF_TRAYS];
-    Card cards[NO_OF_CARDS];
 
     initTrays(trays, &trayTexture);
-    initCards(cards, colors);
+    initCards(game.cards, colors);
 
-    int framesCounter = 0;
     int counter = 0;
     int score = 0;
 
@@ -86,10 +91,10 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(trays, cards, colors, &score, &counter, &stars);
+        handleInput(trays, game.cards, colors, &score, &counter, &stars);
 
         // Update
-        updateCards(cards);
+        updateCards(game.cards);
         updateStars(&stars);
 
         // Draw
@@ -98,7 +103,7 @@ int main() {
 
         drawBackground(cloudsTexture, &increment, order);
         drawTrays(trays, trayTexture, colors);
-        drawCards(cards, checkTexture, borderTexture);
+        drawCards(game.cards, checkTexture, borderTexture);
         drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(score);
         drawStars(stars);
