@@ -38,7 +38,7 @@ typedef struct Spritesheet {
     Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
     int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
-    int frameCounter;
+    int framesCounter;
     int frameSpeed;
     bool isAnimating;
 } Spritesheet;
@@ -60,7 +60,7 @@ typedef struct Card {
     Vector2 currentPosition;    // Tween start position
     Vector2 targetPosition;     // Could be consts
     int state;                  // IDLE | TWEEN
-    int frameCounter;           // Current time in tween
+    int framesCounter;           // Current time in tween
     float duration;             // How long to tween
 } Card;
 
@@ -125,7 +125,7 @@ void initCards(Card cards[], Color colors[]) {
         cards[i].currentPosition = startPosition;   // This is set to the mousePosition at runtime
         cards[i].targetPosition = startPosition;
         cards[i].state = IDLE;
-        cards[i].frameCounter = 0;
+        cards[i].framesCounter = 0;
         cards[i].duration = 30.0f;                  // Length in frame (30 frame = 500ms)
     }
 }
@@ -233,18 +233,18 @@ void updateCards(Card cards[]) {
     if (isTweenCard && !isOff) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             if (cards[i].state == TWEEN) {
-                cards[i].frameCounter++;
-                // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
+                cards[i].framesCounter++;
+                // printf("cards[%d].framesCounter: %d\n", i,cards[i].framesCounter);
 
 
                 float x = EaseBackOut(
-                        (float) cards[i].frameCounter,
+                        (float) cards[i].framesCounter,
                         cards[i].currentPosition.x,
                         cards[i].targetPosition.x - cards[i].currentPosition.x,
                         cards[i].duration
                     );
                 float y = EaseBackOut(
-                        (float) cards[i].frameCounter,
+                        (float) cards[i].framesCounter,
                         cards[i].currentPosition.y,
                         cards[i].targetPosition.y - cards[i].currentPosition.y,
                         cards[i].duration
@@ -253,8 +253,8 @@ void updateCards(Card cards[]) {
                 cards[i].rect.x = x;
                 cards[i].rect.y = y;
 
-                if (cards[i].frameCounter >= cards[i].duration) {
-                    cards[i].frameCounter = 0;
+                if (cards[i].framesCounter >= cards[i].duration) {
+                    cards[i].framesCounter = 0;
                     cards[i].state = IDLE;
                     cards[i].rect.x = cards[i].targetPosition.x;
                     cards[i].rect.y = cards[i].targetPosition.y;
@@ -267,12 +267,12 @@ void updateCards(Card cards[]) {
 }
 void updateStars(Animation *stars) {
     if (!(stars->sheet.isAnimating)) return;
-    stars->sheet.frameCounter++;
+    stars->sheet.framesCounter++;
 
     // Slow down frame speed
-    if (stars->sheet.frameCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
+    if (stars->sheet.framesCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
         // Time to update current frame index and reset counter
-        stars->sheet.frameCounter = 0;
+        stars->sheet.framesCounter = 0;
         stars->sheet.currentFrame++;
 
         // Ensure frame index stays within bounds

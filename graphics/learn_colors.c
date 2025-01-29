@@ -55,7 +55,7 @@ int main() {
     initTrays(trays, &trayTexture);
     initCards(cards, colors);
 
-    int frameCounter = 0;
+    int framesCounter = 0;
     int counter = 0;
     int score = 0;
 
