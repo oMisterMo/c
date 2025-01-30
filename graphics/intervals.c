@@ -4,7 +4,6 @@
 int main() {
 
     InitWindow(600, 600, "Intervals");
-    SetWindowMonitor(2);
 
 
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, BLACK };

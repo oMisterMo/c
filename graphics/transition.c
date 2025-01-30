@@ -16,7 +16,6 @@ int main() {
 
     SetConfigFlags(FLAG_WINDOW_UNDECORATED);
     InitWindow(screenWidth, screenHeight, "Transition");
-    SetWindowMonitor(2);
 
     // Load Textures
     Texture2D transitionTexture = LoadTexture("resources/ui/transition.png");

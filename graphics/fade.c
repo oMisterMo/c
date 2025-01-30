@@ -71,7 +71,6 @@ void drawFadeTransition(Transition currentTransition, float *fadeAmount) {
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Fade Transition Example");
-    SetWindowMonitor(2);
 
 
     // variables

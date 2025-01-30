@@ -88,7 +88,6 @@ void updateSlime(Spritesheet *slimeSheet, Texture2D slimeTexture) {
 int main() {
 
     InitWindow(1600, 768, "Animation");
-    SetWindowMonitor(2);
 
     Texture2D bunnyTexture = LoadTexture("resources/sprites/jumpbunny_anim1.png");
     Texture2D buttonTexture  = LoadTexture("resources/sprites/button.png");

@@ -57,7 +57,6 @@ int main() {
     // Setup
     // ---------------------------------------------
     InitWindow(1024, 768, "Tween");
-    SetWindowMonitor(2);
     SetMousePosition(-1, -1);
     const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
