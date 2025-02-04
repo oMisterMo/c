@@ -4,19 +4,11 @@ This repo holds a range of programs I used to learn the c programming language. 
 
 Programs found in the `graphics/` directory will require `raylib`.
 
-## Files
+## Notes
 
-- arguments.c
-- arrays.c
-- boolean.c
-- enums.c
-- files.c
-- input.c
-- memory.c
-- pointers.c
-- strings.c
-- structs.c
-- types.c
+- [W3 School](https://www.w3schools.com/c/index.php)
+- [Tsoding Daily](https://www.youtube.com/@TsodingDaily)
+- [Cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html)
 
 ## Getting started
 
