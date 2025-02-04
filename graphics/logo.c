@@ -76,7 +76,6 @@ int main() {
             isDragging = false;
 
             ClampScreenRec(&logoBounds);
-
         }
 
         // Update
