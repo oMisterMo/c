@@ -25,7 +25,7 @@ int main() {
     Vector2 vel = { .x = 1, .y = 1 };
     Vector2 pos = { 0, 450 - 50 };
 
-    int framesCounter = 0;          // Useful to count frames
+    int frameCounter = 0;          // Useful to count frames
 
 
     // Main game loop

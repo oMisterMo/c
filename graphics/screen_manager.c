@@ -7,8 +7,8 @@
 
 typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
 
-void update(GameScreen *currentScreen, int *framesCounter);
-void draw(GameScreen *currentScreen, int *framesCounter);
+void update(GameScreen *currentScreen, int *frameCounter);
+void draw(GameScreen *currentScreen, int *frameCounter);
 
 int main() {
 
@@ -30,7 +30,7 @@ int main() {
 
 
 
-    int framesCounter = 0;          // Useful to count frames
+    int frameCounter = 0;          // Useful to count frames
 
     //--------------------------------------------------------------------------------------
 
@@ -40,12 +40,12 @@ int main() {
         ClearBackground(RAYWHITE);
 
         // Update
-        update(&currentScreen, &framesCounter);
+        update(&currentScreen, &frameCounter);
 
         // Draw
         BeginDrawing();
 
-        draw(&currentScreen, &framesCounter);
+        draw(&currentScreen, &frameCounter);
         DrawFPS(GetScreenWidth() - 80 - 20, 20);
         EndDrawing();
     }
@@ -56,16 +56,16 @@ int main() {
     return 0;
 }
 
-void update(GameScreen *currentScreen, int *framesCounter) {
+void update(GameScreen *currentScreen, int *frameCounter) {
     switch (*currentScreen) {
         case LOGO:
         {
             // TODO: Update LOGO screen variables here!
 
-            (*framesCounter)++;    // Count frames
+            (*frameCounter)++;    // Count frames
 
             // Wait for 3 seconds (180 frames) before jumping to TITLE screen
-            if (*framesCounter > 180) {
+            if (*frameCounter > 180) {
                 *currentScreen = TITLE;
             }
         } break;
@@ -100,7 +100,7 @@ void update(GameScreen *currentScreen, int *framesCounter) {
     }
 }
 
-void draw(GameScreen *currentScreen, int *framesCounter) {
+void draw(GameScreen *currentScreen, int *frameCounter) {
     switch(*currentScreen)
     {
         case LOGO:
@@ -108,7 +108,7 @@ void draw(GameScreen *currentScreen, int *framesCounter) {
             // TODO: Draw LOGO screen here!
             DrawText("LOGO SCREEN", GetScreenWidth() / 2 - 290 / 2, 20, 40, LIGHTGRAY);
             DrawText("WAIT for 3 SECONDS...", 290, 220, 20, GRAY);
-            DrawText(TextFormat("Frames: %d", *framesCounter), 20, 100, 20, DARKGREEN);
+            DrawText(TextFormat("Frames: %d", *frameCounter), 20, 100, 20, DARKGREEN);
 
         } break;
         case TITLE:

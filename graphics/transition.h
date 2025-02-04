@@ -62,7 +62,7 @@ typedef struct Game {
     GameScreen currentScreen;
     GameScreen nextScreen;
     TransitionState currentTransition;
-    int framesCounter;
+    int frameCounter;
     float frameEntered;
     float logoCounter;      // I do not need this now that I have frameEntered
 } Game;
@@ -86,7 +86,7 @@ void switchScreens(Game *game, GameScreen next) {
     printf("Entered at %.2f\n", GetTime());
     printf("------------------------------\n");
 
-    // game->framesCounter = 0; // But I need this, think about it
+    // game->frameCounter = 0; // But I need this, think about it
     // game->frameEntered = GetTime();
     // game->currentScreen = next;  // I dont need to trasision statight away
 
@@ -185,7 +185,7 @@ void updateHoverButtonState(UIButtons *button) {
     }
 }
 void updateLoading(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
     (game->logoCounter)++;
 
     // Load logo screen after a 2.5 seconds
@@ -194,43 +194,43 @@ void updateLoading(Game *game, GameUI *gameUI) {
     }
 
     // Reset frames counter to get the loading balls effect
-    if (game->framesCounter > 150) {
-        game->framesCounter = 0;
+    if (game->frameCounter > 150) {
+        game->frameCounter = 0;
     }
 }
 void updateLogo(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
 
     // double currentTime = GetTime();
     // if (currentTime - game->frameEntered >= LOGO_DELAY_SECS + 1) {
     //     switchScreens(game, MENU);
     // }
-    // printf("%d\n", game->framesCounter);
-    if (game->framesCounter >= 60 * LOGO_DELAY_SECS) {
+    // printf("%d\n", game->frameCounter);
+    if (game->frameCounter >= 60 * LOGO_DELAY_SECS) {
         switchScreens(game, MENU);
     }
 
 }
 void updateMenu(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
 
 
     updateHoverButtonState(&gameUI->right);
 }
 void updateLevel(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
 
     updateHoverButtonState(&gameUI->left);
     updateHoverButtonState(&gameUI->right);
 }
 void updateGame(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
 
     updateHoverButtonState(&gameUI->left);
     updateHoverButtonState(&gameUI->right);
 }
 void updateGameover(Game *game, GameUI *gameUI) {
-    (game->framesCounter)++;
+    (game->frameCounter)++;
 
     updateHoverButtonState(&gameUI->left);
 }
@@ -264,7 +264,7 @@ void updateFade(Game *game, float *fadeAmount) {
             game->currentTransition = IDLE;
 
             // NEXT SCENE FULLY VISIABLE
-            game->framesCounter = 0;
+            game->frameCounter = 0;
             game->frameEntered = GetTime();
         }
 
@@ -311,20 +311,20 @@ void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
     }
 
     // if (*currentScreen == TRANSITION_START) {
-    //     (*framesCounter)++;
+    //     (*frameCounter)++;
     // }
     // if (*currentScreen == TRANSITION_END) {
-    //     (*framesCounter)++;
+    //     (*frameCounter)++;
     //     // if (state == TWEENING) {
-    //     //     scale = EaseSineOut((float)framesCounter, 0, 70, duration);
+    //     //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
     //     //     destRect.width  += scale;
     //     //     destRect.height += scale;
     //     //     origin.x = (float) destRect.width / 2;
     //     //     origin.y = (float) destRect.height / 2;
     //     //     // printf("%.1f,%.1f\n", destRect.width, destRect.height);
     //     //     printf("scale: %f\n", scale);
-    //     //     if (framesCounter > duration) {
-    //     //         framesCounter = 0;
+    //     //     if (frameCounter > duration) {
+    //     //         frameCounter = 0;
     //     //         scale = 70.0;
     //     //         state = IDLE;
     //     //         printf("scale: %f\n", scale);
@@ -362,21 +362,21 @@ void drawLoading(Game game, GameUI gameUI) {
     float flowers = true;
 
     DrawText("Loading", posX, posY - fontSize / 2, fontSize, color);
-    if (game.framesCounter > 30) {
+    if (game.frameCounter > 30) {
         if (flowers) {
             DrawTexture(*gameUI.flower, textW + spaceBetween + posX , posY - gameUI.flower->height / 2, WHITE);
         } else {
             DrawCircle(textW + posX, posY, radius, color);
         }
     }
-    if (game.framesCounter > 60) {
+    if (game.frameCounter > 60) {
         if (flowers) {
             DrawTexture(*gameUI.flower, textW + spaceBetween + posX + flowerW , posY - gameUI.flower->height / 2, WHITE);
         } else {
             DrawCircle(textW + posX + spaceBetween, posY, radius, color);
         }
     }
-    if (game.framesCounter > 120) {
+    if (game.frameCounter > 120) {
         if (flowers) {
             DrawTexture(*gameUI.flower, textW + spaceBetween + posX + flowerW * 2, posY - gameUI.flower->height / 2, WHITE);
         } else {
@@ -386,7 +386,7 @@ void drawLoading(Game game, GameUI gameUI) {
 }
 void drawLogo(Game game) {
     ClearBackground(WHITE);
-    int countdown = LOGO_DELAY_SECS - (game.framesCounter / 60);
+    int countdown = LOGO_DELAY_SECS - (game.frameCounter / 60);
     // int countdown = (LOGO_DELAY_SECS + 1) -  (GetTime() - game.frameEntered);
     int fontSize = 240;
     // char *num = 48 + countdown;
@@ -420,13 +420,13 @@ void drawGameover(Game game, UIButtons buttonLeft) {
     drawButtonButton(buttonLeft);
 
     // Draw blinking text
-    if (((game.framesCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
+    if (((game.frameCounter)/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, BLACK);
 }
 void draw(Game game, GameUI gameUI, Rectangle bg, float fadeAmount) {
     BeginDrawing();
     // ClearBackground(WHITE);
 
-    // printf("%d\n", *framesCounter);
+    // printf("%d\n", *frameCounter);
 
     switch (game.currentScreen) {
         case LOADING: {

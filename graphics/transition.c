@@ -74,7 +74,7 @@ int main() {
     game.nextScreen = LOGO;
     game.currentTransition = IDLE;
     game.frameEntered = 0;
-    game.framesCounter = 0;
+    game.frameCounter = 0;
     game.logoCounter = 0;
 
     printf("--------------\n");
