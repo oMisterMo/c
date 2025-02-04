@@ -304,6 +304,12 @@ void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
         default: break;
     }
 
+    if (!IsCursorOnScreen()) {
+        // Reset gameUI hover state
+        gameUI->left.hover = false;
+        gameUI->right.hover = false;
+    }
+
     // if (*currentScreen == TRANSITION_START) {
     //     (*framesCounter)++;
     // }
