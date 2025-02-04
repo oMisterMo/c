@@ -7,7 +7,7 @@ int main() {
 
 
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, BLACK };
-    float spawnInterval = .5;
+    float spawnInterval = 1.0f; // Every 1 second
     float timeLastSpawn = 0.0;
     int index = 0;
 
@@ -16,9 +16,9 @@ int main() {
     while (!WindowShouldClose()) {
         double currentTime = GetTime();
 
-        // Every 500ms, run whats inside the if
+        // Only run after elapsed interval time
         if (currentTime - timeLastSpawn > spawnInterval) {
-            // Do stuff
+
             int len = (sizeof(colors) / sizeof(colors[0])) - 1;
             index = GetRandomValue(0, len);
 
