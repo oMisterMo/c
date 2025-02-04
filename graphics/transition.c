@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 
-
 #define MIN_SCALE 0
 #define MAX_SCALE 2
 
@@ -56,21 +55,27 @@ int main() {
             (float) buttonsTexture.height / 2
         };
     }
-    Rectangle buttonDestLeft = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
-    Rectangle buttonDestRight = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
-    GameUI gameUI = { 
-        { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false },
-        { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false },
-        &flowerTexture
-    };
-    printf("--------------\n");
-    printf("buttonsTexture: %p\n", &buttonsTexture);
 
     // Tween
     Rectangle tweenBG = { 0, 0, GetScreenWidth(), GetScreenHeight() };
     float fadeAmount = 0.0f;
 
-    Game game = { LOADING, LOADING, IDLE, 0, 0, 0 };
+    GameUI gameUI = { 0 };
+    Rectangle buttonDestLeft = { 0, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
+    Rectangle buttonDestRight = { GetScreenWidth() - BUTTON_W, (GetScreenHeight() - BUTTON_H ) / 2, BUTTON_W, BUTTON_H };
+    gameUI.left = (UIButtons) { &buttonsTexture, buttonsSrc[UI_LEFT], buttonsSrc[UI_LEFT + 6], buttonDestLeft, false };
+    gameUI.right = (UIButtons) { &buttonsTexture, buttonsSrc[UI_RIGHT], buttonsSrc[UI_RIGHT + 6], buttonDestRight, false };
+    gameUI.flower = &flowerTexture;
+    printf("--------------\n");
+    printf("buttonsTexture: %p\n", &buttonsTexture);
+
+    Game game = { 0 };
+    game.currentScreen = LOADING;
+    game.nextScreen = LOGO;
+    game.currentTransition = IDLE;
+    game.frameEntered = 0;
+    game.framesCounter = 0;
+    game.logoCounter = 0;
 
     printf("--------------\n");
     printf("ButtonLeft.texture: %p\n", (gameUI.left.texture));

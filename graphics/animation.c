@@ -97,22 +97,26 @@ int main() {
     slimeTexture.height *= 8;
 
     //============================
-    Spritesheet bunnySheet = {
-        (Rectangle){ 0, 0, bunnyTexture.width / NUM_FRAMES_BUNNY, bunnyTexture.height },
-        0, 0, 0, 5
-    };
+    Spritesheet bunnySheet = { 0 };
+    bunnySheet.frameRec = (Rectangle) { 0, 0, bunnyTexture.width / NUM_FRAMES_BUNNY, bunnyTexture.height };
+    bunnySheet.currentFrame = 0;
+    bunnySheet.currentLine = 0;
+    bunnySheet.frameCounter = 0;
+    bunnySheet.frameSpeed = 5;
     //============================
-    Spritesheet buttonSheet = {
-        (Rectangle){ 0, 0, buttonTexture.width, buttonTexture.height / NUM_LINES_BUTTON },
-        0, 0, 0, 1
-    };
+    Spritesheet buttonSheet = { 0 };
+    buttonSheet.frameRec = (Rectangle) { 0, 0, buttonTexture.width, buttonTexture.height / NUM_LINES_BUTTON };
+    buttonSheet.currentLine = 0;
+    buttonSheet.frameCounter = 0;
+    buttonSheet.frameSpeed = 1;
     //============================
     float frameWidth =  (float) (slimeTexture.width / NUM_FRAMES_SLIME);
     float frameHeight = (float) (slimeTexture.height / NUM_LINES_SLIME);
-    Spritesheet slimeSheet = {
-        (Rectangle){ 0, 0, frameWidth, frameHeight },
-        0, 0, 0, 4
-    };
+    Spritesheet slimeSheet = { 0 };
+    slimeSheet.frameRec = (Rectangle) { 0, 0, frameWidth, frameHeight };
+    slimeSheet.currentLine = 0;
+    slimeSheet.frameCounter = 0;
+    slimeSheet.frameSpeed = 4;
 
 
     SetTargetFPS(60);
