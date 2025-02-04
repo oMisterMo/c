@@ -2,6 +2,20 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+void ClampScreen(Vector2 *position, int width, int height) {
+    if (position->x <= 0) position->x = 0;
+    if (position->y <= 0) position->y = 0;
+    if (position->x + width >= GetScreenWidth()) position->x = GetScreenWidth() - width;
+    if (position->y + height >= GetScreenHeight()) position->y = GetScreenHeight() - height;
+}
+
+void ClampScreenRec(Rectangle *rect) {
+    if (rect->x <= 0) rect->x = 0;
+    if (rect->y <= 0) rect->y = 0;
+    if (rect->x + rect->width >= GetScreenWidth()) rect->x = GetScreenWidth() - rect->width;
+    if (rect->y + rect->height >= GetScreenHeight()) rect->y = GetScreenHeight() - rect->height;
+}
+
 int main() {
 
     int screenWidth = 800 * 2;
@@ -16,7 +30,7 @@ int main() {
     // Load logo texture
     Texture2D logo = LoadTexture("resources/logo/raylib_256x256.png");
 
-    Rectangle logoPosition = { (GetScreenWidth() - logo.width ) / 2, (GetScreenHeight() - logo.height ) / 2, logo.width, logo.height };
+    Rectangle logoBounds = { (GetScreenWidth() - logo.width ) / 2, (GetScreenHeight() - logo.height ) / 2, logo.width, logo.height };
     Vector2 touchPosition = { 0, 0 };
     bool isDragging = false;
 
@@ -48,31 +62,20 @@ int main() {
         touchPosition = GetTouchPosition(0);
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(touchPosition, logoPosition)) {
+            if (CheckCollisionPointRec(touchPosition, logoBounds)) {
                 isDragging = true;
             }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (isDragging) {
-                logoPosition.x = touchPosition.x - logoPosition.width / 2;
-                logoPosition.y = touchPosition.y - logoPosition.height / 2;
+                logoBounds.x = touchPosition.x - logoBounds.width / 2;
+                logoBounds.y = touchPosition.y - logoBounds.height / 2;
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             isDragging = false;
 
-            if (logoPosition.x  <= 0) {
-                logoPosition.x = 0;
-            }
-            if (logoPosition.x + logoPosition.width > GetScreenWidth()) {
-                logoPosition.x =  GetScreenWidth() - logoPosition.width;
-            }
-            if (logoPosition.y  <= 0) {
-                logoPosition.y = 0;
-            }
-            if (logoPosition.y + logoPosition.height > GetScreenHeight()) {
-                logoPosition.y =  GetScreenHeight() - logoPosition.height;
-            }
+            ClampScreenRec(&logoBounds);
 
         }
 
@@ -85,7 +88,7 @@ int main() {
         BeginDrawing();
         ClearBackground(WHITE);
 
-        DrawTexture(logo, logoPosition.x, logoPosition.y, WHITE);
+        DrawTexture(logo, logoBounds.x, logoBounds.y, WHITE);
         DrawFPS(20, 20);
 
         EndDrawing();
