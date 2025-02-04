@@ -39,7 +39,7 @@ typedef enum {
 typedef struct Tween {
     Vector2 startPosition;      // Tween start
     Vector2 targetPosition;     // Tween end [could be consts]
-    int state;                  // IDLE | TWEENING
+    TweenState state;           // IDLE | TWEENING
     int frameCounter;           // Current time in tween
     int duration;               // How long to tween
 } Tween;

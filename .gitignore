@@ -3,3 +3,4 @@ test.c
 *.txt
 
 out/
+.vscode/
