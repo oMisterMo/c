@@ -23,7 +23,7 @@ void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
     bunnySheet->frameCounter++;
 
     // Slow down frame speed
-    if (bunnySheet->frameCounter >= (60 / bunnySheet->frameSpeed)) {
+    if (bunnySheet->frameCounter >= (GetFPS() / bunnySheet->frameSpeed)) {
 
         // Time to update current frame index and reset counter
         bunnySheet->frameCounter = 0;
@@ -45,7 +45,7 @@ void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
 void updateButton(Spritesheet *buttonSheet, Texture2D buttonTexture) {
     buttonSheet->frameCounter++;
 
-    if (buttonSheet->frameCounter >= (60 / buttonSheet->frameSpeed)) {
+    if (buttonSheet->frameCounter >= (GetFPS() / buttonSheet->frameSpeed)) {
         buttonSheet->frameCounter = 0;
         buttonSheet->currentLine++;
 
@@ -64,7 +64,7 @@ void updateSlime(Spritesheet *slimeSheet, Texture2D slimeTexture) {
     float frameWidth = (float) (slimeTexture.width / NUM_FRAMES_SLIME);
     float frameHeight = (float) (slimeTexture.height / NUM_LINES_SLIME);
 
-    if (slimeSheet->frameCounter >= (60 / slimeSheet->frameSpeed)) {
+    if (slimeSheet->frameCounter >= (GetFPS() / slimeSheet->frameSpeed)) {
 
         slimeSheet->currentFrame++;
 
