@@ -79,6 +79,7 @@ typedef struct Game {
     Color *colors;
     int score;
     int counter;
+    Animation *stars;
 } Game;
 
 
@@ -155,10 +156,11 @@ void reset(int *score) {
     *score = 0;
 }
 
-void handleInput(Game *game, Animation *stars) {
+void handleInput(Game *game) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
+    Animation *stars = game->stars;
 
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
@@ -291,7 +293,8 @@ void updateCards(Card cards[]) {
         }
     }
 }
-void updateStars(Animation *stars) {
+void updateStars(Game *game) {
+    Animation *stars = game->stars;
     if (!(stars->sheet.isAnimating)) return;
     stars->sheet.frameCounter++;
 

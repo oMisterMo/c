@@ -62,6 +62,7 @@ int main() {
     game.frameCounter = 0;
     game.score = 0;
     game.counter = 0;
+    game.stars = &stars;
 
     // Rectangle trays[NO_OF_TRAYS];
     initTrays(game.trays, game.colors, &trayTexture);
@@ -96,11 +97,11 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(&game, &stars);
+        handleInput(&game);
 
         // Update
         updateCards(game.cards);
-        updateStars(&stars);
+        updateStars(&game);
 
         // Draw
         BeginDrawing();
