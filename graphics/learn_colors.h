@@ -38,7 +38,7 @@ typedef struct Spritesheet {
     Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
     int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
-    int framesCounter;
+    int frameCounter;
     int frameSpeed;
     bool isAnimating;
 } Spritesheet;
@@ -60,25 +60,38 @@ typedef struct Card {
     Vector2 currentPosition;    // Tween start position
     Vector2 targetPosition;     // Could be consts
     int state;                  // IDLE | TWEEN
-    int framesCounter;           // Current time in tween
+    int frameCounter;           // Current time in tween
     float duration;             // How long to tween
 } Card;
+
+typedef struct Tray {
+    Texture2D *texture;
+    Rectangle rect;
+    Color color;
+} Tray;
+
+typedef struct Game {
+    int frameCounter;
+    Card cards[NO_OF_CARDS];
+    Tray trays[NO_OF_TRAYS];
+} Game;
+
 
 
 // ---------------------------
 // Function Definition
 // ---------------------------
 void initCards(Card cards[], Color colors[]);
-void initTrays(Rectangle trays[], Texture2D *tray);
+// void initTrays(Rectangle trays[]);
 void reset(int *score);
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars);
+void handleInput(Tray trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars);
 
 void updateCards(Card cards[]);
 void updateStars(Animation *stars);
 
 void drawBackground(Texture2D clouds[], double *increment, int order[]);
-void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]);
+void drawTrays(Tray trays[]);
 void drawCards(Card cards[], Texture2D check, Texture2D border);
 void drawCursor(Texture2D cursor, Texture2D cursorPressed);
 void drawScore(int score);
@@ -88,17 +101,30 @@ void drawStars(Animation stars);
 // Implementation
 // ---------------------------
 
-void initTrays(Rectangle trays[], Texture2D *tray) {
+void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        trays[i] = (Rectangle) {
+        // trays[i].texture = trayTexture;
+        // trays[i].rect = (Rectangle) {
+        //     trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
+        //     GetScreenHeight() - TRAY_HEIGHT - PADDING,
+        //     TRAY_WIDTH,
+        //     TRAY_HEIGHT
+        // };
+        // trays[i].color = colors[i];
+
+        Rectangle rect = {
             trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
             GetScreenHeight() - TRAY_HEIGHT - PADDING,
             TRAY_WIDTH,
             TRAY_HEIGHT
         };
-        tray->width = TRAY_WIDTH;
-        tray->height = TRAY_HEIGHT;
+
+        trays[i] = (Tray) {
+            .texture = trayTexture,
+            .rect = rect,
+            .color = colors[i]
+        };
     }
 }
 void initCards(Card cards[], Color colors[]) {
@@ -125,7 +151,7 @@ void initCards(Card cards[], Color colors[]) {
         cards[i].currentPosition = startPosition;   // This is set to the mousePosition at runtime
         cards[i].targetPosition = startPosition;
         cards[i].state = IDLE;
-        cards[i].framesCounter = 0;
+        cards[i].frameCounter = 0;
         cards[i].duration = 30.0f;                  // Length in frame (30 frame = 500ms)
     }
 }
@@ -133,7 +159,7 @@ void reset(int *score) {
     *score = 0;
 }
 
-void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars) {
+void handleInput(Tray trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);
@@ -176,7 +202,7 @@ void handleInput(Rectangle trays[], Card cards[], Color colors[], int *score, in
                 int sum = 0;
 
                 for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                    if (CheckCollisionRecs(cards[i].rect, trays[j]) && ColorIsEqual(cards[i].color, colors[j])) {
+                    if (CheckCollisionRecs(cards[i].rect, trays[j].rect) && ColorIsEqual(cards[i].color, colors[j])) {
                         hit = true;
                         ++(*counter);
                         break;
@@ -233,18 +259,18 @@ void updateCards(Card cards[]) {
     if (isTweenCard && !isOff) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             if (cards[i].state == TWEEN) {
-                cards[i].framesCounter++;
-                // printf("cards[%d].framesCounter: %d\n", i,cards[i].framesCounter);
+                cards[i].frameCounter++;
+                // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
 
 
                 float x = EaseBackOut(
-                        (float) cards[i].framesCounter,
+                        (float) cards[i].frameCounter,
                         cards[i].currentPosition.x,
                         cards[i].targetPosition.x - cards[i].currentPosition.x,
                         cards[i].duration
                     );
                 float y = EaseBackOut(
-                        (float) cards[i].framesCounter,
+                        (float) cards[i].frameCounter,
                         cards[i].currentPosition.y,
                         cards[i].targetPosition.y - cards[i].currentPosition.y,
                         cards[i].duration
@@ -253,8 +279,8 @@ void updateCards(Card cards[]) {
                 cards[i].rect.x = x;
                 cards[i].rect.y = y;
 
-                if (cards[i].framesCounter >= cards[i].duration) {
-                    cards[i].framesCounter = 0;
+                if (cards[i].frameCounter >= cards[i].duration) {
+                    cards[i].frameCounter = 0;
                     cards[i].state = IDLE;
                     cards[i].rect.x = cards[i].targetPosition.x;
                     cards[i].rect.y = cards[i].targetPosition.y;
@@ -267,12 +293,12 @@ void updateCards(Card cards[]) {
 }
 void updateStars(Animation *stars) {
     if (!(stars->sheet.isAnimating)) return;
-    stars->sheet.framesCounter++;
+    stars->sheet.frameCounter++;
 
     // Slow down frame speed
-    if (stars->sheet.framesCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
+    if (stars->sheet.frameCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
         // Time to update current frame index and reset counter
-        stars->sheet.framesCounter = 0;
+        stars->sheet.frameCounter = 0;
         stars->sheet.currentFrame++;
 
         // Ensure frame index stays within bounds
@@ -320,15 +346,15 @@ void drawBackground(Texture2D layers[], double *increment, int order[]) {
         }
     }
 }
-void drawTrays(Rectangle trays[], Texture2D tray, Color colors[]) {
+void drawTrays(Tray trays[]) {
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
+        Tray tray = trays[i];
         if (isDrawTray && !isOff) {
             // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
-            Rectangle rect = trays[i];
-            DrawTextureV(tray, (Vector2){rect.x - 7, rect.y + 7}, BLACK);
-            DrawTextureV(tray, (Vector2){rect.x, rect.y}, colors[i]);
+            DrawTextureV(*trays->texture, (Vector2){tray.rect.x - 7, tray.rect.y + 7}, BLACK);
+            DrawTextureV(*trays->texture, (Vector2){tray.rect.x, tray.rect.y}, tray.color);
         } else {
-            DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);
+            DrawRectangleRounded(trays[i].rect, 0.3f, 16, tray.color);
         }
     }
 }

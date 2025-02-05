@@ -1,10 +1,5 @@
 #include "learn_colors.h"
 
-typedef struct Game {
-    int framesCounter;
-    Card cards[NO_OF_CARDS];
-} Game;
-
 
 
 int main() {
@@ -17,7 +12,6 @@ int main() {
     int screenHeight = 600;
     // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
-    SetWindowMonitor(2);
     SetMousePosition(-10, -10);
     if (isShowCursor) {
         // Cursor stuff not working :(
@@ -44,21 +38,30 @@ int main() {
 
     borderTexture.width /= 4;
     borderTexture.height /= 4;
+    trayTexture.width = TRAY_WIDTH;
+    trayTexture.height = TRAY_HEIGHT;
 
-    Spritesheet starsSheet = {
-        (Rectangle){ 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
-        0, 0, 0, 10, false
-    };
-    Animation stars = { &starsTexture, (Vector2) { 0 }, starsSheet };
+    Spritesheet starsSheet = { 0 };
+    starsSheet.frameRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height };
+    starsSheet.currentFrame = 0;
+    starsSheet.currentLine = 0;
+    starsSheet.frameCounter = 0;
+    starsSheet.frameSpeed = 10;
+    starsSheet.isAnimating = false;
+
+    Animation stars = { 0 };
+    stars.texture = &starsTexture;
+    stars.position = (Vector2) { 0 };
+    stars.sheet = starsSheet;
 
 
     // Game vars
-    Game game = { 0, { 0 } };
+    Game game = { 0 };
     double increment = 0.0;
     Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
-    Rectangle trays[NO_OF_TRAYS];
+    // Rectangle trays[NO_OF_TRAYS];
 
-    initTrays(trays, &trayTexture);
+    initTrays(game.trays, colors, &trayTexture);
     initCards(game.cards, colors);
 
     int counter = 0;
@@ -91,7 +94,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(trays, game.cards, colors, &score, &counter, &stars);
+        handleInput(game.trays, game.cards, colors, &score, &counter, &stars);
 
         // Update
         updateCards(game.cards);
@@ -102,7 +105,7 @@ int main() {
         ClearBackground(RAYWHITE);
 
         drawBackground(cloudsTexture, &increment, order);
-        drawTrays(trays, trayTexture, colors);
+        drawTrays(game.trays);
         drawCards(game.cards, checkTexture, borderTexture);
         drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(score);
