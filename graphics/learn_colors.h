@@ -73,13 +73,13 @@ typedef struct Tray {
 } Tray;
 
 typedef struct Game {
-    int frameCounter;
     Card cards[NO_OF_CARDS];
     Tray trays[NO_OF_TRAYS];
     Color *colors;
+    Animation *stars;
+    int frameCounter;
     int score;
     int counter;
-    Animation *stars;
 } Game;
 
 
