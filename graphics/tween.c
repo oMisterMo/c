@@ -34,20 +34,20 @@ typedef struct Sprite {
     Tween tween;
 } Sprite;
 
-typedef struct Item {
+typedef struct GameObject {
     Texture2D texture;
     Rectangle bounds;
     Tween tween;
-} Item;
+} GameObject;
 
 int normalize(int value, int min, int max);
 float lerp(float norm, int min, int max);
 float linearTween(float currentTime, float start, float change, float duration);
 void logger(int frameCounter);
 
-void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo);
-void updateMo(Item *mo);
-void drawMo(Item mo);
+void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo);
+void updateMo(GameObject *mo);
+void drawMo(GameObject mo);
 void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration);
 void drawRect(Rectangle rect);
 
@@ -71,9 +71,18 @@ int main() {
     Rectangle pos = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Vector2 startMo = { pos.x, pos.y };
     Vector2 endMo = { GetScreenWidth() - bunny.width , center.y };
-    Tween tween = { startMo, endMo, IDLE, 0, 60 * 2 };
-    Item mo = { bunny, pos, tween };
-    
+
+    Tween tween = { 0 };
+    tween.startPosition = startMo;
+    tween.targetPosition = endMo;
+    tween.state = IDLE;
+    tween.frameCounter = 0;
+    tween.duration = 60 * 2;
+
+    GameObject mo = { 0 };
+    mo.texture = bunny;
+    mo.bounds = pos;
+    mo.tween = tween;
 
     // Rectangle stuff
     Vector2 startRect = { 20, GetScreenHeight() - RECT_HEIGHT - 20 };
@@ -81,8 +90,8 @@ int main() {
     Rectangle rect = { startRect.x, startRect.y, RECT_WIDTH, RECT_HEIGHT };
     int frameCounter = 0;
     int state = IDLE;
-    int duration = 60 * 4;     // 60 * 4 = 4 seconds
-    float t = 0;  // 0 < t < 1
+    int duration = 60 * 4;          // 60 * 4 = 4 seconds
+    float t = 0;                    // 0 < t < 1
     printf("original rect => %p\n", &rect);
 
 
@@ -145,7 +154,7 @@ float linearTween(float currentTime, float start, float change, float duration) 
     return change * currentTime / duration + start;
 }
 
-void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
+void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         printf("left mouse pressed...\n");
         if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
@@ -172,7 +181,7 @@ void handleInput(Rectangle *rect, int *state, Vector2 center, Item *mo) {
     }
 }
 
-void updateMo(Item *mo) {
+void updateMo(GameObject *mo) {
         if (mo->tween.state == TWEENING) {
             mo->tween.frameCounter++;
 
@@ -196,7 +205,7 @@ void updateMo(Item *mo) {
         }
 }
 
-void drawMo(Item mo) {
+void drawMo(GameObject mo) {
     // Draw Mo
     // DrawRectangleRec(mo.bounds, WHITE);
     DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
