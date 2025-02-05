@@ -13,9 +13,11 @@ int currentSound;
 #define MAX_TOUCH_POINTS 10
 #define MAX_GESTURE_STRINGS   20
 
+#define NO_OF_COLORS 8
+
 #define NO_OF_TRAYS 3
 #define NO_OF_CARDS 4
-#define NO_OF_CLOUDS 4      // fixed
+#define NO_OF_CLOUDS 4      // 4 cloud sprites
 
 #define TRAY_WIDTH 250
 #define TRAY_HEIGHT 183
@@ -74,6 +76,7 @@ typedef struct Game {
     int frameCounter;
     Card cards[NO_OF_CARDS];
     Tray trays[NO_OF_TRAYS];
+    Color *colors;
 } Game;
 
 
@@ -81,21 +84,21 @@ typedef struct Game {
 // ---------------------------
 // Function Definition
 // ---------------------------
-void initCards(Card cards[], Color colors[]);
-// void initTrays(Rectangle trays[]);
-void reset(int *score);
+// void initCards(Card cards[], Color colors[]);
+// void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture);
+// void reset(int *score);
 
-void handleInput(Tray trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars);
+// void handleInput(Game *game, int *score, int *counter, Animation *stars);
 
-void updateCards(Card cards[]);
-void updateStars(Animation *stars);
+// void updateCards(Card cards[]);
+// void updateStars(Animation *stars);
 
-void drawBackground(Texture2D clouds[], double *increment, int order[]);
-void drawTrays(Tray trays[]);
-void drawCards(Card cards[], Texture2D check, Texture2D border);
-void drawCursor(Texture2D cursor, Texture2D cursorPressed);
-void drawScore(int score);
-void drawStars(Animation stars);
+// void drawBackground(Texture2D clouds[], double *increment, int order[]);
+// void drawTrays(Tray trays[]);
+// void drawCards(Card cards[], Texture2D check, Texture2D border);
+// void drawCursor(Texture2D cursor, Texture2D cursorPressed);
+// void drawScore(int score);
+// void drawStars(Animation stars);
 
 // ---------------------------
 // Implementation
@@ -104,15 +107,6 @@ void drawStars(Animation stars);
 void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        // trays[i].texture = trayTexture;
-        // trays[i].rect = (Rectangle) {
-        //     trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
-        //     GetScreenHeight() - TRAY_HEIGHT - PADDING,
-        //     TRAY_WIDTH,
-        //     TRAY_HEIGHT
-        // };
-        // trays[i].color = colors[i];
-
         Rectangle rect = {
             trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
             GetScreenHeight() - TRAY_HEIGHT - PADDING,
@@ -159,7 +153,11 @@ void reset(int *score) {
     *score = 0;
 }
 
-void handleInput(Tray trays[], Card cards[], Color colors[], int *score, int *counter, Animation *stars) {
+void handleInput(Game *game, int *score, int *counter, Animation *stars) {
+    Tray *trays = game->trays;
+    Card *cards = game->cards;
+    Color *colors = game->colors;
+
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(score);

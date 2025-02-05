@@ -57,13 +57,15 @@ int main() {
 
     // Game vars
     Game game = { 0 };
-    double increment = 0.0;
-    Color colors[] = { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
+
+    game.colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
+    game.frameCounter = 0;
+
     // Rectangle trays[NO_OF_TRAYS];
+    initTrays(game.trays, game.colors, &trayTexture);
+    initCards(game.cards, game.colors);
 
-    initTrays(game.trays, colors, &trayTexture);
-    initCards(game.cards, colors);
-
+    double increment = 0.0;
     int counter = 0;
     int score = 0;
 
@@ -94,7 +96,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(game.trays, game.cards, colors, &score, &counter, &stars);
+        handleInput(&game, &score, &counter, &stars);
 
         // Update
         updateCards(game.cards);
