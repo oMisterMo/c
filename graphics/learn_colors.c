@@ -101,7 +101,7 @@ int main() {
 
         // Update
         updateCards(game.cards);
-        updateStars(&game);
+        updateStars(game.stars);
 
         // Draw
         BeginDrawing();

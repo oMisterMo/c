@@ -293,8 +293,7 @@ void updateCards(Card cards[]) {
         }
     }
 }
-void updateStars(Game *game) {
-    Animation *stars = game->stars;
+void updateStars(Animation *stars) {
     if (!(stars->sheet.isAnimating)) return;
     stars->sheet.frameCounter++;
 
