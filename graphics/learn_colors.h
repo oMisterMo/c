@@ -77,6 +77,8 @@ typedef struct Game {
     Card cards[NO_OF_CARDS];
     Tray trays[NO_OF_TRAYS];
     Color *colors;
+    int score;
+    int counter;
 } Game;
 
 
@@ -153,14 +155,14 @@ void reset(int *score) {
     *score = 0;
 }
 
-void handleInput(Game *game, int *score, int *counter, Animation *stars) {
+void handleInput(Game *game, Animation *stars) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
 
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
-        reset(score);
+        reset(&game->score);
         initCards(cards, colors);
     }
 
@@ -202,7 +204,7 @@ void handleInput(Game *game, int *score, int *counter, Animation *stars) {
                 for (int j = 0; j < NO_OF_TRAYS; ++j) {
                     if (CheckCollisionRecs(cards[i].rect, trays[j].rect) && ColorIsEqual(cards[i].color, colors[j])) {
                         hit = true;
-                        ++(*counter);
+                        ++(game->counter);
                         break;
                     }
                 }
@@ -211,9 +213,9 @@ void handleInput(Game *game, int *score, int *counter, Animation *stars) {
                 if (hit) {
                     // Well done, but has it already entered the zone?
                     if (cards[i].hasTouchedEndZone) continue;
-                    printf("HIT %d\n", *counter);
+                    printf("HIT %d\n", game->counter);
                     if (!cards[i].hasScore) {
-                        ++(*score);
+                        ++(game->score);
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 

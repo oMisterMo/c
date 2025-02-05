@@ -60,14 +60,14 @@ int main() {
 
     game.colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
     game.frameCounter = 0;
+    game.score = 0;
+    game.counter = 0;
 
     // Rectangle trays[NO_OF_TRAYS];
     initTrays(game.trays, game.colors, &trayTexture);
     initCards(game.cards, game.colors);
 
     double increment = 0.0;
-    int counter = 0;
-    int score = 0;
 
     int order[20];      // Random value used to displace the backgrounds velocity
     for (int i = 0; i < 20; i++) {
@@ -96,7 +96,7 @@ int main() {
 
     while(!WindowShouldClose()) {
         // Input
-        handleInput(&game, &score, &counter, &stars);
+        handleInput(&game, &stars);
 
         // Update
         updateCards(game.cards);
@@ -110,7 +110,7 @@ int main() {
         drawTrays(game.trays);
         drawCards(game.cards, checkTexture, borderTexture);
         drawCursor(cursorTexture, cursorPressedTexture);
-        drawScore(score);
+        drawScore(game.score);
         drawStars(stars);
 
         EndDrawing();
