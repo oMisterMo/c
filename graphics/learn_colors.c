@@ -40,21 +40,22 @@ int main() {
     Texture2D redTexture = LoadTexture("resources/sprites/red.png");
     Texture2D greenTexture = LoadTexture("resources/sprites/green.png");
     Texture2D blueTexture = LoadTexture("resources/sprites/blue.png");
+    Texture2D nPatchTexture = LoadTexture("resources/ui/ninepatch_button.png");
+
+    borderTexture.width /= 4;
+    borderTexture.height /= 4;
+    trayTexture.width = TRAY_WIDTH;
+    trayTexture.height = TRAY_HEIGHT;
+
     Rectangle greenSrc = { 0, 0, 32, 32 };
     Rectangle redSrc = { 0, 0, 32, 32 };
     Rectangle blueSrc = { 0, 0, 32, 32 };
-
-    Texture2D nPatchTexture = LoadTexture("resources/ui/ninepatch_button.png");
     NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
 
     GetRandomSourceRec(&greenSrc);
     GetRandomSourceRec(&redSrc);
     GetRandomSourceRec(&blueSrc);
 
-    borderTexture.width /= 4;
-    borderTexture.height /= 4;
-    trayTexture.width = TRAY_WIDTH;
-    trayTexture.height = TRAY_HEIGHT;
 
     Spritesheet starsSheet = { 0 };
     starsSheet.frameRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height };
