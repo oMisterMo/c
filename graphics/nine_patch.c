@@ -9,7 +9,7 @@ int main() {
     // Init variables
     Texture2D nPatchTexture = LoadTexture("resources/ui/ninepatch_button.png");
     // What to draw?
-    NPatchInfo srcInfo = { (Rectangle){ 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
+    NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
     // Where to draw?
     Rectangle destRect = { 160.0f, 160.0f, 32.0f, 32.0f };
     // Set the size
