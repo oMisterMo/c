@@ -45,9 +45,13 @@ int main() {
     Texture2D redTexture = LoadTexture("resources/sprites/red.png");
     Texture2D greenTexture = LoadTexture("resources/sprites/green.png");
     Texture2D blueTexture = LoadTexture("resources/sprites/blue.png");
+    float scale = 0.5;
     Rectangle greenRect = { 0, 0, 128, 128 };
     Rectangle redRect = { 0, 0, 128, 128 };
     Rectangle blueRect = { 0, 0, 128, 128 };
+    Rectangle greenDest = { 0, 0, 128 * scale, 128 * scale };
+    Rectangle redDest = { 128, 0, 128 * scale, 128 * scale };
+    Rectangle blueDest = { 128 * 2, 0, 128 * scale, 128 * scale };
     RandomSourceRec(&greenRect);
     RandomSourceRec(&redRect);
     RandomSourceRec(&blueRect);
@@ -75,6 +79,7 @@ int main() {
     Game game = { 0 };
 
     game.colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
+    game.colorTextures = (Texture2D[]) { redTexture, greenTexture, blueTexture };
     game.frameCounter = 0;
     game.score = 0;
     game.counter = 0;
@@ -82,7 +87,7 @@ int main() {
 
     // Rectangle trays[NO_OF_TRAYS];
     initTrays(game.trays, game.colors, &trayTexture);
-    initCards(game.cards, game.colors);
+    initCards(game.cards, game.colors, game.colorTextures);
 
     double increment = 0.0;
 
@@ -123,15 +128,20 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // drawBackground(cloudsTexture, &increment, order);
-        // drawTrays(game.trays);
-        // drawCards(game.cards, checkTexture, borderTexture);
-        // drawCursor(cursorTexture, cursorPressedTexture);
-        // drawScore(game.score);
-        // drawStars(stars);
-        DrawTextureRec(redTexture, redRect, (Vector2) { 0 }, WHITE);
-        DrawTextureRec(blueTexture, greenRect, (Vector2) { 128 }, WHITE);
-        DrawTextureRec(greenTexture, blueRect, (Vector2) { 128*2 }, WHITE);
+        drawBackground(cloudsTexture, &increment, order);
+        drawTrays(game.trays);
+        drawCards(game.cards, checkTexture, borderTexture);
+        drawCursor(cursorTexture, cursorPressedTexture);
+        drawScore(game.score);
+        drawStars(stars);
+
+
+        // // DrawTextureRec(redTexture, redRect, (Vector2) { 0 }, WHITE);
+        // // DrawTextureRec(blueTexture, greenRect, (Vector2) { 128 }, WHITE);
+        // // DrawTextureRec(greenTexture, blueRect, (Vector2) { 128*2 }, WHITE);
+        // DrawTexturePro(redTexture, redRect, redDest, (Vector2) { 0 }, 0, WHITE);
+        // DrawTexturePro(blueTexture, greenRect, blueDest, (Vector2) { 0 }, 0, WHITE);
+        // DrawTexturePro(greenTexture, blueRect,greenDest, (Vector2) { 0 }, 0, WHITE);
 
         EndDrawing();
 

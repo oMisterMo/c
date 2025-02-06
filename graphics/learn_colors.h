@@ -11,7 +11,7 @@ Sound soundArray[MAX_SOUNDS] = { 0 };
 int currentSound;
 
 #define MAX_TOUCH_POINTS 10
-#define MAX_GESTURE_STRINGS   20
+#define MAX_GESTURE_STRINGS 20
 
 #define NO_OF_COLORS 8
 
@@ -21,8 +21,15 @@ int currentSound;
 
 #define TRAY_WIDTH 250
 #define TRAY_HEIGHT 183
-#define CARD_WIDTH 200/2      // min size = 150 = size of check texture
-#define CARD_HEIGHT 200/2
+
+
+#if (defined(isDrawCard) && isDrawCard < 1)
+    #define CARD_WIDTH 100      // min size = 150 = size of check texture
+    #define CARD_HEIGHT 100
+#else
+    #define CARD_WIDTH 150
+    #define CARD_HEIGHT 150
+#endif
 
 #define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
@@ -64,6 +71,11 @@ typedef struct Card {
     int state;                  // IDLE | TWEEN
     int frameCounter;           // Current time in tween
     float duration;             // How long to tween
+
+    // img
+    Texture2D texture;
+    Rectangle src;
+    Rectangle dest;
 } Card;
 
 typedef struct Tray {
@@ -76,6 +88,7 @@ typedef struct Game {
     Card cards[NO_OF_CARDS];
     Tray trays[NO_OF_TRAYS];
     Color *colors;
+    Texture2D *colorTextures;
     Animation *stars;
     int frameCounter;
     int score;
@@ -107,6 +120,10 @@ typedef struct Game {
 // Implementation
 // ---------------------------
 
+Rectangle GetRandomSource() {
+    return (Rectangle) { 128 * GetRandomValue(0, 5), 128 * GetRandomValue(0, 5), 128, 128 };
+}
+
 void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
@@ -124,20 +141,23 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
         };
     }
 }
-void initCards(Card cards[], Color colors[]) {
+void initCards(Card cards[], Color colors[], Texture2D textures[]) {
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 startPosition = {
             cardStartX + GetScreenWidth() / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
             PADDING
         };
+        int id = GetRandomValue(0, NO_OF_TRAYS - 1);
+        float scale = 0.7f;
+
         cards[i].rect = (Rectangle) {
             startPosition.x,
             startPosition.y,
             CARD_WIDTH,
             CARD_HEIGHT
         };
-        cards[i].color = colors[GetRandomValue(0, NO_OF_TRAYS - 1)];
+        cards[i].color = colors[id];
 
         // flags
         cards[i].isDragging = false;
@@ -150,6 +170,11 @@ void initCards(Card cards[], Color colors[]) {
         cards[i].state = IDLE;
         cards[i].frameCounter = 0;
         cards[i].duration = 30.0f;                  // Length in frame (30 frame = 500ms)
+
+        // img
+        cards[i].texture = textures[id];
+        cards[i].src = GetRandomSource();
+        cards[i].dest = (Rectangle) { startPosition.x, startPosition.y, 128 * scale, 128 * scale };
     }
 }
 void reset(int *score) {
@@ -160,12 +185,13 @@ void handleInput(Game *game) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
+    Texture2D *colorTextures = game->colorTextures;
     Animation *stars = game->stars;
 
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(&game->score);
-        initCards(cards, colors);
+        initCards(cards, colors, colorTextures);
     }
 
 
@@ -246,7 +272,7 @@ void handleInput(Game *game) {
 
                 // Yes? Reset cards
                 if (sum >= NO_OF_CARDS) {
-                    initCards(cards, colors);
+                    initCards(cards, colors, colorTextures);
 
                     if (isAudio && !isOff) PlaySound(soundArray[3]);  // CHIME
                 }
@@ -362,24 +388,25 @@ void drawTrays(Tray trays[]) {
 }
 void drawCards(Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
+        Card card = cards[i];
+        // float w = card.dest.width;
+        // float h = card.dest.height;
         if (isDrawCard && !isOff) {
-            DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
-            DrawTextureRec(border, (Rectangle) {400, 0, 400 / 4, 400 / 4} , (Vector2) {cards[i].rect.x, cards[i].rect.y}, WHITE);
-            if (cards[i].hasTouchedEndZone) {
-                int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
-                int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-                DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
-                DrawTexture(check, x, y, WHITE);
-            }
+            DrawTexturePro(card.texture,
+            card.src, card.rect,
+            (Vector2) { 0 }, 0, WHITE);
+            DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
         } else {
-            DrawRectangleRoundedLinesEx(cards[i].rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
-            DrawRectangleRounded(cards[i].rect, 0.3f, 16, cards[i].color);
-            if (cards[i].hasTouchedEndZone) {
-                int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
-                int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-                DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
-                DrawTexture(check, x, y, WHITE);
-            }
+            DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
+            DrawRectangleRounded(card.rect, 0.3f, 16, card.color);
+        }
+
+        // Draw empty square
+        if (cards[i].hasTouchedEndZone) {
+            int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
+            int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+            DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+            DrawTexture(check, x, y, WHITE);
         }
     }
 }
