@@ -75,7 +75,6 @@ typedef struct Card {
     // img
     Texture2D texture;
     Rectangle src;
-    Rectangle dest;
 } Card;
 
 typedef struct Tray {
@@ -121,7 +120,12 @@ typedef struct Game {
 // ---------------------------
 
 Rectangle GetRandomSource() {
-    return (Rectangle) { 128 * GetRandomValue(0, 5), 128 * GetRandomValue(0, 5), 128, 128 };
+    return (Rectangle) { 32 * GetRandomValue(0, 1), 32 * GetRandomValue(0, 4), 32, 32 };
+}
+
+void GetRandomSourceRec(Rectangle *rect) {
+    rect->x =  32 * GetRandomValue(0, 1);
+    rect->y = 32 * GetRandomValue(0, 4);
 }
 
 void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
@@ -174,7 +178,6 @@ void initCards(Card cards[], Color colors[], Texture2D textures[]) {
         // img
         cards[i].texture = textures[id];
         cards[i].src = GetRandomSource();
-        cards[i].dest = (Rectangle) { startPosition.x, startPosition.y, 128 * scale, 128 * scale };
     }
 }
 void reset(int *score) {
@@ -389,8 +392,6 @@ void drawTrays(Tray trays[]) {
 void drawCards(Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Card card = cards[i];
-        // float w = card.dest.width;
-        // float h = card.dest.height;
         if (isDrawCard && !isOff) {
             DrawTexturePro(card.texture,
             card.src, card.rect,

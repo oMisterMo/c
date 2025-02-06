@@ -3,7 +3,7 @@
 #define isPrarallaxBackground true
 #define isShowCursor true
 #define isDrawTray true
-#define isDrawCard false
+#define isDrawCard true
 #define isTweenCard true
 #define isAnimateStars true
 #define isAudio false

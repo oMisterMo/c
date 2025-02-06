@@ -2,12 +2,7 @@
 
 
 
-void RandomSourceRec(Rectangle *rect) {
-    int x = GetRandomValue(0, 5);
-    int y = GetRandomValue(0, 5);
-    rect->x = x * 128;
-    rect->y = y * 128;
-}
+
 
 int main() {
 
@@ -45,16 +40,13 @@ int main() {
     Texture2D redTexture = LoadTexture("resources/sprites/red.png");
     Texture2D greenTexture = LoadTexture("resources/sprites/green.png");
     Texture2D blueTexture = LoadTexture("resources/sprites/blue.png");
-    float scale = 0.5;
-    Rectangle greenRect = { 0, 0, 128, 128 };
-    Rectangle redRect = { 0, 0, 128, 128 };
-    Rectangle blueRect = { 0, 0, 128, 128 };
-    Rectangle greenDest = { 0, 0, 128 * scale, 128 * scale };
-    Rectangle redDest = { 128, 0, 128 * scale, 128 * scale };
-    Rectangle blueDest = { 128 * 2, 0, 128 * scale, 128 * scale };
-    RandomSourceRec(&greenRect);
-    RandomSourceRec(&redRect);
-    RandomSourceRec(&blueRect);
+    Rectangle greenSrc = { 0, 0, 32, 32 };
+    Rectangle redSrc = { 0, 0, 32, 32 };
+    Rectangle blueSrc = { 0, 0, 32, 32 };
+
+    GetRandomSourceRec(&greenSrc);
+    GetRandomSourceRec(&redSrc);
+    GetRandomSourceRec(&blueSrc);
 
     borderTexture.width /= 4;
     borderTexture.height /= 4;
@@ -134,14 +126,6 @@ int main() {
         drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(game.score);
         drawStars(stars);
-
-
-        // // DrawTextureRec(redTexture, redRect, (Vector2) { 0 }, WHITE);
-        // // DrawTextureRec(blueTexture, greenRect, (Vector2) { 128 }, WHITE);
-        // // DrawTextureRec(greenTexture, blueRect, (Vector2) { 128*2 }, WHITE);
-        // DrawTexturePro(redTexture, redRect, redDest, (Vector2) { 0 }, 0, WHITE);
-        // DrawTexturePro(blueTexture, greenRect, blueDest, (Vector2) { 0 }, 0, WHITE);
-        // DrawTexturePro(greenTexture, blueRect,greenDest, (Vector2) { 0 }, 0, WHITE);
 
         EndDrawing();
 
