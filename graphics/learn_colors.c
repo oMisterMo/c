@@ -2,6 +2,13 @@
 
 
 
+void RandomSourceRec(Rectangle *rect) {
+    int x = GetRandomValue(0, 5);
+    int y = GetRandomValue(0, 5);
+    rect->x = x * 128;
+    rect->y = y * 128;
+}
+
 int main() {
 
     // Setup config
@@ -35,6 +42,15 @@ int main() {
     Texture2D trayTexture = LoadTexture("resources/sprites/tray.png");
     Texture2D borderTexture = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
     Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
+    Texture2D redTexture = LoadTexture("resources/sprites/red.png");
+    Texture2D greenTexture = LoadTexture("resources/sprites/green.png");
+    Texture2D blueTexture = LoadTexture("resources/sprites/blue.png");
+    Rectangle greenRect = { 0, 0, 128, 128 };
+    Rectangle redRect = { 0, 0, 128, 128 };
+    Rectangle blueRect = { 0, 0, 128, 128 };
+    RandomSourceRec(&greenRect);
+    RandomSourceRec(&redRect);
+    RandomSourceRec(&blueRect);
 
     borderTexture.width /= 4;
     borderTexture.height /= 4;
@@ -107,12 +123,15 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        drawBackground(cloudsTexture, &increment, order);
-        drawTrays(game.trays);
-        drawCards(game.cards, checkTexture, borderTexture);
-        drawCursor(cursorTexture, cursorPressedTexture);
-        drawScore(game.score);
-        drawStars(stars);
+        // drawBackground(cloudsTexture, &increment, order);
+        // drawTrays(game.trays);
+        // drawCards(game.cards, checkTexture, borderTexture);
+        // drawCursor(cursorTexture, cursorPressedTexture);
+        // drawScore(game.score);
+        // drawStars(stars);
+        DrawTextureRec(redTexture, redRect, (Vector2) { 0 }, WHITE);
+        DrawTextureRec(blueTexture, greenRect, (Vector2) { 128 }, WHITE);
+        DrawTextureRec(greenTexture, blueRect, (Vector2) { 128*2 }, WHITE);
 
         EndDrawing();
 
@@ -131,6 +150,9 @@ int main() {
     UnloadTexture(trayTexture);
     UnloadTexture(borderTexture);
     UnloadTexture(starsTexture);
+    UnloadTexture(redTexture);
+    UnloadTexture(greenTexture);
+    UnloadTexture(blueTexture);
 
     // Audio
     if (isAudio && !isOff) {
