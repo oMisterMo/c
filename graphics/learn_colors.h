@@ -163,7 +163,8 @@ void initCards(Game *game) {
             PADDING
         };
         int id = GetRandomValue(0, NO_OF_TRAYS - 1);
-        float scale = 0.7f;
+
+        if (isDrawCard && id >= 3) id = GetRandomValue(0, 2);
 
         cards[i].rect = (Rectangle) {
             startPosition.x,
