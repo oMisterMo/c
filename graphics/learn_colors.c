@@ -44,6 +44,9 @@ int main() {
     Rectangle redSrc = { 0, 0, 32, 32 };
     Rectangle blueSrc = { 0, 0, 32, 32 };
 
+    Texture2D nPatchTexture = LoadTexture("resources/ui/ninepatch_button.png");
+    NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
+
     GetRandomSourceRec(&greenSrc);
     GetRandomSourceRec(&redSrc);
     GetRandomSourceRec(&blueSrc);
@@ -76,10 +79,12 @@ int main() {
     game.score = 0;
     game.counter = 0;
     game.stars = &stars;
+    game.nPatchTexture = nPatchTexture;
+    game.nPatchSrc = srcInfo;
 
     // Rectangle trays[NO_OF_TRAYS];
     initTrays(game.trays, game.colors, &trayTexture);
-    initCards(game.cards, game.colors, game.colorTextures);
+    initCards(&game);
 
     double increment = 0.0;
 

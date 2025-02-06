@@ -27,8 +27,8 @@ int currentSound;
     #define CARD_WIDTH 100      // min size = 150 = size of check texture
     #define CARD_HEIGHT 100
 #else
-    #define CARD_WIDTH 150
-    #define CARD_HEIGHT 150
+    #define CARD_WIDTH 124
+    #define CARD_HEIGHT 124
 #endif
 
 #define GAP 70              // Space between cards & trays
@@ -73,6 +73,8 @@ typedef struct Card {
     float duration;             // How long to tween
 
     // img
+    Texture2D nPatchTexture;
+    NPatchInfo nPatchSrc;
     Texture2D texture;
     Rectangle src;
 } Card;
@@ -92,6 +94,8 @@ typedef struct Game {
     int frameCounter;
     int score;
     int counter;
+    Texture2D nPatchTexture;
+    NPatchInfo nPatchSrc;
 } Game;
 
 
@@ -145,7 +149,12 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
         };
     }
 }
-void initCards(Card cards[], Color colors[], Texture2D textures[]) {
+// void initCards(Card cards[], Color colors[], Texture2D textures[]) {
+void initCards(Game *game) {
+    Card *cards = game->cards;
+    Color *colors = game->colors;
+    Texture2D *textures = game->colorTextures;
+
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 startPosition = {
@@ -176,6 +185,8 @@ void initCards(Card cards[], Color colors[], Texture2D textures[]) {
         cards[i].duration = 30.0f;                  // Length in frame (30 frame = 500ms)
 
         // img
+        cards[i].nPatchTexture = game->nPatchTexture;
+        cards[i].nPatchSrc = game->nPatchSrc;
         cards[i].texture = textures[id];
         cards[i].src = GetRandomSource();
     }
@@ -194,7 +205,7 @@ void handleInput(Game *game) {
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
     if (IsKeyPressed(KEY_R)) {
         reset(&game->score);
-        initCards(cards, colors, colorTextures);
+        initCards(game);
     }
 
 
@@ -275,7 +286,7 @@ void handleInput(Game *game) {
 
                 // Yes? Reset cards
                 if (sum >= NO_OF_CARDS) {
-                    initCards(cards, colors, colorTextures);
+                    initCards(game);
 
                     if (isAudio && !isOff) PlaySound(soundArray[3]);  // CHIME
                 }
@@ -393,10 +404,10 @@ void drawCards(Card cards[], Texture2D check, Texture2D border) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Card card = cards[i];
         if (isDrawCard && !isOff) {
-            DrawTexturePro(card.texture,
-            card.src, card.rect,
-            (Vector2) { 0 }, 0, WHITE);
-            DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
+
+            DrawTextureNPatch(card.nPatchTexture, card.nPatchSrc, card.rect, (Vector2) { 0 }, 0, WHITE);
+            DrawTexturePro(card.texture, card.src, card.rect, (Vector2) { 0 }, 0, WHITE);
+            // DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
         } else {
             DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
             DrawRectangleRounded(card.rect, 0.3f, 16, card.color);
