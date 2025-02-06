@@ -27,8 +27,9 @@ int currentSound;
     #define CARD_WIDTH 100      // min size = 150 = size of check texture
     #define CARD_HEIGHT 100
 #else
-    #define CARD_WIDTH 124
-    #define CARD_HEIGHT 124
+    // Size of card with texture, should be multiple of 32 to avoid scaling issues
+    #define CARD_WIDTH 128
+    #define CARD_HEIGHT 128
 #endif
 
 #define GAP 70              // Space between cards & trays
