@@ -151,7 +151,6 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
         };
     }
 }
-// void initCards(Card cards[], Color colors[], Texture2D textures[]) {
 void initCards(Game *game) {
     Card *cards = game->cards;
     Color *colors = game->colors;
