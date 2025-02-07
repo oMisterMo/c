@@ -68,7 +68,7 @@ typedef struct Animation {
 } Animation;
 
 typedef struct Card {
-    Rectangle rect;             // Actual position
+    Rectangle dest;             // Actual position
     Color color;
     bool isDragging;
     bool hasTouchedEndZone;
@@ -90,7 +90,7 @@ typedef struct Card {
 
 typedef struct Tray {
     Texture2D *texture;
-    Rectangle rect;
+    Rectangle dest;
     Color color;
 } Tray;
 
@@ -144,7 +144,7 @@ void GetRandomSourceRec(Rectangle *rect) {
 void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
-        Rectangle rect = {
+        Rectangle dest = {
             trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
             GetScreenHeight() - TRAY_HEIGHT - PADDING,
             TRAY_WIDTH,
@@ -153,7 +153,7 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
 
         trays[i] = (Tray) {
             .texture = trayTexture,
-            .rect = rect,
+            .dest = dest,
             .color = colors[i]
         };
     }
@@ -173,7 +173,7 @@ void initCards(Game *game) {
 
         if (isDrawCard && id >= 3) id = GetRandomValue(0, 2);
 
-        cards[i].rect = (Rectangle) {
+        cards[i].dest = (Rectangle) {
             startPosition.x,
             startPosition.y,
             CARD_WIDTH,
@@ -236,14 +236,14 @@ void handleInput(Game *game) {
         // Pointer arithmetic to get the next card
         Card *card = (cards + i);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(GetTouchPosition(0), card->rect)) {
+            if (CheckCollisionPointRec(GetTouchPosition(0), card->dest)) {
                 card->isDragging = true;
             }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (card->isDragging) {
-                card->rect.x = touchPosition.x - card->rect.width / 2;
-                card->rect.y = touchPosition.y - card->rect.height / 2;
+                card->dest.x = touchPosition.x - card->dest.width / 2;
+                card->dest.y = touchPosition.y - card->dest.height / 2;
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -255,7 +255,7 @@ void handleInput(Game *game) {
                 int sum = 0;
 
                 for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                    if (CheckCollisionRecs(card->rect, trays[j].rect) && ColorIsEqual(card->color, colors[j])) {
+                    if (CheckCollisionRecs(card->dest, trays[j].dest) && ColorIsEqual(card->color, colors[j])) {
                         hit = true;
                         ++(game->counter);
                         break;
@@ -281,10 +281,10 @@ void handleInput(Game *game) {
                     printf("Reset Card...\n");
                     if (isTweenCard && !isOff) {
                         card->state = TWEEN;
-                        card->currentPosition = (Vector2) { touchPosition.x - card->rect.width / 2, touchPosition.y - card->rect.height / 2 };
+                        card->currentPosition = (Vector2) { touchPosition.x - card->dest.width / 2, touchPosition.y - card->dest.height / 2 };
                     } else {
-                        card->rect.x = card->targetPosition.x;
-                        card->rect.y = card->targetPosition.y;
+                        card->dest.x = card->targetPosition.x;
+                        card->dest.y = card->targetPosition.y;
                     }
 
                     if (isAudio && !isOff) PlaySound(soundArray[2]);  // STOP
@@ -330,14 +330,14 @@ void updateCards(Card cards[]) {
                         card->duration
                     );
 
-                card->rect.x = x;
-                card->rect.y = y;
+                card->dest.x = x;
+                card->dest.y = y;
 
                 if (card->frameCounter >= card->duration) {
                     card->frameCounter = 0;
                     card->state = IDLE;
-                    card->rect.x = card->targetPosition.x;
-                    card->rect.y = card->targetPosition.y;
+                    card->dest.x = card->targetPosition.x;
+                    card->dest.y = card->targetPosition.y;
                 }
 
 
@@ -405,10 +405,10 @@ void drawTrays(Tray trays[]) {
         Tray tray = trays[i];
         if (isDrawTray && !isOff) {
             // DrawRectangleRounded(trays[i], 0.3f, 16, colors[i]);    // Show bounds
-            DrawTextureV(*trays->texture, (Vector2){tray.rect.x - 7, tray.rect.y + 7}, BLACK);
-            DrawTextureV(*trays->texture, (Vector2){tray.rect.x, tray.rect.y}, tray.color);
+            DrawTextureV(*trays->texture, (Vector2){tray.dest.x - 7, tray.dest.y + 7}, BLACK);
+            DrawTextureV(*trays->texture, (Vector2){tray.dest.x, tray.dest.y}, tray.color);
         } else {
-            DrawRectangleRounded(trays[i].rect, 0.3f, 16, tray.color);
+            DrawRectangleRounded(trays[i].dest, 0.3f, 16, tray.color);
         }
     }
 }
@@ -417,12 +417,12 @@ void drawCards(Card cards[], Texture2D check, Texture2D border) {
         Card card = cards[i];
         if (isDrawCard && !isOff) {
 
-            DrawTextureNPatch(card.nPatchTexture, card.nPatchSrc, card.rect, (Vector2) { 0 }, 0, WHITE);
-            DrawTexturePro(card.texture, card.src, card.rect, (Vector2) { 0 }, 0, WHITE);
-            // DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
+            DrawTextureNPatch(card.nPatchTexture, card.nPatchSrc, card.dest, (Vector2) { 0 }, 0, WHITE);
+            DrawTexturePro(card.texture, card.src, card.dest, (Vector2) { 0 }, 0, WHITE);
+            // DrawRectangleRoundedLinesEx(card.dest, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
         } else {
-            DrawRectangleRoundedLinesEx(card.rect, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
-            DrawRectangleRounded(card.rect, 0.3f, 16, card.color);
+            DrawRectangleRoundedLinesEx(card.dest, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
+            DrawRectangleRounded(card.dest, 0.3f, 16, card.color);
         }
 
         // Draw empty square
