@@ -233,27 +233,29 @@ void handleInput(Game *game) {
 
     // Handle Cards
     for (int i = 0; i < NO_OF_CARDS; ++i) {
+        // Pointer arithmetic to get the next card
+        Card *card = (cards + i);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(GetTouchPosition(0), cards[i].rect)) {
-                cards[i].isDragging = true;
+            if (CheckCollisionPointRec(GetTouchPosition(0), card->rect)) {
+                card->isDragging = true;
             }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            if (cards[i].isDragging) {
-                cards[i].rect.x = touchPosition.x - cards[i].rect.width / 2;
-                cards[i].rect.y = touchPosition.y - cards[i].rect.height / 2;
+            if (card->isDragging) {
+                card->rect.x = touchPosition.x - card->rect.width / 2;
+                card->rect.y = touchPosition.y - card->rect.height / 2;
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
 
-            if (cards[i].isDragging) {
-                cards[i].isDragging = false;
+            if (card->isDragging) {
+                card->isDragging = false;
 
                 bool hit = false;
                 int sum = 0;
 
                 for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                    if (CheckCollisionRecs(cards[i].rect, trays[j].rect) && ColorIsEqual(cards[i].color, colors[j])) {
+                    if (CheckCollisionRecs(card->rect, trays[j].rect) && ColorIsEqual(card->color, colors[j])) {
                         hit = true;
                         ++(game->counter);
                         break;
@@ -263,26 +265,26 @@ void handleInput(Game *game) {
                 // Did the card enter the correct tray?
                 if (hit) {
                     // Well done, but has it already entered the zone?
-                    if (cards[i].hasTouchedEndZone) continue;
+                    if (card->hasTouchedEndZone) continue;
                     printf("HIT %d\n", game->counter);
-                    if (!cards[i].hasScore) {
+                    if (!card->hasScore) {
                         ++(game->score);
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 
                         if (isAudio && !isOff) PlaySound(soundArray[0]);  // CLICK
                     }
-                    cards[i].hasTouchedEndZone = true;
-                    cards[i].hasScore = true;
+                    card->hasTouchedEndZone = true;
+                    card->hasScore = true;
                 } else {
                     // No, tween the card back to its original position
                     printf("Reset Card...\n");
                     if (isTweenCard && !isOff) {
-                        cards[i].state = TWEEN;
-                        cards[i].currentPosition = (Vector2) { touchPosition.x - cards[i].rect.width / 2, touchPosition.y - cards[i].rect.height / 2 };
+                        card->state = TWEEN;
+                        card->currentPosition = (Vector2) { touchPosition.x - card->rect.width / 2, touchPosition.y - card->rect.height / 2 };
                     } else {
-                        cards[i].rect.x = cards[i].targetPosition.x;
-                        cards[i].rect.y = cards[i].targetPosition.y;
+                        card->rect.x = card->targetPosition.x;
+                        card->rect.y = card->targetPosition.y;
                     }
 
                     if (isAudio && !isOff) PlaySound(soundArray[2]);  // STOP
@@ -309,32 +311,33 @@ void handleInput(Game *game) {
 void updateCards(Card cards[]) {
     if (isTweenCard && !isOff) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
-            if (cards[i].state == TWEEN) {
-                cards[i].frameCounter++;
-                // printf("cards[%d].frameCounter: %d\n", i,cards[i].frameCounter);
+            Card *card = (cards + i);
+            if (card->state == TWEEN) {
+                card->frameCounter++;
+                // printf("cards[%d].frameCounter: %d\n", i,card->frameCounter);
 
 
                 float x = EaseBackOut(
-                        (float) cards[i].frameCounter,
-                        cards[i].currentPosition.x,
-                        cards[i].targetPosition.x - cards[i].currentPosition.x,
-                        cards[i].duration
+                        (float) card->frameCounter,
+                        card->currentPosition.x,
+                        card->targetPosition.x - card->currentPosition.x,
+                        card->duration
                     );
                 float y = EaseBackOut(
-                        (float) cards[i].frameCounter,
-                        cards[i].currentPosition.y,
-                        cards[i].targetPosition.y - cards[i].currentPosition.y,
-                        cards[i].duration
+                        (float) card->frameCounter,
+                        card->currentPosition.y,
+                        card->targetPosition.y - card->currentPosition.y,
+                        card->duration
                     );
 
-                cards[i].rect.x = x;
-                cards[i].rect.y = y;
+                card->rect.x = x;
+                card->rect.y = y;
 
-                if (cards[i].frameCounter >= cards[i].duration) {
-                    cards[i].frameCounter = 0;
-                    cards[i].state = IDLE;
-                    cards[i].rect.x = cards[i].targetPosition.x;
-                    cards[i].rect.y = cards[i].targetPosition.y;
+                if (card->frameCounter >= card->duration) {
+                    card->frameCounter = 0;
+                    card->state = IDLE;
+                    card->rect.x = card->targetPosition.x;
+                    card->rect.y = card->targetPosition.y;
                 }
 
 
@@ -423,10 +426,10 @@ void drawCards(Card cards[], Texture2D check, Texture2D border) {
         }
 
         // Draw empty square
-        if (cards[i].hasTouchedEndZone) {
-            int x = (cards[i].targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
-            int y = (cards[i].targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
-            DrawRectangleLines(cards[i].targetPosition.x, cards[i].targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
+        if (card.hasTouchedEndZone) {
+            int x = (card.targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
+            int y = (card.targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
+            DrawRectangleLines(card.targetPosition.x, card.targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
             DrawTexture(check, x, y, WHITE);
         }
     }
