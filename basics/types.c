@@ -36,7 +36,7 @@ void types() {
     char *e[10]; // 10 bytes string
 
     // ints
-    int b; // 4 bytes
+    int n; // 4 bytes
 
     // floats
     float l; // 4 bytes
@@ -136,8 +136,8 @@ void print_types() {
     // }
 
 
-    printf("%8s %5s\n", "Type", "Size");
-    printf("----------------\n");
+    printf("%8s %5s\n", "Type", "Size (Bytes)");
+    printf("-------------------------------\n");
     printf("%8s %5ld\n", "char", sizeof(char));
     printf("%8s %5ld\n", "short", sizeof(short));
     printf("%8s %5ld\n", "int", sizeof(int));
