@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include "raylib.h"
 
+#define SIZE 32     // default single sprite size
+
 
 Rectangle GetRandomSource() {
-    return (Rectangle) { 32 * GetRandomValue(0, 1), 32 * GetRandomValue(0, 4), 32, 32 };
+    return (Rectangle) { SIZE * GetRandomValue(0, 1), SIZE * GetRandomValue(0, 4), SIZE, SIZE };
 }
 
 int main() {
@@ -20,13 +22,16 @@ int main() {
     // What to draw?
     NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
     // Where to draw?
-    Rectangle destRect = { 160.0f, 160.0f, 32.0f, 32.0f };
+    Rectangle destRect = { 160.0f, 160.0f, SIZE, SIZE };
     // Set the size
-    destRect.width = 100;
-    destRect.height = 100;
+    float scale = 5.0f;
+    destRect.width = SIZE * scale;
+    destRect.height = SIZE * scale;
 
-    Rectangle redSrc = { 0, 0, 32, 32 };
-    redSrc = GetRandomSource();
+    // Get first image from the red spritesheet
+    Rectangle srcRect = { 0, 0, SIZE, SIZE };
+    // Randomise the x,y offset
+    srcRect = GetRandomSource();
 
 
     SetTargetFPS(60);
@@ -41,12 +46,15 @@ int main() {
         ClearBackground(SKYBLUE);
         DrawFPS(20, 20);
 
+        // Testing, draw textures
         // DrawTexture(nPatchTexture, 100, 300, WHITE);
-        
-        DrawTextureNPatch(nPatchTexture, srcInfo, destRect, (Vector2) { 0 }, 0, WHITE);
-
         // DrawTexture(redTexture, 0, 0, WHITE);
-        DrawTexturePro(redTexture, redSrc, destRect, (Vector2) { 0 }, 0, WHITE);
+
+        // Draw the resizeable UI background
+        DrawTextureNPatch(nPatchTexture, srcInfo, destRect, (Vector2) { 0 }, 0, WHITE);
+        
+        // Draw the image on top of the background
+        DrawTexturePro(blueTexture, srcRect, destRect, (Vector2) { 0 }, 0, WHITE);
 
         EndDrawing();
     }
