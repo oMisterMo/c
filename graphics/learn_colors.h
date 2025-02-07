@@ -24,7 +24,8 @@ int currentSound;
 
 
 #if (defined(isDrawCard) && isDrawCard < 1)
-    #define CARD_WIDTH 100      // min size = 150 = size of check texture
+    // Size of card without texture
+    #define CARD_WIDTH 100
     #define CARD_HEIGHT 100
 #else
     // Size of card with texture, should be multiple of 32 to avoid scaling issues
