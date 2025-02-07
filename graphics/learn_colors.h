@@ -6,21 +6,32 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define MAX_SOUNDS 10
-Sound soundArray[MAX_SOUNDS] = { 0 };
-int currentSound;
-
-#define MAX_TOUCH_POINTS 10
-#define MAX_GESTURE_STRINGS 20
-
-#define NO_OF_COLORS 8
 
 #define NO_OF_TRAYS 3
 #define NO_OF_CARDS 4
-#define NO_OF_CLOUDS 4      // 4 cloud sprites
+#define GAP 70              // Space between cards & trays
+#define PADDING 70          // Space above & below
 
-#define TRAY_WIDTH 250
-#define TRAY_HEIGHT 183
+
+
+#define MAX_SOUNDS 10
+Sound soundArray[MAX_SOUNDS] = { 0 };
+int currentSound;
+#define MAX_TOUCH_POINTS 10
+#define MAX_GESTURE_STRINGS 20
+#define NO_OF_COLORS 8
+#define NO_OF_CLOUDS 4      // 4 cloud sprites
+#define NUM_FRAMES_STARS 8
+
+#if (defined(isDrawTray) && isDrawTray < 1)
+    // Size of tray without texture
+    #define TRAY_WIDTH 150
+    #define TRAY_HEIGHT 100
+#else
+    // Size of trey with texture
+    #define TRAY_WIDTH 250
+    #define TRAY_HEIGHT 183
+#endif
 
 
 #if (defined(isDrawCard) && isDrawCard < 1)
@@ -32,10 +43,6 @@ int currentSound;
     #define CARD_WIDTH 128
     #define CARD_HEIGHT 128
 #endif
-
-#define GAP 70              // Space between cards & trays
-#define PADDING 70          // Space above & below
-#define NUM_FRAMES_STARS 8
 
 #define MIN_NO_OF_TRAYS 2   // unused
 #define MAX_NO_OF_TRAYS 8   // unused
