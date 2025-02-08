@@ -71,8 +71,8 @@ typedef struct Card {
     Rectangle dest;             // Actual position
     Color color;
     bool isDragging;
-    bool hasTouchedEndZone;
-    bool hasScore;
+    bool reachedTarget;
+    bool scoredPoints;
 
     // tween
     Vector2 currentPosition;    // Tween start position
@@ -84,8 +84,8 @@ typedef struct Card {
     // img
     Texture2D nPatchTexture;
     NPatchInfo nPatchSrc;
-    Texture2D texture;
-    Rectangle src;
+    Texture2D imgTexture;
+    Rectangle imgSrc;
 } Card;
 
 typedef struct Tray {
@@ -183,8 +183,8 @@ void initCards(Game *game) {
 
         // flags
         cards[i].isDragging = false;
-        cards[i].hasTouchedEndZone = false;
-        cards[i].hasScore = false;
+        cards[i].reachedTarget = false;
+        cards[i].scoredPoints = false;
 
         // tween
         cards[i].currentPosition = startPosition;   // This is set to the mousePosition at runtime
@@ -196,8 +196,8 @@ void initCards(Game *game) {
         // img
         cards[i].nPatchTexture = game->nPatchTexture;
         cards[i].nPatchSrc = game->nPatchSrc;
-        cards[i].texture = textures[id];
-        cards[i].src = GetRandomSource();
+        cards[i].imgTexture = textures[id];
+        cards[i].imgSrc = GetRandomSource();
     }
 }
 void reset(int *score) {
@@ -265,17 +265,17 @@ void handleInput(Game *game) {
                 // Did the card enter the correct tray?
                 if (hit) {
                     // Well done, but has it already entered the zone?
-                    if (card->hasTouchedEndZone) continue;
+                    if (card->reachedTarget) continue;
                     printf("HIT %d\n", game->counter);
-                    if (!card->hasScore) {
+                    if (!card->scoredPoints) {
                         ++(game->score);
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 
                         if (isAudio && !isOff) PlaySound(soundArray[0]);  // CLICK
                     }
-                    card->hasTouchedEndZone = true;
-                    card->hasScore = true;
+                    card->reachedTarget = true;
+                    card->scoredPoints = true;
                 } else {
                     // No, tween the card back to its original position
                     printf("Reset Card...\n");
@@ -292,7 +292,7 @@ void handleInput(Game *game) {
 
                 // Have all cards been moved to the correct zone?
                 for (int j = 0; j < NO_OF_CARDS; ++j) {
-                    sum += cards[j].hasTouchedEndZone;
+                    sum += cards[j].reachedTarget;
                 }
 
                 // Yes? Reset cards
@@ -418,7 +418,7 @@ void drawCards(Card cards[], Texture2D check, Texture2D border) {
         if (isDrawCard && !isOff) {
 
             DrawTextureNPatch(card.nPatchTexture, card.nPatchSrc, card.dest, (Vector2) { 0 }, 0, WHITE);
-            DrawTexturePro(card.texture, card.src, card.dest, (Vector2) { 0 }, 0, WHITE);
+            DrawTexturePro(card.imgTexture, card.imgSrc, card.dest, (Vector2) { 0 }, 0, WHITE);
             // DrawRectangleRoundedLinesEx(card.dest, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
         } else {
             DrawRectangleRoundedLinesEx(card.dest, 0.3f, 16, 2, ColorAlpha(BLACK, 0.3f));
@@ -426,7 +426,7 @@ void drawCards(Card cards[], Texture2D check, Texture2D border) {
         }
 
         // Draw empty square
-        if (card.hasTouchedEndZone) {
+        if (card.reachedTarget) {
             int x = (card.targetPosition.x + CARD_WIDTH / 2) - check.width / 2;
             int y = (card.targetPosition.y + CARD_HEIGHT / 2) - check.height / 2;
             DrawRectangleLines(card.targetPosition.x, card.targetPosition.y, CARD_WIDTH, CARD_HEIGHT, ColorAlpha(GRAY, 0.4f));
