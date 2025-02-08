@@ -270,7 +270,7 @@ void handleInput(Game *game) {
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 
-                        if (isAudio && !isOff) PlaySFX(click);
+                        if (isAudio && !isOff) PlaySFX(sfx.click);
                     }
                     card->reachedTarget = true;
                     card->scoredPoints = true;
@@ -285,7 +285,7 @@ void handleInput(Game *game) {
                         card->dest.y = card->targetPosition.y;
                     }
 
-                    if (isAudio && !isOff) PlaySFX(stop);
+                    if (isAudio && !isOff) PlaySFX(sfx.stop);
                 }
 
                 // Have all cards been moved to the correct zone?
@@ -297,7 +297,7 @@ void handleInput(Game *game) {
                 if (sum >= NO_OF_CARDS) {
                     initCards(game);
 
-                    if (isAudio && !isOff) PlaySFX(popup);
+                    if (isAudio && !isOff) PlaySFX(sfx.popup);
                 }
             }
 

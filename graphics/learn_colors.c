@@ -1,4 +1,4 @@
-#include "sfx.h"
+#include "learn_colors_sfx.h"
 #include "learn_colors.h"
 
 
