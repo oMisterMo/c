@@ -14,9 +14,7 @@
 
 
 
-#define MAX_SOUNDS 10
-Sound soundArray[MAX_SOUNDS] = { 0 };
-int currentSound;
+
 #define MAX_TOUCH_POINTS 10
 #define MAX_GESTURE_STRINGS 20
 #define NO_OF_COLORS 8
@@ -272,7 +270,7 @@ void handleInput(Game *game) {
                         stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
                         stars->sheet.isAnimating = true;
 
-                        if (isAudio && !isOff) PlaySound(soundArray[0]);  // CLICK
+                        if (isAudio && !isOff) PlaySFX(click);
                     }
                     card->reachedTarget = true;
                     card->scoredPoints = true;
@@ -287,7 +285,7 @@ void handleInput(Game *game) {
                         card->dest.y = card->targetPosition.y;
                     }
 
-                    if (isAudio && !isOff) PlaySound(soundArray[2]);  // STOP
+                    if (isAudio && !isOff) PlaySFX(stop);
                 }
 
                 // Have all cards been moved to the correct zone?
@@ -299,7 +297,7 @@ void handleInput(Game *game) {
                 if (sum >= NO_OF_CARDS) {
                     initCards(game);
 
-                    if (isAudio && !isOff) PlaySound(soundArray[3]);  // CHIME
+                    if (isAudio && !isOff) PlaySFX(popup);
                 }
             }
 

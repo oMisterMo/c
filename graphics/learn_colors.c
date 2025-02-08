@@ -1,7 +1,5 @@
+#include "sfx.h"
 #include "learn_colors.h"
-
-
-
 
 
 int main() {
@@ -99,12 +97,7 @@ int main() {
         printf("-------------------\n");
         printf("LOAD AUDIO\n");
         printf("-------------------\n");
-        InitAudioDevice();
-        soundArray[0] = LoadSound("resources/sfx/button_click.wav");
-        soundArray[1] = LoadSound("resources/sfx/piece_select.wav");
-        soundArray[2] = LoadSound("resources/sfx/piece_stop.wav");
-        soundArray[3] = LoadSound("resources/sfx/popup.wav");
-        currentSound = 0;
+        LoadSFX();
     }
 
 
@@ -156,10 +149,7 @@ int main() {
 
     // Audio
     if (isAudio && !isOff) {
-        for (int i = 0; i < MAX_SOUNDS; ++i) {
-            UnloadSound(soundArray[i]);
-        }
-        CloseAudioDevice();
+        UnloadSFX();
     }
 
     CloseWindow();
