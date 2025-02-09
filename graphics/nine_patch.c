@@ -38,6 +38,9 @@ int main() {
     while(!WindowShouldClose()) {
 
         // Handle input
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), destRect)) {
+            srcRect = GetRandomSource();
+        }
 
         // Update
 
