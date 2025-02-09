@@ -22,11 +22,11 @@ int main() {
     // What to draw?
     NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
     // Where to draw?
-    Rectangle destRect = { 160.0f, 160.0f, SIZE, SIZE };
-    // Set the size
     float scale = 5.0f;
-    destRect.width = SIZE * scale;
-    destRect.height = SIZE * scale;
+    float w = SIZE * scale;
+    float h = SIZE * scale;
+    Rectangle destRect = { (GetScreenWidth() - w ) / 2 , (GetScreenHeight() - h) / 2, w, h };
+    // Set the size
 
     // Get first image from the red spritesheet
     Rectangle srcRect = { 0, 0, SIZE, SIZE };
