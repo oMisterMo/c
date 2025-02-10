@@ -5,11 +5,13 @@
 void initialize();
 void copy(char a[], char b[]);
 void copy_string();
+void array_pointers();
 
 int main() {
 
     initialize();
     copy_string();
+    array_pointers();
 
 
     printf("\n");
@@ -17,12 +19,16 @@ int main() {
 }
 
 void initialize() {
+    printf("\n---Initialize---\n");
     // String literal (automatically appends '\0')
     char greetings[] = "Hello World!";
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 26 characters
 
-    // Character array (must manually append '\0')
+    // Character array (must manually append '\0') [can't be modified]
     char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
+
+    // Pointer which points to a string [can be modified]
+    char *str2 = "Some String";
 
     // Dynamically allocate
     char *string = malloc(4);
@@ -31,7 +37,7 @@ void initialize() {
     string[2] = 'y';
     string[3] = '\0';
 
-    printf("\n%s\n\n", string);
+    printf("%s\n\n", string);
 
 
     // It is also important that you know that sizeof will always return the memory size (in bytes), and not the actual string length
@@ -42,12 +48,14 @@ void initialize() {
     printf("%c\n", greetings[1]);
     str[0] = 'J';
     printf("%s\n", str);
+    printf("%s\n", str2);
 
 
     free(string);
 }
 
 void copy(char a[], char b[]) {
+    printf("\n---Copy---\n");
     int i = 0;
     while( (a[i] = b[i]) != '\0' ) {
         ++i;
@@ -70,4 +78,24 @@ void copy_string() {
     // copy(dest, src);
 
     printf("Final copied string: %s\n", dest);
+}
+
+void array_pointers() {
+    printf("\n---Array Pointers---\n");
+    char str[] = "Hello";
+
+    // The array name is a pointer to the first value of the list
+    printf("%p\n", str);
+    printf("%p\n", &str[0]);
+
+    // You can modify pointers
+    printf("%c\n", *&str[0]);
+    printf("%c\n", *str);
+    *str = 'Y';
+
+    // You can not modify arrays
+    // str = "Impossible";
+
+
+    printf("%s\n", str);
 }
