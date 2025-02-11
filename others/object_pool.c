@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdint.h>
 
 #define BORROW '+'
 #define RELEASE '-'
@@ -25,6 +26,7 @@ PoolObject object_pool[NUM_OBJECTS] = { 0 };
  * Get a free objet
  */
 Vector2 *BorrowVector2(void) {
+    // Loop through all objects, return the first free obj
     for (int i = 0; i < NUM_OBJECTS; ++i) {
         if (object_pool[i].allocated == false) {
             object_pool[i].allocated = true;
@@ -36,26 +38,43 @@ Vector2 *BorrowVector2(void) {
     return NULL;
 }
 /**
- * Release the object, no longer in use
+ * Release the object that is longer in use (FASTER)
  */
 void ReturnVector2(Vector2 *v) {
-    for (int i = 0; i < NUM_OBJECTS; ++i) {
-        if (&(object_pool[i].obj) == v) {
-            assert(object_pool[i].allocated);
-            object_pool[i].allocated = false;
-            printf("%c [%d] %p\n", RELEASE, i, v);
-            return;
-        }
-    }
-    assert(false);  // This is a bug, look into it.
+    // Calculate the index of the object to return
+    unsigned int i = ((uintptr_t) v - (uintptr_t) object_pool) / sizeof(PoolObject);
+
+    // Make sure this is a real pointer at the computed memory address i
+    assert(&(object_pool[i].obj) == v);
+    assert(object_pool[i].allocated);
+
+    // Return the object to the pool
+    object_pool[i].allocated = false;
+    printf("%c [%d] %p\n", RELEASE, i, v);
+    return;
 }
+
+// /**
+//  * Release the object that is longer in use (SLOW)
+//  */
+// void ReturnVector2(Vector2 *v) {
+//     for (int i = 0; i < NUM_OBJECTS; ++i) {
+//         if (&(object_pool[i].obj) == v) {
+//             assert(object_pool[i].allocated);
+//             object_pool[i].allocated = false;
+//             printf("%c [%d] %p\n", RELEASE, i, v);
+//             return;
+//         }
+//     }
+//     assert(false);  // This is a bug, look into it.
+// }
 
 int main() {
 
     printf("------------\n");
     printf("Object Pool\n");
     printf("------------\n");
-    printf("%ld bytes\n", sizeof(object_pool));
+    printf("Total size of pool: %ld bytes\n\n", sizeof(object_pool));
 
     Vector2 *v = BorrowVector2();
     Vector2 *v2 = BorrowVector2();
