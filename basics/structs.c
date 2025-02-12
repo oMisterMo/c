@@ -2,8 +2,15 @@
 #include <stdint.h>
 #include <string.h>
 
+typedef struct Point {
+    int x;
+    int y;
+    // int64_t z;
+} Point;
+
 void basic_structure();
 void copy_structure();
+void dynamic_structure();
 void raylib_structure();
 
 /**
@@ -25,19 +32,15 @@ int main(int argc, char *argv[]) {
 
     // basic_structure();
     // copy_structure();
-    raylib_structure();
+    dynamic_structure();
+    // raylib_structure();
 
     return 0;
 }
 
 void basic_structure() {
-    struct Point {
-        int x;
-        int y;
-        // int64_t z;
-    };
 
-    struct Point p1 = {1, 2};
+    struct Point p1 = { 1, 2 };
     struct Point p2;
     p2.x = 3;
     p2.y = 4;
@@ -74,6 +77,27 @@ void copy_structure() {
     // Print values
     printf("%d %c %s\n", s1.myNum, s1.myLetter, s1.myString);
     printf("%d %c %s\n", s2.myNum, s2.myLetter, s2.myString); 
+}
+
+void dynamic_structure() {
+    Point p = { 1, 2 };
+    Point *arr = malloc(sizeof(Point) * 3);
+
+    printf("%ld\n", sizeof(Point) * 3); // 8 * 3 = 24bytes
+
+    // Modify the second element
+    (arr+1)->x = 2;
+    (arr+1)->y = 5;
+
+    // Print all 3 elements
+    for(int i = 0; i < 3; ++i) {
+        Point *p = arr + i;
+        printf("%p ", p);
+        printf("%d %d\n", p->x, p->y);
+    }
+
+    // Free dynamic memory
+    free(arr);
 }
 
 void raylib_structure() {
