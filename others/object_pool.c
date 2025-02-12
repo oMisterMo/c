@@ -6,6 +6,7 @@
 #define BORROW '+'
 #define RELEASE '-'
 
+#define NUM_OBJECTS 10
 
 typedef struct {
     int x;
@@ -13,17 +14,24 @@ typedef struct {
 } Vector2;
 
 typedef struct {
-    bool allocated; // No direct access
-    Vector2 obj;
+    Vector2 obj;    // 8 bytes
+    bool allocated; // 4 bytes (No direct access)
 } PoolObject;
 
+// Reduce wasted bytes as a result of memory alignment
+// typedef struct {
+//     Vector2 obj[NUM_OBJECTS];
+//     bool allocated[NUM_OBJECTS]; // No direct access
+// } PoolObject;
+
 // Allocate some objects
-#define NUM_OBJECTS 10
 // Vector2 object_pool[NUM_OBJECTS] = { 0 };
 PoolObject object_pool[NUM_OBJECTS] = { 0 };
 
 /**
- * Get a free objet
+ * Get a free objet O(N)
+ *
+ *  Todo: Manage the free objects as a singly linked list (as a free list), instead of the allocated flag, now the allocation would be O(1)
  */
 Vector2 *BorrowVector2(void) {
     // Loop through all objects, return the first free obj
