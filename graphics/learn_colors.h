@@ -267,7 +267,7 @@ void handleInput(Game *game) {
                     printf("HIT %d\n", game->counter);
                     if (!card->scoredPoints) {
                         ++(game->score);
-                        stars->position = (Vector2){ GetTouchX() - (*stars->texture).width / NUM_FRAMES_STARS / 2, GetTouchY() - (*stars->texture).height / 2 };
+                        stars->position = (Vector2) { GetTouchX() - stars->texture->width / NUM_FRAMES_STARS / 2, GetTouchY() - stars->texture->height / 2 };
                         stars->sheet.isAnimating = true;
 
                         if (isAudio && !isOff) PlaySFX(sfx.click);
@@ -360,7 +360,7 @@ void updateStars(Animation *stars) {
         }
 
         // Update source rect (index * width)
-        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) (*stars->texture).width / NUM_FRAMES_STARS;
+        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) stars->texture->width / NUM_FRAMES_STARS;
 
     }
 }
