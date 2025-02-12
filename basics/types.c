@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 void types();
 void print_pretty(float, uint8_t);
@@ -26,6 +27,9 @@ int main(int argc, char *argv[]) {
  * https://en.wikipedia.org/wiki/C_data_types#Main_types
  */
 void types() {
+    // bool
+    bool boolean; // 1 byte
+
     // char
     char a; // 1 byte
 
@@ -138,6 +142,7 @@ void print_types() {
 
     printf("%8s %5s\n", "Type", "Size (Bytes)");
     printf("-------------------------------\n");
+    printf("%8s %5ld\n", "bool", sizeof(bool));
     printf("%8s %5ld\n", "char", sizeof(char));
     printf("%8s %5ld\n", "short", sizeof(short));
     printf("%8s %5ld\n", "int", sizeof(int));
