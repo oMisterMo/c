@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct Point {
     int x;
@@ -80,7 +81,7 @@ void copy_structure() {
 }
 
 void dynamic_structure() {
-    Point p = { 1, 2 };
+    // Allocate space for 3 Point objects
     Point *arr = malloc(sizeof(Point) * 3);
 
     printf("%ld\n", sizeof(Point) * 3); // 8 * 3 = 24bytes
