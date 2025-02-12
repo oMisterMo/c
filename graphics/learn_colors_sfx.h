@@ -1,3 +1,5 @@
+// RAYLIB_H
+
 #include "raylib.h"
 
 // --------------------
