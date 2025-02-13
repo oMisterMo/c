@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 void initialize();
+void modify();
 void copy(char a[], char b[]);
 void copy_string();
 void array_pointers();
@@ -10,6 +11,7 @@ void array_pointers();
 int main() {
 
     initialize();
+    modify();
     copy_string();
     array_pointers();
 
@@ -52,6 +54,26 @@ void initialize() {
 
 
     free(string);
+}
+
+void modify() {
+    printf("\n---Array Modify---\n");
+    // char str[] = "Hello";
+    char *str = "Hello";
+
+    str = "MO";
+    printf("%c\n", *(str+1));
+
+    // Error, strings are stored once in immutable locations
+    // If you want to edit character use str[]
+    // If you want to edit whole word use char *str
+    // *(str+1) = 'P';
+
+    for (int i = 0; i < 10; ++i) {
+        printf("%p %c\n", str + i, str[i]);
+    }
+
+    printf("\n");
 }
 
 void copy(char a[], char b[]) {
