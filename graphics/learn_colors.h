@@ -267,8 +267,17 @@ void handleInput(Game *game) {
                     printf("HIT %d\n", game->counter);
                     if (!card->scoredPoints) {
                         ++(game->score);
+
+
+
+                        // Get free starts object
+                        // Set the properties
+                        // Add to list
                         stars->position = (Vector2) { GetTouchX() - stars->texture->width / NUM_FRAMES_STARS / 2, GetTouchY() - stars->texture->height / 2 };
                         stars->sheet.isAnimating = true;
+
+
+
 
                         if (isAudio && !isOff) PlaySFX(sfx.click);
                     }
@@ -344,6 +353,7 @@ void updateCards(Card cards[]) {
     }
 }
 void updateStars(Animation *stars) {
+    // Loop through all stars, and animate otherwise do nothing to empty array
     if (!(stars->sheet.isAnimating)) return;
     stars->sheet.frameCounter++;
 
@@ -355,8 +365,17 @@ void updateStars(Animation *stars) {
 
         // Ensure frame index stays within bounds
         if (stars->sheet.currentFrame > NUM_FRAMES_STARS - 1) {
+
+
+
+            // Star animation is complete
+            // Reset it members
+            // Remove current reference from the list
             stars->sheet.currentFrame = 0;
             stars->sheet.isAnimating = false;
+
+
+
         }
 
         // Update source rect (index * width)
@@ -445,6 +464,7 @@ void drawScore(int score) {
     DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 }
 void drawStars(Animation stars) {
+    // Loop through all stars, and draw otherwise do nothing to empty array
     if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
         DrawTextureRec(*stars.texture, stars.sheet.frameRec, stars.position , WHITE);
     }
