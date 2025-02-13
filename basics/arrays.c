@@ -130,6 +130,7 @@ void dynamic_allocation() {
 
 
     free(string);
+    string = NULL;
 }
 
 /**

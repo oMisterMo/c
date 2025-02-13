@@ -54,6 +54,7 @@ void initialize() {
 
 
     free(string);
+    string = NULL;
 }
 
 void modify() {

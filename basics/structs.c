@@ -99,6 +99,7 @@ void dynamic_structure() {
 
     // Free dynamic memory
     free(arr);
+    arr = NULL;
 }
 
 void raylib_structure() {
