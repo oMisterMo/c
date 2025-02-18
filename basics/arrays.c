@@ -20,7 +20,7 @@ int main() {
     // declare_initialize();
     // multi_dimensional();
     // dynamic_allocation();
-    histogram_of_lengths();
+    // histogram_of_lengths();
     array_overflow();
 
 
@@ -41,9 +41,13 @@ void declare() {
     list[2] = 'c';
 
     // Initialize all values to 0
+    printf("nums: ");
     for(int i = 0; i < 10; ++i) {
         nums[i] = 0;
+        printf("%d ", nums[i]);
     }
+    printf("\n");
+    printf("char[]: %s\n",  list);
 }
 
 /**
@@ -52,31 +56,35 @@ void declare() {
  */
 void declare_initialize() {
     // Array with 5 elements
-    int arr[] = {1, 2, 3, 4, 5};
+    int small_num_arr[] = {1, 2, 3, 4, 5};
 
     // Initialized with 0
-    int arr[128] = {0};
+    int large_num_arr[128] = {0};
 
     // Single quote character array
     char str[6] = {'H', 'e', 'l', 'l', 'o', '\0'};  // 5 characters + 1 null terminator
-    char str[6] = {'H', 'e', 'l', 'l', 'o'};        // 5 characters + 1 null terminator
+    // char str[6] = {'H', 'e', 'l', 'l', 'o'};        // 5 characters + 1 null terminator
 
     // Double quotes
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\0";   // 26 characters + 1 null terminator = 27 bytes = 26 length
-    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";     // 26 characters + 1 null terminator = 27 bytes = 26 length
+    // char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";     // 26 characters + 1 null terminator = 27 bytes = 26 length
 
 
     printf("\n");
     for(int i = 0; i < 5; ++i) {
-        printf("%d ", arr[i]);
+        printf("%d ", small_num_arr[i]);
     }
-    printf("\n");
+    printf("\n\n");
+    for(int i = 0; i < 6; ++i) {
+        printf("%d ", large_num_arr[i]);
+    }
+    printf("...\n\n");
     printf("%s", str);
-    printf("\n");
-    for(int i = 0; i < strlen(alphabet); ++i) {
+    printf("\n\n");
+    for(size_t i = 0; i < strlen(alphabet); ++i) {
         printf("%c ", alphabet[i]);
     }
-    printf("\n");
+    printf("\n\n");
     printf("%s", alphabet);
 
 }
@@ -103,7 +111,8 @@ void multi_dimensional() {
 
 void dynamic_allocation() {
     // Start by allocating 6 * 1 byte
-    char *string = (char*) malloc(6 * sizeof(char));
+    const int NO_OF_CHAR = 6;
+    char *string = (char*) malloc(NO_OF_CHAR * sizeof(char));
 
     // Initialize the 1st, 4th and 5th bytes
     string[0] = 'a';
@@ -111,11 +120,11 @@ void dynamic_allocation() {
     // string[2] = 'c';
     string[3] = 'd';
     string[4] = 'e';
-    // string[5] = '\0';
+    string[5] = '\0';   // Needed otherwise heap-buffer-overflow
 
     // Print the allocated registers
     printf("\n");
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < NO_OF_CHAR; i++) {
         printf("%9p (%c) \n", (string + i), *(string + i));
     }
     printf("string: %s\n", string);
@@ -125,7 +134,7 @@ void dynamic_allocation() {
 
     // Print the allocated registers
     printf("\n");
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < NO_OF_CHAR; i++) {
         printf("%9p (%c) \n", (string + i), *(string + i));
     }
     printf("string: %s\n", string);
@@ -202,13 +211,19 @@ void array_overflow() {
     #define SIZE 8
     char firstname[SIZE];
     char lastname[SIZE];
+
+    // Set first character of lastname so we can track the overflow position
     lastname[0] = 'M';
+
+    // Print the first name + 2 extra bytes
     printf("firstname[%d]\n\n", SIZE);
     for (int i = 0; i < SIZE + 2; ++i) {
         if (i == SIZE ) printf("\n=============\n");
         printf("%p [%d] %c\n", &firstname[i], i, *(firstname + i));
     }
     printf("=============\n");
+
+    // Print the lastname
     printf("\nlastname[%d]\n\n", SIZE);
     for (int i = 0; i < SIZE; ++i) {
         printf("%p [%d] %c\n", &lastname[i], i, *(lastname + i));
