@@ -58,31 +58,29 @@ int main() {
     // ---------------------------------------------
     InitWindow(1024, 768, "Tween");
     SetMousePosition(-1, -1);
-    const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
-    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
 
 
     // ---------------------------------------------
     // Initialize
     // ---------------------------------------------
-    Texture2D bunny = LoadTexture("resources/sprites/piece.png");
+    const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
+    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
 
     // Mo stuff
-    Rectangle pos = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
-    Vector2 startMo = { pos.x, pos.y };
-    Vector2 endMo = { GetScreenWidth() - bunny.width , center.y };
-
+    Texture2D bunny = LoadTexture("resources/sprites/piece.png");
+    Rectangle bounds = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Tween tween = { 0 };
-    tween.startPosition = startMo;
-    tween.targetPosition = endMo;
+    tween.startPosition = (Vector2) { bounds.x, bounds.y };
+    tween.targetPosition = (Vector2) { GetScreenWidth() - bunny.width , center.y };
     tween.state = IDLE;
     tween.frameCounter = 0;
     tween.duration = 60 * 2;
-
-    GameObject mo = { 0 };
-    mo.texture = bunny;
-    mo.bounds = pos;
-    mo.tween = tween;
+    // Designated initializers
+    GameObject mo = {
+        .texture = "",
+        .bounds = bounds,
+        .tween = tween
+     };
 
     // Rectangle stuff
     Vector2 startRect = { 20, GetScreenHeight() - RECT_HEIGHT - 20 };
