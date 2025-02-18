@@ -12,6 +12,7 @@ void declare_initialize();
 void multi_dimensional();
 void dynamic_allocation();
 void histogram_of_lengths();
+void array_overflow();
 
 int main() {
 
@@ -20,6 +21,7 @@ int main() {
     // multi_dimensional();
     // dynamic_allocation();
     histogram_of_lengths();
+    array_overflow();
 
 
     printf("\n");
@@ -194,4 +196,22 @@ void histogram_of_lengths() {
     }
     printf("(%d)", nother);
 
+}
+
+void array_overflow() {
+    #define SIZE 8
+    char firstname[SIZE];
+    char lastname[SIZE];
+    lastname[0] = 'M';
+    printf("firstname[%d]\n\n", SIZE);
+    for (int i = 0; i < SIZE + 2; ++i) {
+        if (i == SIZE ) printf("\n=============\n");
+        printf("%p [%d] %c\n", &firstname[i], i, *(firstname + i));
+    }
+    printf("=============\n");
+    printf("\nlastname[%d]\n\n", SIZE);
+    for (int i = 0; i < SIZE; ++i) {
+        printf("%p [%d] %c\n", &lastname[i], i, *(lastname + i));
+    }
+    printf("%ld\n", (lastname - &firstname[SIZE - 1]));
 }
