@@ -10,17 +10,25 @@ int main() {
     char str[] = "Hello";
     char str2[] = "mo";
 
-    // for_loop();
-    // while_loop();
-    // do_while_loop();
+    for_loop();
+    while_loop();
+    do_while_loop();
+
+
+    // Copy "mo" into "Hello"
+    // "m o \0 l o" or "m o \0";
     copy(str, str2);
 
-    printf("str: %s\n\n", str);
+    printf("\n");
+    printf("str: %s\n", str);
+    printf("str: %s\n", &str[0]);
+    printf("\n");
 
+    printf("FIRST: %p\n", str);
     printf("FIRST: %p\n", &str[0]);
-    for(int i = 0; i < 10; ++i) {
-        printf("%p - %c\n" , (str + i), str[i]);
-    }
+    // for(int i = 0; i < 10; ++i) {
+    //     printf("%p - %c\n" , (str + i), str[i]);
+    // }
 
     printf("\n");
 
@@ -37,7 +45,7 @@ void for_loop() {
 void while_loop() {
     int a; 
     int b = 5;
-    while(a = b) {
+    while( (a = b) ) {
         printf("b: %d\n", b);
         b--;
     }

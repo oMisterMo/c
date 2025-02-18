@@ -28,12 +28,12 @@ void raylib_structure();
  * If you want to change/modify a value, you can use the dot syntax (.).
  * And to modify a string value, the strcpy() function
  */
-int main(int argc, char *argv[]) {
+int main(void) {
 
 
-    // basic_structure();
+    basic_structure();
     // copy_structure();
-    dynamic_structure();
+    // dynamic_structure();
     // raylib_structure();
 
     return 0;

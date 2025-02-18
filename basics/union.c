@@ -2,7 +2,7 @@
 #include <assert.h>
 
 
-int main(int argc, char *argv[]) {
+int main(void) {
 
 
     // Exactyl like structs but only 1 member can have a value

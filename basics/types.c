@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 void types();
-void print_pretty(float, uint8_t);
 void print_types();
 void unary_operators();
 
@@ -14,9 +13,9 @@ void unary_operators();
  * Implicit = Automatic
  * Explicit = Manual
  */
-int main(int argc, char *argv[]) {
+int main(void) {
 
-    types();
+    // types();
     print_types();
     
     printf("\n");
@@ -27,88 +26,42 @@ int main(int argc, char *argv[]) {
  * https://en.wikipedia.org/wiki/C_data_types#Main_types
  */
 void types() {
-    // bool
-    bool boolean; // 1 byte
+    // standard
+    // bool boolean; // 1 byte
+    // char a; // 1 byte
+    // short b; // 2 bytes
+    // char *c[10]; // 10 bytes string
+    // int d; // 4 bytes
+    // float e; // 4 bytes
+    // double f; // 8 bytes
 
-    // char
-    char a; // 1 byte
-
-    // short
-    short b; // 2 bytes
-
-    // string
-    char *e[10]; // 10 bytes string
-
-    // ints
-    int n; // 4 bytes
-
-    // floats
-    float l; // 4 bytes
-
-    // doubles
-    double m; // 8 bytes
-
-    // more ints from stdint.h
-    int8_t c; // 1 byte (-128 - 127)
-    int16_t d; // 2 bytes
-    int32_t f; // 4 bytes
-    int64_t g; // 8 bytes
-    uint8_t h; // 1 byte (0 - 255)
-    uint16_t i; // 2 bytes
-    uint32_t j; // 4 bytes
-    uint64_t k; // 8 bytes
-    // print_pretty(l, h); // pass by value
+    // c99 additions (more ints from stdint.h)
+    // int8_t a; // 1 byte (-128 - 127)
+    // int16_t b; // 2 bytes
+    // int32_t c; // 4 bytes
+    // int64_t d; // 8 bytes
+    // uint8_t e; // 1 byte (0 - 255)
+    // uint16_t f; // 2 bytes
+    // uint32_t g; // 4 bytes
+    // uint64_t h; // 8 bytes
 
 
     // may change size depending on major 32-bit systems or 64-bit systems (use stdint.h)
-    // char c; // 1 byte
-    // short d; // 2 bytes
-    // int f; // 4 bytes
-    // long g; // 4 bytes or 8 bytes
-    // long long g; // 8 bytes
-    // unsigned char h; // 1 byte
-    // unsigned short i; // 2 bytes
-    // unsigned int j; // 4 bytes
-    // unsigned long k; // 4 bytes or 8 bytes
-    // unsigned long long k; // 8 bytes
-
+    // char a; // 1 byte
+    // short b; // 2 bytes
+    // int c; // 4 bytes
+    // long d; // 4 bytes or 8 bytes
+    // long long e; // 8 bytes
+    // unsigned char f; // 1 byte
+    // unsigned short g; // 2 bytes
+    // unsigned int h; // 4 bytes
+    // unsigned long i; // 4 bytes or 8 bytes
+    // unsigned long long j; // 8 bytes
 }
 
-void print_pretty(float l, uint8_t h) {
-    printf("---Printing pretty---\n");
-    l = 3.14159;
-    printf("%f\n", l); // 3.141590 (6 decimal places)
-    printf("%.2f\n", l); // 3.14 (2 decimal places)
-
-    h = 255; // uint8_t (0 - 255)
-    printf("%d \n", h);
-
-    // Arrays
-    printf("*** Arrays ***\n");
-    int arr[15];
-    char list[3];
-
-    arr[0] = 10;
-    arr[1] = 2;
-    arr[2] = 2;
-
-    list[0] = 'a';
-    list[1] = 'b';
-    list[2] = 'c';
-
-    printf("arr[0]= %d\n", arr[0]);
-    printf("list[1]= %c\n", list[1]);
-
-    // Loops
-    printf("\n*** Loops ***\n");
-    for(int i = 0; i < 10; i++) {
-        printf("%d ", i);
-    }
-
-    // Others
-    printf("\n---End, Printing pretty---\n");
-}
-
+/**
+ * Use sizeof() to print the type and bytes
+ */
 void print_types() {
     // const char *BUILD_IN_TYPES[] = {
     //     "char",

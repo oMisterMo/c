@@ -16,10 +16,12 @@ void function_pointers(int*, int*);
  * 
  */
 int main() {
-    int a = 1, b = 2;
+    
+    simple_pointers();
 
-    // simple_pointers();
-    array_pointers();
+    // array_pointers();
+
+    // int a = 1, b = 2;
     // function_pointers(&a, &b);
 
     printf("\n");
