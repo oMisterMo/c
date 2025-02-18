@@ -33,7 +33,8 @@ int square(int *n) {
  *
  * DO NOT USE!!!
  */
-power(base, n)
+// power(base, n)       // omitted due to error
+int power(base, n)
 int base, n;
 {
     int i, p;

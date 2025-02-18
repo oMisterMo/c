@@ -30,9 +30,6 @@ const char INPUT_CHAR = '$';
  * Use the scanf() function to get a single word as input, and use fgets() for multiple words.
  */
 int main() {
-
-    int a = 1;
-    int b = 10;
     
     // single_char();
     // single_int();
@@ -145,7 +142,7 @@ void count_lines() {
     while ((c = getchar()) != EOF) {
         if (c == '\n') {
             ++nl;
-            printf("Number of lines: %d (ctrl + d to exit)\n", nl);
+            printf("Number of lines: %d (CTRL + D to exit)\n", nl);
             printf(INPUT_STR, INPUT_CHAR);
         }
     }
@@ -355,13 +352,16 @@ int get_line(char line[], int lim) {
     return i;
 }
 
+/**
+ * NOT FINISHED YET...
+ */
 void print_longest_line() {
     #define MAXLINE 5
 
     int len;                // the len of the current line
-    int max = 0;            // max line length found
     char line[MAXLINE];     // a line read through the terminal
-    char longest[MAXLINE];  // longest found
+    // int max = 0;            // max line length found
+    // char longest[MAXLINE];  // longest found
 
     printf("\nline[%ld]\n", sizeof(line));
     printf("Max characters = %ld\n\n", sizeof(line) - 2);
@@ -375,7 +375,7 @@ void print_longest_line() {
 
         // DEBUG - Print line length and inputted line
         printf("(len: %d) - [", len);
-        for(int i = 0; i < strlen(line) + 1; ++i) {
+        for(size_t i = 0; i < strlen(line) + 1; ++i) {
             printf("'%c' ", line[i]);
         }
         printf("\b] - (bytes: %d)\n", len + 1);

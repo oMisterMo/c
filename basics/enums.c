@@ -3,7 +3,7 @@
 /**
  * An enum is a special type that represents a group of constants (unchangeable values).
  */
-int main(int argc, char *argv[]) {
+int main(void) {
 
     enum Day {Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday}; // 0, 1, 2, 3, 4, 5, 6
     enum Day today = Wednesday; // 2

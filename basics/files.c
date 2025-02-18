@@ -45,7 +45,6 @@ int read_file_by_character() {
     printf("Opening file...\n\n");
     FILE *file = fopen("x.txt", "r");  // r = read, w = write, a = append
 
-
     // Check if file is opened
     if(file == NULL) {
         printf("Error opening file\n");
@@ -79,6 +78,12 @@ int read_file_by_line() {
 
     // Open a file in read mode
     file = fopen("x.txt", "r");
+
+    // Check if file is opened
+    if(file == NULL) {
+        printf("Error opening file\n");
+        return 1;
+    }
 
     // Store the content of the file
     char lines[100];
@@ -131,7 +136,6 @@ int write_file() {
     FILE *file;
     // fopen(filename, mode);
     file = fopen("x.txt", "w");  // r = read, w = write, a = append
-
 
     // Check if file is opened
     if(file == NULL) {
