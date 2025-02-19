@@ -18,18 +18,22 @@ void ClampScreenRec(Rectangle *rect) {
 
 int main() {
 
+    printf("-------------------\n");
+    printf("INIT WINDOW\n");
+    printf("-------------------\n");
+
     int screenWidth = 800 * 2;
     int screenHeight = 400 * 2;
 
-    // Before window creation
     // FLAG_VSYNC_HINT | FLAG_FULLSCREEN_MODE | FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_UNDECORATED
     SetConfigFlags( FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Logo");
-    //After window creation
 
+    printf("-------------------\n");
+    printf("LOAD TEXTURES\n");
+    printf("-------------------\n");
     // Load logo texture
     Texture2D logo = LoadTexture("resources/logo/raylib_256x256.png");
-
     Rectangle logoBounds = { (GetScreenWidth() - logo.width ) / 2, (GetScreenHeight() - logo.height ) / 2, logo.width, logo.height };
     Vector2 touchPosition = { 0, 0 };
     bool isDragging = false;
@@ -37,6 +41,10 @@ int main() {
     int frameCounter = 0;
 
     SetTargetFPS(60);
+
+    printf("-------------------\n");
+    printf("GAME\n");
+    printf("-------------------\n");
 
     while(!WindowShouldClose()) {
 
@@ -79,7 +87,6 @@ int main() {
         }
 
         // Update
-
         // Collision detection
 
 
@@ -93,6 +100,10 @@ int main() {
         EndDrawing();
 
     }
+
+    printf("-------------------\n");
+    printf("DESTROY\n");
+    printf("-------------------\n");
 
     UnloadTexture(logo);
     CloseWindow();
