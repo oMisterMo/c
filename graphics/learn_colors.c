@@ -50,9 +50,9 @@ int main() {
     Rectangle blueSrc = { 0, 0, 32, 32 };
     NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
 
-    GetRandomSourceRec(&greenSrc);
-    GetRandomSourceRec(&redSrc);
-    GetRandomSourceRec(&blueSrc);
+    SetRandomSourceRec(&greenSrc);
+    SetRandomSourceRec(&redSrc);
+    SetRandomSourceRec(&blueSrc);
 
 
     Spritesheet starsSheet = { 0 };
@@ -101,11 +101,11 @@ int main() {
     }
 
 
+    SetTargetFPS(60);
+
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
-
-    SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
         // Input

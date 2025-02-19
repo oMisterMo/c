@@ -108,33 +108,20 @@ typedef struct Game {
 
 
 // ---------------------------
-// Function Definition
+// Function Declaration
 // ---------------------------
-// void initCards(Card cards[], Color colors[]);
-// void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture);
-// void reset(int *score);
 
-// void handleInput(Game *game, int *score, int *counter, Animation *stars);
-
-// void updateCards(Card cards[]);
-// void updateStars(Animation *stars);
-
-// void drawBackground(Texture2D clouds[], double *increment, int order[]);
-// void drawTrays(Tray trays[]);
-// void drawCards(Card cards[], Texture2D check, Texture2D border);
-// void drawCursor(Texture2D cursor, Texture2D cursorPressed);
-// void drawScore(int score);
-// void drawStars(Animation stars);
+// Todo: add declarations
 
 // ---------------------------
-// Implementation
+// Function definition
 // ---------------------------
 
 Rectangle GetRandomSource() {
     return (Rectangle) { 32 * GetRandomValue(0, 1), 32 * GetRandomValue(0, 4), 32, 32 };
 }
 
-void GetRandomSourceRec(Rectangle *rect) {
+void SetRandomSourceRec(Rectangle *rect) {
     rect->x =  32 * GetRandomValue(0, 1);
     rect->y = 32 * GetRandomValue(0, 4);
 }
