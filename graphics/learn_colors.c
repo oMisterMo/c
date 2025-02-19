@@ -45,41 +45,52 @@ int main() {
     trayTexture.width = TRAY_WIDTH;
     trayTexture.height = TRAY_HEIGHT;
 
-    Rectangle greenSrc = { 0, 0, 32, 32 };
-    Rectangle redSrc = { 0, 0, 32, 32 };
-    Rectangle blueSrc = { 0, 0, 32, 32 };
-    NPatchInfo srcInfo = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 16, 16, 16, 16, NPATCH_NINE_PATCH };
+    // Compound Literals (C99)
+    Rectangle greenSrc = (Rectangle) { 0, 0, 32, 32 };
+    Rectangle redSrc = (Rectangle) { 0, 0, 32, 32 };
+    Rectangle blueSrc = (Rectangle) { 0, 0, 32, 32 };
+    // Designated Initializers (C99)
+    NPatchInfo srcInfo = {
+        .source = { 0.0f, 64.0f, 64.0f, 64.0f },
+        .left = 16,
+        .top = 16,
+        .right = 16,
+        .bottom = 16,
+        .layout = NPATCH_NINE_PATCH
+    };
 
     SetRandomSourceRec(&greenSrc);
     SetRandomSourceRec(&redSrc);
     SetRandomSourceRec(&blueSrc);
 
 
-    Spritesheet starsSheet = { 0 };
-    starsSheet.frameRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height };
-    starsSheet.currentFrame = 0;
-    starsSheet.currentLine = 0;
-    starsSheet.frameCounter = 0;
-    starsSheet.frameSpeed = 10;
-    starsSheet.isAnimating = false;
+    Spritesheet starsSheet = {
+        .frameRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
+        .currentFrame = 0,
+        .currentLine = 0,
+        .frameCounter = 0,
+        .frameSpeed = 10,
+        .isAnimating = false
+     };
 
-    Animation stars = { 0 };
-    stars.texture = &starsTexture;
-    stars.position = (Vector2) { 0 };
-    stars.sheet = starsSheet;
+    Animation stars = {
+        .texture = &starsTexture,
+        .position = (Vector2) { 0 },
+        .sheet = starsSheet
+     };
 
 
     // Game vars
-    Game game = { 0 };
-
-    game.colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY };
-    game.colorTextures = (Texture2D[]) { redTexture, greenTexture, blueTexture };
-    game.frameCounter = 0;
-    game.score = 0;
-    game.counter = 0;
-    game.stars = &stars;
-    game.nPatchTexture = nPatchTexture;
-    game.nPatchSrc = srcInfo;
+    Game game = {
+        .colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY },
+        .colorTextures = (Texture2D[]) { redTexture, greenTexture, blueTexture },
+        .frameCounter = 0,
+        .score = 0,
+        .counter = 0,
+        .stars = &stars,
+        .nPatchTexture = nPatchTexture,
+        .nPatchSrc = srcInfo
+     };
 
     // Rectangle trays[NO_OF_TRAYS];
     initTrays(game.trays, game.colors, &trayTexture);
