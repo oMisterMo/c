@@ -121,7 +121,6 @@ typedef struct Game {
 Rectangle GetRandomSource() {
     return (Rectangle) { 32 * GetRandomValue(0, 1), 32 * GetRandomValue(0, 4), 32, 32 };
 }
-
 void SetRandomSourceRec(Rectangle *rect) {
     rect->x =  32 * GetRandomValue(0, 1);
     rect->y = 32 * GetRandomValue(0, 4);
@@ -189,9 +188,6 @@ void initCards(Game *game) {
         cards[i].imgTexture = textures[id];
         cards[i].imgSrc = GetRandomSource();
     }
-}
-void reset(int *score) {
-    *score = 0;
 }
 
 void handleInput(Game *game) {
@@ -460,4 +456,8 @@ void drawStars(Animation stars) {
     if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
         DrawTextureRec(*stars.texture, stars.sheet.frameRec, stars.position , WHITE);
     }
+}
+
+void reset(int *score) {
+    *score = 0;
 }
