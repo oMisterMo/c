@@ -421,7 +421,7 @@ void drawTrays(Tray trays[]) {
         }
     }
 }
-void drawCards(Card cards[], Texture2D check, Texture2D border) {
+void drawCards(Card cards[], Texture2D check) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Card card = cards[i];
         if (isDrawCard && !isOff) {

@@ -33,15 +33,12 @@ int main() {
     Texture2D cursorTexture = LoadTexture("resources/ui/icon_hand_1.png");
     Texture2D cursorPressedTexture = LoadTexture("resources/ui/icon_hand_2.png");
     Texture2D trayTexture = LoadTexture("resources/sprites/tray.png");
-    Texture2D borderTexture = LoadTexture("resources/ui/button_borders_square.png");   // 400 * 3 x 400
     Texture2D starsTexture = LoadTexture("resources/ui/medal_stars.png");
     Texture2D redTexture = LoadTexture("resources/sprites/red.png");
     Texture2D greenTexture = LoadTexture("resources/sprites/green.png");
     Texture2D blueTexture = LoadTexture("resources/sprites/blue.png");
     Texture2D nPatchTexture = LoadTexture("resources/ui/ninepatch_button.png");
 
-    borderTexture.width /= 4;
-    borderTexture.height /= 4;
     trayTexture.width = TRAY_WIDTH;
     trayTexture.height = TRAY_HEIGHT;
 
@@ -131,7 +128,7 @@ int main() {
 
         drawBackground(cloudsTexture, &increment, order);
         drawTrays(game.trays);
-        drawCards(game.cards, checkTexture, borderTexture);
+        drawCards(game.cards, checkTexture);
         drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(game.score);
         drawStars(stars);
@@ -151,7 +148,6 @@ int main() {
     UnloadTexture(cursorTexture);
     UnloadTexture(cursorPressedTexture);
     UnloadTexture(trayTexture);
-    UnloadTexture(borderTexture);
     UnloadTexture(starsTexture);
     UnloadTexture(redTexture);
     UnloadTexture(greenTexture);
