@@ -29,7 +29,10 @@ int main() {
     printf("Hello world!\n");
 
     Person mo = { 33, 'M', "Mohammed" };
+    printf("%ld\n", sizeof(Vector2));
+    printf("%ld\n", sizeof(Vector3));
     printf("%ld\n", sizeof(Person));
+    printf("age: %d\n", mo.age);
     
     
     

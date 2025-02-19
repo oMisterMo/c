@@ -3,12 +3,22 @@
 #include <stdint.h> // uint32_t
 #include <time.h> // time
 
+void print_len();
+
 int main() {
+
+    print_len();
+
+    printf("\n");
+    return 0;
+}
+
+void print_len() {
+    printf("\n---Len---\n");
     int nums[] = {25, 50, 75, 100};
 
     // Total bytes in the array divided by the size of the first element
     int length = sizeof(nums) / sizeof(nums[0]);
-    int i;
 
     printf("size of int : %lu\n", sizeof(int));
     printf("number of elements in the array: %d\n", length);
@@ -19,7 +29,4 @@ int main() {
     // for (i = 0; i < length; i++) {
     //     printf("%d ", nums[i]);
     // }
-
-    printf("\n");
-    return 0;
 }

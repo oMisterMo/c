@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 /**
  * null is a value, 0 is a number, and '\0' is a character.

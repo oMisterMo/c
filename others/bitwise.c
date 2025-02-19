@@ -7,7 +7,7 @@ void flags();
 
 int main() {
 
-
+    shift();
     flags();
     printf("\n");
 
@@ -18,11 +18,13 @@ int main() {
  * Left shift same as mult 2
  */
 void shift() {
+    printf("\n---Shift---\n");
     uint8_t number = 0b00000001 << 1;
     printf("%d\n", number);
 }
 
 void flags() {
+    printf("\n---Flags---\n");
     // 1 byte represents 8 different states
     // 1 2 4 8 16 32 64 128
 
