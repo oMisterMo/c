@@ -45,6 +45,8 @@ int main() {
     trayTexture.width = TRAY_WIDTH;
     trayTexture.height = TRAY_HEIGHT;
 
+    // Game vars
+
     // Compound Literals (C99)
     Rectangle greenSrc = (Rectangle) { 0, 0, 32, 32 };
     Rectangle redSrc = (Rectangle) { 0, 0, 32, 32 };
@@ -63,7 +65,6 @@ int main() {
     SetRandomSourceRec(&redSrc);
     SetRandomSourceRec(&blueSrc);
 
-
     Spritesheet starsSheet = {
         .frameRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
         .currentFrame = 0,
@@ -79,11 +80,10 @@ int main() {
         .sheet = starsSheet
      };
 
-
-    // Game vars
     Game game = {
         .colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY },
-        .colorTextures = (Texture2D[]) { redTexture, greenTexture, blueTexture },
+        .cardTextures = (Texture2D[]) { redTexture, greenTexture, blueTexture },
+        .trayTexture = &trayTexture,
         .frameCounter = 0,
         .score = 0,
         .counter = 0,
@@ -93,7 +93,7 @@ int main() {
      };
 
     // Rectangle trays[NO_OF_TRAYS];
-    initTrays(game.trays, game.colors, &trayTexture);
+    initTrays(&game);
     initCards(&game);
 
     double increment = 0.0;
@@ -110,7 +110,6 @@ int main() {
         printf("-------------------\n");
         LoadSFX();
     }
-
 
     SetTargetFPS(60);
 

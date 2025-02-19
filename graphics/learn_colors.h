@@ -96,7 +96,8 @@ typedef struct Game {
     Card cards[NO_OF_CARDS];
     Tray trays[NO_OF_TRAYS];
     Color *colors;
-    Texture2D *colorTextures;
+    Texture2D *cardTextures;
+    Texture2D *trayTexture;
     Animation *stars;
     int frameCounter;
     int score;
@@ -126,7 +127,11 @@ void SetRandomSourceRec(Rectangle *rect) {
     rect->y = 32 * GetRandomValue(0, 4);
 }
 
-void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
+void initTrays(Game *game) {
+    Tray *trays = game->trays;
+    Color *colors = game->colors;
+    Texture2D *texture = game->trayTexture;
+
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         Rectangle dest = {
@@ -137,7 +142,7 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
         };
 
         trays[i] = (Tray) {
-            .texture = trayTexture,
+            .texture = texture,
             .dest = dest,
             .color = colors[i]
         };
@@ -146,7 +151,7 @@ void initTrays(Tray trays[], Color colors[], Texture2D *trayTexture) {
 void initCards(Game *game) {
     Card *cards = game->cards;
     Color *colors = game->colors;
-    Texture2D *textures = game->colorTextures;
+    Texture2D *textures = game->cardTextures;
 
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
@@ -193,7 +198,7 @@ void handleInput(Game *game) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
-    Texture2D *colorTextures = game->colorTextures;
+    Texture2D *cardTextures = game->cardTextures;
     Animation *stars = game->stars;
 
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
