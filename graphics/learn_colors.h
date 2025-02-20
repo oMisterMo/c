@@ -113,6 +113,7 @@ typedef struct Game {
 // ---------------------------
 
 // Todo: add declarations
+void reset(int *score);
 
 // ---------------------------
 // Function definition
@@ -194,7 +195,6 @@ void handleInput(Game *game) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
-    Texture2D *cardTextures = game->cardTextures;
     Animation *stars = game->stars;
 
     if (IsKeyPressed(KEY_F)) ToggleFullscreen();
@@ -378,7 +378,6 @@ void drawBackground(Texture2D layers[], double *increment, int order[]) {
 
         int width = layers[0].width;
         int height = layers[0].height;
-        int X_REAPEAT = ceil((float) GetScreenWidth() / (float) width);
         int startX = 0;
         int startY = -height / 2 ;
 

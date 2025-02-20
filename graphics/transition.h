@@ -143,7 +143,7 @@ void inputGameover(Game *game, GameUI gameUI) {
         }
     }
 }
-void handleInput(Game *game, GameUI gameUI, Rectangle *bg, float *fadeAmount) {
+void handleInput(Game *game, GameUI gameUI) {
     // printf("currentScreen: %d\n", currentScreen);
 
     if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
@@ -184,7 +184,7 @@ void updateHoverButtonState(UIButtons *button) {
         button->hover = false;
     }
 }
-void updateLoading(Game *game, GameUI *gameUI) {
+void updateLoading(Game *game) {
     (game->frameCounter)++;
     (game->logoCounter)++;
 
@@ -198,7 +198,7 @@ void updateLoading(Game *game, GameUI *gameUI) {
         game->frameCounter = 0;
     }
 }
-void updateLogo(Game *game, GameUI *gameUI) {
+void updateLogo(Game *game) {
     (game->frameCounter)++;
 
     // double currentTime = GetTime();
@@ -236,7 +236,7 @@ void updateGameover(Game *game, GameUI *gameUI) {
 }
 void updateFade(Game *game, float *fadeAmount) {
     // printf("currentFadeType: %d\n", currentFadeType);
-    if (game->currentTransition == IDLE) {
+    if (game->currentTransition == TRANISITON_IDLE) {
         // printf("idle\n");
     }
     if (game->currentTransition == TRANSITION_START) {
@@ -261,7 +261,7 @@ void updateFade(Game *game, float *fadeAmount) {
         *fadeAmount -= FADE_INCREMENT;
         if (*fadeAmount <= 0.0f) {
             *fadeAmount = 0.0f;
-            game->currentTransition = IDLE;
+            game->currentTransition = TRANISITON_IDLE;
 
             // NEXT SCENE FULLY VISIABLE
             game->frameCounter = 0;
@@ -271,18 +271,18 @@ void updateFade(Game *game, float *fadeAmount) {
     }
 
 }
-void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
+void update(Game *game, GameUI *gameUI, float *fadeAmount) {
     if (game->currentTransition == TRANSITION_START || game->currentTransition == TRANSITION_END) {
         updateFade(game, fadeAmount);
         return;
     }
     switch (game->currentScreen) {
         case LOADING: {
-            updateLoading(game, gameUI);
+            updateLoading(game);
         }
         break;
         case LOGO: {
-            updateLogo(game, gameUI);
+            updateLogo(game);
         }
         break;
         case MENU: {
@@ -309,32 +309,6 @@ void update(Game *game, GameUI *gameUI, Rectangle *bg, float *fadeAmount) {
         gameUI->left.hover = false;
         gameUI->right.hover = false;
     }
-
-    // if (*currentScreen == TRANSITION_START) {
-    //     (*frameCounter)++;
-    // }
-    // if (*currentScreen == TRANSITION_END) {
-    //     (*frameCounter)++;
-    //     // if (state == TWEENING) {
-    //     //     scale = EaseSineOut((float)frameCounter, 0, 70, duration);
-    //     //     destRect.width  += scale;
-    //     //     destRect.height += scale;
-    //     //     origin.x = (float) destRect.width / 2;
-    //     //     origin.y = (float) destRect.height / 2;
-    //     //     // printf("%.1f,%.1f\n", destRect.width, destRect.height);
-    //     //     printf("scale: %f\n", scale);
-    //     //     if (frameCounter > duration) {
-    //     //         frameCounter = 0;
-    //     //         scale = 70.0;
-    //     //         state = IDLE;
-    //     //         printf("scale: %f\n", scale);
-    //     //         printf("Done.\n");
-    //     //     }
-    //     // }
-    //     // if (state == IDLE) {
-
-    //     // }
-    // }
 }
 
 

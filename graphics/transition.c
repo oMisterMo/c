@@ -27,9 +27,9 @@ int main() {
     float scale = 0.01;
     transitionTexture.width *= scale;
     transitionTexture.height *= scale;
-    Rectangle sourceRec = { 0, 0, transitionTexture.width, transitionTexture.height };  // multiply width by -1 to flip
-    Rectangle destRect = { screenWidth / 2, screenHeight / 2, transitionTexture.width, transitionTexture.height };
-    Vector2 origin = { (float) transitionTexture.width / 2, (float) transitionTexture.height / 2 };
+    // Rectangle sourceRec = { 0, 0, transitionTexture.width, transitionTexture.height };  // multiply width by -1 to flip
+    // Rectangle destRect = { screenWidth / 2, screenHeight / 2, transitionTexture.width, transitionTexture.height };
+    // Vector2 origin = { (float) transitionTexture.width / 2, (float) transitionTexture.height / 2 };
 
     // Set buttons attrubutes
     buttonsTexture.width *= 0.3;
@@ -72,7 +72,7 @@ int main() {
     Game game = { 0 };
     game.currentScreen = LOADING;
     game.nextScreen = LOGO;
-    game.currentTransition = IDLE;
+    game.currentTransition = TRANISITON_IDLE;
     game.frameEntered = 0;
     game.frameCounter = 0;
     game.logoCounter = 0;
@@ -86,10 +86,10 @@ int main() {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         // Handle input
-        handleInput(&game, gameUI, &tweenBG, &fadeAmount);
+        handleInput(&game, gameUI);
 
         // Update
-        update(&game, &gameUI, &tweenBG, &fadeAmount);
+        update(&game, &gameUI, &fadeAmount);
 
         // Draw
         draw(game, gameUI, tweenBG, fadeAmount);

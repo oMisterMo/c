@@ -25,8 +25,6 @@ int main() {
     Vector2 vel = { .x = 1, .y = 1 };
     Vector2 pos = { 0, 450 - 50 };
 
-    int frameCounter = 0;          // Useful to count frames
-
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key

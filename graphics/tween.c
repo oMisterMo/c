@@ -48,7 +48,7 @@ void logger(int frameCounter);
 void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo);
 void updateMo(GameObject *mo);
 void drawMo(GameObject mo);
-void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration);
+void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, int duration);
 void drawRect(Rectangle rect);
 
 int main() {
@@ -63,7 +63,6 @@ int main() {
     // ---------------------------------------------
     // Initialize
     // ---------------------------------------------
-    const int GAP = (GetScreenWidth() - (TOTAL_WIDTH)) / NO_OF_SPACES;
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
 
     // Mo stuff
@@ -77,7 +76,7 @@ int main() {
     tween.duration = 60 * 2;
     // Designated initializers
     GameObject mo = {
-        .texture = "",
+        .texture = bunny,
         .bounds = bounds,
         .tween = tween
      };
@@ -89,7 +88,7 @@ int main() {
     int frameCounter = 0;
     int state = IDLE;
     int duration = 60 * 4;          // 60 * 4 = 4 seconds
-    float t = 0;                    // 0 < t < 1
+    // float t = 0;                    // 0 < t < 1
     printf("original rect => %p\n", &rect);
 
 
@@ -106,7 +105,7 @@ int main() {
         // ---------------------------------------------
         // Update
         // ---------------------------------------------
-        updateRect(&rect, startRect, endRect, &frameCounter, &state, center, duration);
+        updateRect(&rect, startRect, endRect, &frameCounter, &state, duration);
         updateMo(&mo);
 
         // ---------------------------------------------
@@ -210,7 +209,7 @@ void drawMo(GameObject mo) {
     DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
 }
 
-void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, Vector2 center, int duration) {
+void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, int duration) {
     // printf("rect => %p\n", rect);
     if (*state == TWEENING) {
 
