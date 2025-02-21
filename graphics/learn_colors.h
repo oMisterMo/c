@@ -21,7 +21,9 @@
 #define NO_OF_CLOUDS 4      // 4 cloud sprites
 #define NUM_FRAMES_STARS 8
 
-#if (defined(isDrawTray) && isDrawTray < 1)
+// https://gcc.gnu.org/onlinedocs/gcc-13.3.0/cpp/Defined.html - simplify
+// #if (defined(isDrawTray) && isDrawTray < 1)
+#if (isDrawTray < 1)
     // Size of tray without texture
     #define TRAY_WIDTH 150
     #define TRAY_HEIGHT 100
@@ -32,7 +34,7 @@
 #endif
 
 
-#if (defined(isDrawCard) && isDrawCard < 1)
+#if (isDrawCard < 1)
     // Size of card without texture
     #define CARD_WIDTH 100
     #define CARD_HEIGHT 100
