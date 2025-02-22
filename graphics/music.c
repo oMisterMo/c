@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include "raylib.h"
 
+void callback(void *bufferData, unsigned int frames) {
+    printf("frames: %u\n", frames);
+}
+
 int main(void) {
 
 
@@ -15,7 +19,8 @@ int main(void) {
     InitAudioDevice();              // Initialize audio device
     Music music = LoadMusicStream("resources/music/country.mp3");
     PlayMusicStream(music);
-
+    SetMusicVolume(music, 0.2f);
+    AttachAudioStreamProcessor(music.stream, callback);
 
 
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
@@ -54,9 +59,11 @@ int main(void) {
         
         
         // update
-          // Get normalized time played for current music stream
-          timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music);
-          if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
+        // Get normalized time played for current music stream
+        timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music);
+        if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
+
+
         
         
         
