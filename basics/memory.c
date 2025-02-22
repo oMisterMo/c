@@ -6,11 +6,13 @@
 
 void allocate();
 void memoryset();
+void memorycopy();
 
 int main() {
 
-    allocate();
+    // allocate();
     // memoryset();
+    memorycopy();
     printf("\n");
 
     return 0;
@@ -74,5 +76,17 @@ void memoryset() {
 
     for (int i = 0; i < 10; ++i) {
         printf("%p (%d): %16d\n", arr + i, i, arr[i]);
+    }
+}
+
+void memorycopy() {
+    printf("\n---Memory Copy---\n");
+    int arr[] = { 9, 8, 7 };
+    int dst[5];
+    // dst, src, bytes
+    memcpy(dst, arr, sizeof(int) * 3);
+
+    for (int i = 0; i < 5; ++i) {
+        printf("dst[%d]: %d\n", i, dst[i]);
     }
 }
