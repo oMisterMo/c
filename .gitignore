@@ -1,5 +1,6 @@
 *.out
 test.c
+temp.c
 *.txt
 
 out/
