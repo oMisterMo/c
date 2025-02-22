@@ -18,9 +18,17 @@ int main(void) {
     printf("-------------------\n");
     InitAudioDevice();              // Initialize audio device
     Music music = LoadMusicStream("resources/music/country.mp3");
+    printf("\n\n");
+    printf("music.frameCount: %u\n", music.frameCount);
+    printf("music.looping: %d\n", music.looping);
+    printf("music.stream.sampleRate: %d\n", music.stream.sampleRate);
+    printf("music.stream.sampleSize: %d\n", music.stream.sampleSize);
+    printf("music.stream.channels: %d\n", music.stream.channels);
+    printf("rate / size: %u", music.stream.sampleRate / music.stream.sampleSize);
+    printf("\n\n");
     PlayMusicStream(music);
     SetMusicVolume(music, 0.2f);
-    AttachAudioStreamProcessor(music.stream, callback);
+    // AttachAudioStreamProcessor(music.stream, callback);
 
 
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
