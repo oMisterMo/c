@@ -27,6 +27,9 @@ int main(void) {
     bool pause = false;             // Music playing paused
     const float TOTAL_LENGTH = GetMusicTimeLength(music);
     // float timePlayed = GetMusicTimePlayed(music);
+    Rectangle musicPlayer = { 0, 0, GetScreenWidth() * .7, 100 };
+    musicPlayer.x = (GetScreenWidth() - musicPlayer.width) / 2;
+    musicPlayer.y = (GetScreenHeight() - musicPlayer.height) / 2;
 
 
 
@@ -72,9 +75,9 @@ int main(void) {
         ClearBackground(BLACK);
 
         // Draw music rect
-        DrawRectangle(200, 200, 400, 12, RAYWHITE);
-        DrawRectangle(200, 200, (int)(timePlayed*400.0f), 12, MAROON);
-        DrawRectangleLines(200, 200, 400, 12, GRAY);
+        DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
+        DrawRectangle(musicPlayer.x, musicPlayer.y, (int)(timePlayed * musicPlayer.width), musicPlayer.height, MAROON);
+        DrawRectangleLines(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, GRAY);
 
         // Draw music progress percentage
         DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, 30, WHITE);
