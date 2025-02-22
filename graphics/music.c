@@ -1,8 +1,25 @@
 #include <stdio.h>
+#include <stdint.h>
+// #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include "raylib.h"
 
+#define ARRAY_LEN(xs) sizeof(xs) / sizeof(xs[0])
+
+uint64_t global_frames[1024] = { 0 };
+size_t global_frames_count = 0;
+
 void callback(void *bufferData, unsigned int frames) {
-    printf("frames: %u\n", frames);
+    // printf("frames: %u\n", frames);
+    // printf("ARRAY_LEN(frames) %ld\n", ARRAY_LEN(global_frames));
+
+    if (frames > ARRAY_LEN(global_frames)) {
+        frames = ARRAY_LEN(global_frames);
+    }
+
+    memcpy(global_frames, bufferData, sizeof(uint64_t) * frames);
+    global_frames_count = frames;
 }
 
 int main(void) {
@@ -24,11 +41,13 @@ int main(void) {
     printf("music.stream.sampleRate: %d\n", music.stream.sampleRate);
     printf("music.stream.sampleSize: %d\n", music.stream.sampleSize);
     printf("music.stream.channels: %d\n", music.stream.channels);
-    printf("rate / size: %u", music.stream.sampleRate / music.stream.sampleSize);
+    assert(music.stream.sampleSize == 32);
+    assert(music.stream.channels == 2);
+    printf("samepleSize * channels (L + R): %u", music.stream.sampleSize * music.stream.channels);
     printf("\n\n");
     PlayMusicStream(music);
     SetMusicVolume(music, 0.2f);
-    // AttachAudioStreamProcessor(music.stream, callback);
+    AttachAudioStreamProcessor(music.stream, callback);
 
 
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
@@ -78,9 +97,14 @@ int main(void) {
         
         
         
-          // draw
+        // draw
         BeginDrawing();
         ClearBackground(BLACK);
+
+        // Draw main
+        for (size_t i  = 0; i < global_frames_count; ++i) {
+
+        }
 
         // Draw music rect
         DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
@@ -89,6 +113,7 @@ int main(void) {
 
         // Draw music progress percentage
         DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, 30, WHITE);
+        DrawText(TextFormat("%d", global_frames_count), GetScreenWidth() - 80, 20, 30, WHITE);
 
         // Draw help
 
