@@ -90,3 +90,8 @@ void memorycopy() {
         printf("dst[%d]: %d\n", i, dst[i]);
     }
 }
+
+void memorymove() {
+
+    // memmove();
+}
