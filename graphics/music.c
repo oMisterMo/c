@@ -16,7 +16,7 @@ typedef struct {
 // Cirular buffer
 
 // ( L + BLANK + R ) * SAMPLE_RATE
-Frame global_frames[(314 + 198 + 314) * 1] = { 0 };
+Frame global_frames[(314 + 198 + 314) * 24] = { 0 };
 
 // Number of frames added to global frames array
 size_t global_frames_count = 0;
@@ -37,9 +37,11 @@ void callback(void *bufferData, unsigned int frames) {
         // Start filling the window (global_frames) with data
         memcpy(global_frames + global_frames_count, bufferData, sizeof(Frame) * frames);
         global_frames_count += frames;
-        printf("add\n");
-        printf("+%ld\n", global_frames_count);
+        // printf("add\n");
+        printf("global_frames_count: %ld\n", global_frames_count);
     } else if (frames <= capacity) {
+        // Window is full -> chunk < array.length
+
         // Ran out of capacity
         // Frames overflow
         // Shift array to the front, copy the remaining data
@@ -48,14 +50,16 @@ void callback(void *bufferData, unsigned int frames) {
         memmove(global_frames, global_frames + frames, sizeof(Frame) * (capacity - frames));
         // Copy the rest of the data to the end
         memcpy(global_frames + (capacity - frames), bufferData, sizeof(Frame) * frames);
-        printf("shift\n");
+        // printf("shift\n");
     } else {
+        // window if full -> chunk > array.length
+
         // The frames you are trying to copy over is too much
         // Truncate the end of the buffer data
         // Copy just the full aray
         memcpy(global_frames, bufferData, sizeof(Frame) * capacity);
         global_frames_count = capacity;
-        printf("overflow\n");
+        // printf("overflow\n");
     }
 }
 
