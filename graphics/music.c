@@ -75,8 +75,8 @@ int main(void) {
     printf("Init Audio\n");
     printf("-------------------\n");
     InitAudioDevice();              // Initialize audio device
-    Music music = LoadMusicStream("resources/music/country.mp3");
-    // Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
+    // Music music = LoadMusicStream("resources/music/country.mp3");
+    Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
     printf("\n\n");
     printf("music.frameCount: %u\n", music.frameCount);
     printf("music.looping: %d\n", music.looping);
@@ -207,14 +207,26 @@ int main(void) {
         //     }
         // }
 
-        // Draw music rect
+        // Draw music progress percentage
         // DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
         // DrawRectangle(musicPlayer.x, musicPlayer.y, (int)(timePlayed * musicPlayer.width), musicPlayer.height, MAROON);
         // DrawRectangleLines(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, GRAY);
 
-        // Draw music progress percentage
-        DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, 30, WHITE);
-        DrawText(TextFormat("%d", global_frames_count), GetScreenWidth() - 130, 20, 30, WHITE);
+        // left
+        const float TEXT_SIZE = 30;
+        DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
+
+        // right
+        const char* FRAME_COUNT = "Frame count: ";
+        const char* TOTAL_FRAMES = "Total frames: ";
+        DrawText(TextFormat("%s%d", FRAME_COUNT, music.frameCount),
+            GetScreenWidth() - MeasureText(FRAME_COUNT, TEXT_SIZE) - MeasureText(TextFormat("%d", music.frameCount), TEXT_SIZE)  - 20,
+            20, TEXT_SIZE, WHITE);
+        DrawText(TextFormat("%s%d", TOTAL_FRAMES, global_frames_count),
+            GetScreenWidth() - MeasureText(TOTAL_FRAMES, TEXT_SIZE) - MeasureText(TextFormat("%d", global_frames_count), TEXT_SIZE) - 20,
+            20 + 50,
+            TEXT_SIZE,
+            WHITE);
 
         // Draw help
 
