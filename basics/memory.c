@@ -68,30 +68,37 @@ void allocate() {
  */
 void memoryset() {
     printf("\n---Memory Set---\n");
-    int arr[10];
+    int src[10];
 
     // memset(S,C,N);
     // memset(pointer, init character, bytes to set)
-    memset(arr, 0, sizeof(arr) / 2);
+    memset(src, 0, sizeof(src) / 2);
 
     for (int i = 0; i < 10; ++i) {
-        printf("%p (%d): %16d\n", arr + i, i, arr[i]);
+        printf("%p (%d): %16d\n", src + i, i, src[i]);
     }
 }
 
+/**
+ * Copy N bytes of SRC to DEST
+ */
 void memorycopy() {
     printf("\n---Memory Copy---\n");
-    int arr[] = { 9, 8, 7 };
-    int dst[5];
-    // dst, src, bytes
-    memcpy(dst, arr, sizeof(int) * 3);
+    int src[] = { 9, 8, 7 };
+    int dest[5];
+    // dest, src, bytes
+    memcpy(dest, src, sizeof(int) * 3);
 
     for (int i = 0; i < 5; ++i) {
-        printf("dst[%d]: %d\n", i, dst[i]);
+        printf("dest[%d]: %d\n", i, dest[i]);
     }
 }
 
+/**
+ * Copy N bytes of SRC to DEST, guaranteeing
+ * correct behavior for overlapping strings
+ */
 void memorymove() {
-
-    // memmove();
+    printf("\n---Memory Move---\n");
+    // memmove(dest, src, bytes);
 }
