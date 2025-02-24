@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
 // #include <stdlib.h>
 #include <string.h>
@@ -28,15 +29,20 @@ void update_global_frames_callback(void *buffer, unsigned int frames) {
 
     size_t capacity = ARRAY_LEN(global_frames);
 
-    if (frames <= capacity - global_frames_count) {
+    bool global_frames_not_full = frames <= capacity - global_frames_count;
+    bool chunk_to_copy_less_than_global_frames = frames <= capacity;
+
+    if (global_frames_not_full) {
+
         // There exists space in the array for the section of data
         // Start filling the window (global_frames) with data
         memcpy(global_frames + global_frames_count, buffer, sizeof(Frame) * frames);
         global_frames_count += frames;
-        printf("global_frames_count + %u\n", frames);
-        // printf("global_frames_count: %ld\n", global_frames_count);
+
         // printf("add\n");
-    } else if (frames <= capacity) {
+
+    } else if (chunk_to_copy_less_than_global_frames) {
+
         // Window is full -> chunk < array.length
 
         // Ran out of capacity
@@ -47,16 +53,23 @@ void update_global_frames_callback(void *buffer, unsigned int frames) {
         memmove(global_frames, global_frames + frames, sizeof(Frame) * (capacity - frames));
         // Copy the rest of the data to the end
         memcpy(global_frames + (capacity - frames), buffer, sizeof(Frame) * frames);
+
         // printf("copy\n");
+
     } else {
-        // window if full -> chunk > array.length
+
+        // Window is full -> chunk > array.length
 
         // The frames you are trying to copy over is too much
         // Truncate the end of the buffer data
+
         // Copy just the full aray
         memcpy(global_frames, buffer, sizeof(Frame) * capacity);
+        // Cap the capcity
         global_frames_count = capacity;
+
         // printf("fill\n");
+
     }
 }
 
