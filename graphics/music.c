@@ -22,23 +22,20 @@ Frame global_frames[(314 + 198 + 314) * 24] = { 0 };
 size_t global_frames_count = 0;
 
 
-void callback(void *bufferData, unsigned int frames) {
+void update_global_frames_callback(void *buffer, unsigned int frames) {
     // printf("---\n");
     // printf("ARRAY_LEN(frames) %ld\n", ARRAY_LEN(global_frames));
-
-    // bufferData = 8 bytes
-    // L = FIRST CHUNK + EMPTY
-    // R = SECOND CHUNK
 
     size_t capacity = ARRAY_LEN(global_frames);
 
     if (frames <= capacity - global_frames_count) {
         // There exists space in the array for the section of data
         // Start filling the window (global_frames) with data
-        memcpy(global_frames + global_frames_count, bufferData, sizeof(Frame) * frames);
+        memcpy(global_frames + global_frames_count, buffer, sizeof(Frame) * frames);
         global_frames_count += frames;
+        printf("global_frames_count + %u\n", frames);
+        // printf("global_frames_count: %ld\n", global_frames_count);
         // printf("add\n");
-        printf("global_frames_count: %ld\n", global_frames_count);
     } else if (frames <= capacity) {
         // Window is full -> chunk < array.length
 
@@ -49,18 +46,28 @@ void callback(void *bufferData, unsigned int frames) {
         // Move remaining section to the front of the buffer
         memmove(global_frames, global_frames + frames, sizeof(Frame) * (capacity - frames));
         // Copy the rest of the data to the end
-        memcpy(global_frames + (capacity - frames), bufferData, sizeof(Frame) * frames);
-        // printf("shift\n");
+        memcpy(global_frames + (capacity - frames), buffer, sizeof(Frame) * frames);
+        // printf("copy\n");
     } else {
         // window if full -> chunk > array.length
 
         // The frames you are trying to copy over is too much
         // Truncate the end of the buffer data
         // Copy just the full aray
-        memcpy(global_frames, bufferData, sizeof(Frame) * capacity);
+        memcpy(global_frames, buffer, sizeof(Frame) * capacity);
         global_frames_count = capacity;
-        // printf("overflow\n");
+        // printf("fill\n");
     }
+}
+
+void debug_callback(void *buffer, unsigned int frames) {
+    // [8, 8, 8, 8, ...]
+    float *samples = (float *)buffer;
+    // [[4,4], [4,4], ...]
+    float l = samples[0];
+    float r = samples[1];
+    printf("Left %.2f\n", l);
+    printf("Right %.2f\n\n", r);
 }
 
 int main(void) {
@@ -89,7 +96,8 @@ int main(void) {
     printf("\n\n");
     PlayMusicStream(music);
     SetMusicVolume(music, 0.2f);
-    AttachAudioStreamProcessor(music.stream, callback);
+    AttachAudioStreamProcessor(music.stream, update_global_frames_callback);
+    // AttachAudioStreamProcessor(music.stream, debug_callback);
 
 
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
@@ -154,69 +162,29 @@ int main(void) {
         float cell_width = (float) w / (float) global_frames_count;
         // printf("global_frames_count: %ld\n", global_frames_count);
 
-        // for (size_t i  = 0; i < global_frames_count; ++i) {
-        // for (size_t i  = 0; i < 314; ++i) {
-        //     float t = global_frames[i].left;
-        //     if (t > 0) {
-        //         DrawRectangle(i * cell_width, h/2 - h/2*t, 1, h/2*t, RED);
-        //     } else {
-        //         DrawRectangle(i * cell_width, h/2, 1, -h/2*t, YELLOW);
-        //     }
-        // }
-        // for (size_t i  = 314; i < 314 + 198; ++i) {
-        //     float t = global_frames[i].left;
-        //     DrawCircle(i * cell_width, h/2, 1, BLUE);
-        //     // if (t > 0) {
-        //     //     DrawRectangle(i * cell_width, h/2 - h/2*t, 1, h/2*t, RED);
-        //     // } else {
-        //     //     DrawRectangle(i * cell_width, h/2, 1, -h/2*t, YELLOW);
-        //     // }
-        // }
-        // for (size_t i  = 314 + 198; i < global_frames_count; ++i) {
-        //     float t = global_frames[i].left;
-        //     if (t > 0) {
-        //         DrawRectangle(i * cell_width, h/2 - h/2*t, 1, h/2*t, RED);
-        //     } else {
-        //         DrawRectangle(i * cell_width, h/2, 1, -h/2*t, YELLOW);
-        //     }
-        // }
 
         for (size_t i  = 0; i < global_frames_count; ++i) {
-            float t = global_frames[i].left;
-            if (t > 0) {
-                DrawRectangle(i * cell_width, h/2 - h/2*t, 1, h/2*t, RED);
+            float left = global_frames[i].left;
+            // float right = global_frames[i].right;
+            if (left > 0) {
+                DrawRectangle(i * cell_width, h/2 - h/2*left, 1, h/2 * left, RED);
             } else {
-                DrawRectangle(i * cell_width, h/2, 1, -h/2*t, YELLOW);
+                DrawRectangle(i * cell_width, h/2, 1, -h/2 * left, YELLOW);
             }
         }
 
-        // for (size_t i  = 0; i < global_frames_count; ++i) {
-        //     // Grab 1 channel (L)
-        //     float left = global_frames[i].left;
-        //     float right = global_frames[i].right;
-
-        //     // printf("cell_w: %f\n", cell_width);
-        //     float x = i * cell_width;
-        //     float y = h / 2;
-        //     float max_height = h * 0.5;
-        //     if (left) {
-        //         DrawRectangle(x, y - max_height * left, 1, max_height * left, RED);
-        //     }
-        //     if (right) {
-        //         // DrawRectangle(x, y, 1, max_height * right, RED);
-        //     }
-        // }
 
         // Draw music progress percentage
         // DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
         // DrawRectangle(musicPlayer.x, musicPlayer.y, (int)(timePlayed * musicPlayer.width), musicPlayer.height, MAROON);
         // DrawRectangleLines(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, GRAY);
 
-        // left
+        // Draw help stuff
+        // left section
         const float TEXT_SIZE = 30;
         DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
 
-        // right
+        // right section
         const char* FRAME_COUNT = "Frame count: ";
         const char* TOTAL_FRAMES = "Total frames: ";
         DrawText(TextFormat("%s%d", FRAME_COUNT, music.frameCount),
@@ -228,7 +196,6 @@ int main(void) {
             TEXT_SIZE,
             WHITE);
 
-        // Draw help
 
         EndDrawing();
 
