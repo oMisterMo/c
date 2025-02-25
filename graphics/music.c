@@ -17,7 +17,10 @@ typedef struct {
 // Cirular buffer
 
 // ( L + BLANK + R ) * SAMPLE_RATE
-Frame global_frames[(314 + 198 + 314) * 24] = { 0 };
+// Frame global_frames[(314 + 198 + 314) * 24] = { 0 };
+
+// 2 seconds worth of data (44100 * 2)
+Frame global_frames[44100 * 2] = { 0 };
 
 // Number of frames added to global frames array
 size_t global_frames_count = 0;
@@ -83,8 +86,108 @@ void debug_callback(void *buffer, unsigned int frames) {
     printf("Right %.2f\n\n", r);
 }
 
-int main(void) {
+void LogMusicData(Music music) {
+    const float TOTAL_LENGTH = GetMusicTimeLength(music);   // framesCount / sampleRate
 
+    printf("\n\n");
+    printf("Length of song in seconds: %f\n", TOTAL_LENGTH);
+    printf("music.frameCount: %u\n", music.frameCount);
+    printf("music.looping: %d\n", music.looping);
+    printf("music.stream.sampleRate: %d\n", music.stream.sampleRate);
+    printf("music.stream.sampleSize: %d\n", music.stream.sampleSize);
+    printf("music.stream.channels: %d\n", music.stream.channels);
+    assert(music.stream.sampleSize == 32);
+    assert(music.stream.channels == 2);
+    printf("samepleSize * channels (L + R): %u", music.stream.sampleSize * music.stream.channels);
+    printf("\n\n");
+}
+
+void MoreLogging() {
+    printf("Frame: %ld bytes\n", sizeof(Frame));
+    printf("\nglobal_frames\n");
+    printf("---------------\n");
+    printf("%ld elements\n", ARRAY_LEN(global_frames));
+    printf("%ld bytes\n", sizeof(global_frames));
+}
+
+void HandleInput(Music music, float *timePlayed) {
+    if (IsKeyDown(KEY_RIGHT)) {
+        UpdateMusicStream(music);   // Update music buffer with new stream data
+    }
+    if (IsKeyPressed(KEY_R)) {
+        printf("restart music\n");
+        StopMusicStream(music);
+        PlayMusicStream(music);
+    }
+    if (IsKeyPressed(KEY_S)) {
+        printf("stop music\n");
+        StopMusicStream(music);
+    }
+    if (IsKeyPressed(KEY_SPACE)) {
+        printf("seek to 30 secs\n");
+        *timePlayed = 0;
+        SeekMusicStream(music, 30);
+    }
+    if (IsKeyPressed(KEY_P)) {
+        if (IsMusicStreamPlaying(music)) {
+            printf("pause music\n");
+            PauseMusicStream(music);
+        } else {
+            printf("resume music\n");
+            ResumeMusicStream(music);
+        }
+    }
+}
+
+void Update(Music music, float *timePlayed) {
+    // Get normalized time played for current music stream
+    *timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
+    if (*timePlayed > 1.0f) *timePlayed = 1.0f;   // Make sure time played is no longer than music
+}
+
+void Draw(Music music, float *timePlayed) {
+    // Draw main
+    int w = GetScreenWidth();
+    int h = GetScreenHeight();
+
+    // float cell_width = (float) w / (float) 1000;
+    float cell_width = (float) w / (float) global_frames_count;
+    // printf("global_frames_count: %ld\n", global_frames_count);
+
+    for (size_t i  = 0; i < global_frames_count; ++i) {
+        float left = global_frames[i].left;
+        // float right = global_frames[i].right;
+        if (left > 0) {
+            DrawRectangle(i * cell_width, h/2 - h/2*left, 1, h/2 * left, RED);
+        } else {
+            DrawRectangle(i * cell_width, h/2, 1, -h/2 * left, YELLOW);
+        }
+    }
+
+    // Draw music progress percentage
+    // DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
+    // DrawRectangle(musicPlayer.x, musicPlayer.y, (int)(timePlayed * musicPlayer.width), musicPlayer.height, MAROON);
+    // DrawRectangleLines(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, GRAY);
+
+    // Draw help stuff
+    // left section
+    const float TEXT_SIZE = 30;
+    DrawText(TextFormat("%.2f", *timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
+
+    // right section
+    const char* FRAME_COUNT = "Global frame count: ";
+    const char* TOTAL_FRAMES = "Elements: ";
+    DrawText(TextFormat("%s%d", FRAME_COUNT, music.frameCount),
+        GetScreenWidth() - MeasureText(FRAME_COUNT, TEXT_SIZE) - MeasureText(TextFormat("%d", music.frameCount), TEXT_SIZE)  - 20,
+        20, TEXT_SIZE, WHITE);
+    DrawText(TextFormat("%s%d", TOTAL_FRAMES, ARRAY_LEN(global_frames)),
+        GetScreenWidth() - MeasureText(TOTAL_FRAMES, TEXT_SIZE) - MeasureText(TextFormat("%d", ARRAY_LEN(global_frames)), TEXT_SIZE) - 20,
+        20 + 50,
+        TEXT_SIZE,
+        WHITE);
+}
+
+int main(void) {
 
     printf("-------------------\n");
     printf("Init Window\n");
@@ -95,33 +198,20 @@ int main(void) {
     printf("Init Audio\n");
     printf("-------------------\n");
     InitAudioDevice();              // Initialize audio device
-    // Music music = LoadMusicStream("resources/music/country.mp3");
-    Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
-    printf("\n\n");
-    printf("music.frameCount: %u\n", music.frameCount);
-    printf("music.looping: %d\n", music.looping);
-    printf("music.stream.sampleRate: %d\n", music.stream.sampleRate);
-    printf("music.stream.sampleSize: %d\n", music.stream.sampleSize);
-    printf("music.stream.channels: %d\n", music.stream.channels);
-    assert(music.stream.sampleSize == 32);
-    assert(music.stream.channels == 2);
-    printf("samepleSize * channels (L + R): %u", music.stream.sampleSize * music.stream.channels);
-    printf("\n\n");
+    Music music = LoadMusicStream("resources/music/country.mp3");
+    // Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
+    // LogMusicData(music);
+
     PlayMusicStream(music);
     SetMusicVolume(music, 0.2f);
     AttachAudioStreamProcessor(music.stream, update_global_frames_callback);
     // AttachAudioStreamProcessor(music.stream, debug_callback);
 
-
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
     bool pause = false;             // Music playing paused
-    const float TOTAL_LENGTH = GetMusicTimeLength(music);
-    // float timePlayed = GetMusicTimePlayed(music);
     Rectangle musicPlayer = { 0, 0, GetScreenWidth() * .7, 100 };
     musicPlayer.x = (GetScreenWidth() - musicPlayer.width) / 2;
     musicPlayer.y = (GetScreenHeight() - musicPlayer.height) / 2;
-
-
 
     // Set our game to run at 60 frames-per-second
     SetTargetFPS(60);               
@@ -129,91 +219,24 @@ int main(void) {
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
-    printf("Length of song in seconds: %f\n", TOTAL_LENGTH);
-    printf("Frame: %ld bytes\n", sizeof(Frame));
-    printf("Number of frames: %ld\n", ARRAY_LEN(global_frames));
-    printf("global_frames: %ld bytes\n", sizeof(global_frames));
+    // MoreLogging();
 
     while(!WindowShouldClose()) {
 
-    
         // input
-        if (IsKeyDown(KEY_RIGHT)) {
-            UpdateMusicStream(music);   // Update music buffer with new stream data
-        }
-        if (IsKeyDown(KEY_R)) {
-            StopMusicStream(music);
-            PlayMusicStream(music);
-        }
-        if (IsKeyDown(KEY_S)) {
-            StopMusicStream(music);
-        }
-        if (IsKeyPressed(KEY_SPACE)) {
-            timePlayed = 0;
-            SeekMusicStream(music, 30);
-        }
-        
-        
+        HandleInput(music, &timePlayed);
+
         // update
-        // Get normalized time played for current music stream
-        timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music);
-        if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
+        Update(music, &timePlayed);
 
-
-        
-        
-        
         // draw
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // Draw main
-        int w = GetScreenWidth();
-        int h = GetScreenHeight();
-
-        // float cell_width = (float) w / (float) 1000;
-        float cell_width = (float) w / (float) global_frames_count;
-        // printf("global_frames_count: %ld\n", global_frames_count);
-
-
-        for (size_t i  = 0; i < global_frames_count; ++i) {
-            float left = global_frames[i].left;
-            // float right = global_frames[i].right;
-            if (left > 0) {
-                DrawRectangle(i * cell_width, h/2 - h/2*left, 1, h/2 * left, RED);
-            } else {
-                DrawRectangle(i * cell_width, h/2, 1, -h/2 * left, YELLOW);
-            }
-        }
-
-
-        // Draw music progress percentage
-        // DrawRectangle(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, RAYWHITE);
-        // DrawRectangle(musicPlayer.x, musicPlayer.y, (int)(timePlayed * musicPlayer.width), musicPlayer.height, MAROON);
-        // DrawRectangleLines(musicPlayer.x, musicPlayer.y, musicPlayer.width, musicPlayer.height, GRAY);
-
-        // Draw help stuff
-        // left section
-        const float TEXT_SIZE = 30;
-        DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
-
-        // right section
-        const char* FRAME_COUNT = "Frame count: ";
-        const char* TOTAL_FRAMES = "Total frames: ";
-        DrawText(TextFormat("%s%d", FRAME_COUNT, music.frameCount),
-            GetScreenWidth() - MeasureText(FRAME_COUNT, TEXT_SIZE) - MeasureText(TextFormat("%d", music.frameCount), TEXT_SIZE)  - 20,
-            20, TEXT_SIZE, WHITE);
-        DrawText(TextFormat("%s%d", TOTAL_FRAMES, global_frames_count),
-            GetScreenWidth() - MeasureText(TOTAL_FRAMES, TEXT_SIZE) - MeasureText(TextFormat("%d", global_frames_count), TEXT_SIZE) - 20,
-            20 + 50,
-            TEXT_SIZE,
-            WHITE);
-
+        Draw(music, &timePlayed);
 
         EndDrawing();
-
     }
-
 
     printf("-------------------\n");
     printf("Destroy\n");
@@ -222,7 +245,6 @@ int main(void) {
     UnloadMusicStream(music);   // Unload music stream buffers from RAM
     CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
     CloseWindow();
-
 
     return 0;
 }
