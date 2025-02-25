@@ -12,6 +12,10 @@ typedef struct {
     float left;
     float right;
 } Frame;
+typedef struct {
+    Music music;
+    float timePlayed;
+} Game;
 
 
 // Cirular buffer
@@ -110,7 +114,10 @@ void MoreLogging() {
     printf("%ld bytes\n", sizeof(global_frames));
 }
 
-void HandleInput(Music music, float *timePlayed) {
+void HandleInput(Game *game) {
+    Music music = game->music;
+    float timePlayed = game->timePlayed;
+
     if (IsKeyDown(KEY_RIGHT)) {
         UpdateMusicStream(music);   // Update music buffer with new stream data
     }
@@ -125,7 +132,7 @@ void HandleInput(Music music, float *timePlayed) {
     }
     if (IsKeyPressed(KEY_SPACE)) {
         printf("seek to 30 secs\n");
-        *timePlayed = 0;
+        timePlayed = 0;
         SeekMusicStream(music, 30);
     }
     if (IsKeyPressed(KEY_P)) {
@@ -139,13 +146,19 @@ void HandleInput(Music music, float *timePlayed) {
     }
 }
 
-void Update(Music music, float *timePlayed) {
+void Update(Game *game) {
+    Music music = game->music;
+    float timePlayed = game->timePlayed;
+
     // Get normalized time played for current music stream
-    *timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
-    if (*timePlayed > 1.0f) *timePlayed = 1.0f;   // Make sure time played is no longer than music
+    timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
+    if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
 }
 
-void Draw(Music music, float *timePlayed) {
+void Draw(Game *game) {
+    Music music = game->music;
+    float timePlayed = game->timePlayed;
+
     // Draw main
     int w = GetScreenWidth();
     int h = GetScreenHeight();
@@ -172,7 +185,7 @@ void Draw(Music music, float *timePlayed) {
     // Draw help stuff
     // left section
     const float TEXT_SIZE = 30;
-    DrawText(TextFormat("%.2f", *timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
+    DrawText(TextFormat("%.2f", timePlayed * 100), 20, 20, TEXT_SIZE, WHITE);
 
     // right section
     const char* FRAME_COUNT = "Global frame count: ";
@@ -213,6 +226,11 @@ int main(void) {
     musicPlayer.x = (GetScreenWidth() - musicPlayer.width) / 2;
     musicPlayer.y = (GetScreenHeight() - musicPlayer.height) / 2;
 
+    Game game = {
+        .music = music,
+        .timePlayed = timePlayed
+    };
+
     // Set our game to run at 60 frames-per-second
     SetTargetFPS(60);               
     
@@ -224,16 +242,16 @@ int main(void) {
     while(!WindowShouldClose()) {
 
         // input
-        HandleInput(music, &timePlayed);
+        HandleInput(&game);
 
         // update
-        Update(music, &timePlayed);
+        Update(&game);
 
         // draw
         BeginDrawing();
         ClearBackground(BLACK);
 
-        Draw(music, &timePlayed);
+        Draw(&game);
 
         EndDrawing();
     }
