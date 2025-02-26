@@ -11,6 +11,8 @@ typedef struct {
     int screenHeight;
     Shader shader_0;
     Shader shader_1;
+    Shader shader_2;
+    Shader shader_3;
 } Game;
 
 void KeepRectOnScreen(Rectangle *rect) {
@@ -44,7 +46,9 @@ void BasicShader(Game *game) {
 }
 
 void IntermediateShader(Game *game) {
-
+    BeginShaderMode(game->shader_1);
+        DrawTextureRec(game->target.texture, (Rectangle) { 0, 0, (float)game->screenWidth, (float)-game->screenHeight }, (Vector2) { 0, 0 }, WHITE);
+    EndShaderMode();
 }
 
 int main(void) {
@@ -73,11 +77,24 @@ int main(void) {
     // Load shader to be used on some parts drawing
     // NOTE 1: Using GLSL 330 shader version, on OpenGL ES 2.0 use GLSL 100 shader version
     // NOTE 2: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
-    Shader shader = LoadShader(NULL, "./shaders/simple.fs");
+    Shader shader_0 = LoadShader(NULL, "./shaders/shader_0.fs");
+    Shader shader_1 = LoadShader(NULL, "./shaders/shader_1.fs");
+    Shader shader_2 = LoadShader(NULL, "./shaders/shader_2.fs");
+    Shader shader_3 = LoadShader(NULL, "./shaders/shader_3.fs");
     // Shader shader = LoadShader(NULL, "./shaders/fog.fs");
     // Shader shader = LoadShader(NULL, "./shaders/pixelizer.fs");
     // Shader shader = LoadShader(NULL, "./shaders/grayscale.fs");
     // Shader shader = LoadShader(NULL, NULL);
+
+    // ==== SET UNIFORM VALUE ====
+
+    // Variable that is passed to shader
+    float seconds = 2.0f;
+
+    // The 'seconds' shader uniform location
+    int secondsLoc = GetShaderLocation(shader_1, "seconds");
+    printf("\nseconds shader location: %d\n", secondsLoc);
+    // ============================
 
     Game game = {
         .rect = rect,
@@ -86,8 +103,8 @@ int main(void) {
         .src = src,
         .screenWidth = screenWidth,
         .screenHeight = screenHeight,
-        .shader_0 = shader,
-        .shader_1 = shader
+        .shader_0 = shader_0,
+        .shader_1 = shader_1
     };
 
     SetTargetFPS(60);
@@ -107,8 +124,9 @@ int main(void) {
         }
 
         // update
-        // rect.x += 2;
-        // rect.y += 2;
+        seconds += GetFrameTime();
+        printf("%.2f\n", seconds);
+        SetShaderValue(shader_1, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
 
         KeepRectOnScreen(&rect);
         
@@ -132,7 +150,7 @@ int main(void) {
     printf("-------------------\n");
 
     UnloadTexture(texture);
-    UnloadShader(shader);
+    UnloadShader(shader_0);
     UnloadRenderTexture(target);
     CloseWindow();
 
