@@ -90,11 +90,21 @@ int main(void) {
     // ==== SET UNIFORM VALUE ====
 
     // Variable that is passed to shader
+    Vector2 resolution = { GetScreenWidth(), GetScreenHeight() };
     float seconds = 2.0f;
+    Vector2 mouse = { 0 };
 
     // The shader uniform location
+    int resolutionLoc = GetShaderLocation(shader_0, "resolution");
     int secondsLoc = GetShaderLocation(shader_0, "seconds");
-    printf("\nseconds shader location: %d\n", secondsLoc);
+    int mouseLoc = GetShaderLocation(shader_0, "mouse");
+    int bandsLoc = GetShaderLocation(shader_0, "bands");
+    printf("\n\n");
+    printf("resolution shader location: %d\n", resolutionLoc);
+    printf("seconds shader location: %d\n", secondsLoc);
+    printf("mouse shader location: %d\n", mouseLoc);
+    printf("bands shader location: %d\n", bandsLoc);
+    printf("\n\n");
     // ============================
 
     Game game = {
@@ -126,9 +136,12 @@ int main(void) {
 
         // update
         seconds += GetFrameTime();
+        mouse = GetMousePosition();
         printf("%.2f secs, sinf() =%.2f\n", seconds, sinf(seconds));
+        SetShaderValue(shader_0, resolutionLoc, &resolution, SHADER_UNIFORM_VEC2);  // Can I set this once?
         SetShaderValue(shader_0, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
-        SetShaderValue(shader_1, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
+        SetShaderValue(shader_0, mouseLoc, &mouse, SHADER_UNIFORM_VEC2);
+        // SetShaderValue(shader_0, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
 
         // collision detection
         KeepRectOnScreen(&rect);
