@@ -9,6 +9,8 @@ typedef struct {
     Rectangle dest;
     int screenWidth;
     int screenHeight;
+    Shader shader_0;
+    Shader shader_1;
 } Game;
 
 void KeepRectOnScreen(Rectangle *rect) {
@@ -21,22 +23,28 @@ void KeepRectOnScreen(Rectangle *rect) {
 }
 
 void BasicShader(Game *game) {
-    Rectangle rect = game->rect;
-    RenderTexture2D target = game->target;
-    int screenWidth = game->screenWidth;
-    int screenHeight = game->screenHeight;
-    Texture2D texture = game->texture;
-    Rectangle src = game->src;
+    BeginShaderMode(game->shader_0);
+        Rectangle rect = game->rect;
+        RenderTexture2D target = game->target;
+        int screenWidth = game->screenWidth;
+        int screenHeight = game->screenHeight;
+        Texture2D texture = game->texture;
+        Rectangle src = game->src;
 
-    // Shader on shape? [doesn't work on shapes]
-    // DrawRectangleRec(rect, RED);
+        // Shader on shape? [doesn't work on shapes]
+        // DrawRectangleRec(rect, RED);
 
-    // Reular texture - Overlayed with shader fragments [incorrect flip]
-    // DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
+        // Reular texture - Overlayed with shader fragments [incorrect flip]
+        // DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
 
-    // Empty texture spanning the full screen
-    // DrawTexture(target.texture, 0, 0, WHITE);    [incorrect flip]
-    DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight }, (Vector2) { 0, 0 }, WHITE);
+        // Empty texture spanning the full screen
+        // DrawTexture(target.texture, 0, 0, WHITE);    [incorrect flip]
+        DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight }, (Vector2) { 0, 0 }, WHITE);
+    EndShaderMode();
+}
+
+void IntermediateShader(Game *game) {
+
 }
 
 int main(void) {
@@ -78,6 +86,8 @@ int main(void) {
         .src = src,
         .screenWidth = screenWidth,
         .screenHeight = screenHeight,
+        .shader_0 = shader,
+        .shader_1 = shader
     };
 
     SetTargetFPS(60);
@@ -105,12 +115,11 @@ int main(void) {
         
         // draw
         BeginDrawing();
-            ClearBackground(GRAY);
+            ClearBackground(WHITE);
 
             // Shader stuff - Texture height must be flipped
-            BeginShaderMode(shader);
-                BasicShader(&game);
-            EndShaderMode();
+            // BasicShader(&game);
+            IntermediateShader(&game);
 
             // Normal drawing
             DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
