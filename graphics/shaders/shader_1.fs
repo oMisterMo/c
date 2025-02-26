@@ -27,7 +27,7 @@ void main()
 {
 
     // lerp_green_blue();
-    // lightning();
+    lightning();
 
 }
 

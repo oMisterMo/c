@@ -92,8 +92,8 @@ int main(void) {
     // Variable that is passed to shader
     float seconds = 2.0f;
 
-    // The 'seconds' shader uniform location
-    int secondsLoc = GetShaderLocation(shader_1, "seconds");
+    // The shader uniform location
+    int secondsLoc = GetShaderLocation(shader_0, "seconds");
     printf("\nseconds shader location: %d\n", secondsLoc);
     // ============================
 
@@ -127,8 +127,10 @@ int main(void) {
         // update
         seconds += GetFrameTime();
         printf("%.2f secs, sinf() =%.2f\n", seconds, sinf(seconds));
+        SetShaderValue(shader_0, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
         SetShaderValue(shader_1, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
 
+        // collision detection
         KeepRectOnScreen(&rect);
         
         
