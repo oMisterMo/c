@@ -43,17 +43,11 @@ int main(void) {
     while (!WindowShouldClose()) {
 
         // input
-        // Camera rotation controls
-        if (IsKeyDown(KEY_A)) camera.rotation--;
-        else if (IsKeyDown(KEY_S)) camera.rotation++;
 
-        // Limit camera rotation to 80 degrees (-40 to 40)
-        if (camera.rotation > 40) camera.rotation = 40;
-        else if (camera.rotation < -40) camera.rotation = -40;
         // Camera zoom controls
-        camera.zoom += ((float)GetMouseWheelMove()*0.05f);
+        camera.zoom += ((float)GetMouseWheelMove()*0.4f);
 
-        if (camera.zoom > 3.0f) camera.zoom = 3.0f;
+        if (camera.zoom > 6.0f) camera.zoom = 6.0f;
         else if (camera.zoom < 0.1f) camera.zoom = 0.1f;
 
         // Camera reset (zoom and rotation)
@@ -86,7 +80,7 @@ int main(void) {
                 for (size_t i = 0; i < samples; ++i) {
                     float t = (float) i / samples;
 
-                    DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.3f));
+                    DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
                 }
             EndMode2D();
         EndDrawing();
