@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "raylib.h"
+#include "raymath.h"
 
 // #define PI atan2f(1, 1) * 4
 
@@ -28,14 +29,14 @@ int main(void) {
 
     RenderTexture target = LoadRenderTexture(screenWidth, screenHeight);
 
-    Vector2 initialMousePosition = {};
-    float scale = 2.5f;
+    // Vector2 initialMousePosition = {};
+    // float scale = 2.5f;
 
     Camera2D camera = { 0 };
     camera.target = (Vector2){ 0 };
     camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f * scale;
+    camera.zoom = 2.5f;
 
     SetTargetFPS(60);
 
@@ -47,30 +48,43 @@ int main(void) {
 
         // input
 
-        // Camera zoom controls
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            Vector2 delta = GetMouseDelta();
+            delta = Vector2Scale(delta, -1.0f/camera.zoom);
+            camera.target = Vector2Add(camera.target, delta);
+        }
+
+        // Camera zoom center of screen
         camera.zoom += ((float)GetMouseWheelMove()*0.4f);
 
         if (camera.zoom > 6.0f) camera.zoom = 6.0f;
         else if (camera.zoom < 0.1f) camera.zoom = 0.1f;
+
+        // // Zoom based on mouse wheel
+        // float wheel = GetMouseWheelMove();
+        // if (wheel != 0)
+        // {
+        //     // Get the world point that is under the mouse
+        //     Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+
+        //     // Set the offset to where the mouse is
+        //     camera.offset = GetMousePosition();
+
+        //     // Set the target to match, so that the camera maps the world space point
+        //     // under the cursor to the screen space point under the cursor at any zoom
+        //     camera.target = mouseWorldPos;
+
+        //     // Zoom increment
+        //     float scaleFactor = 1.0f + (0.25f*fabsf(wheel));
+        //     if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
+        //     camera.zoom = Clamp(camera.zoom*scaleFactor, 0.125f, 64.0f);
+        // }
 
         // Camera reset (zoom and rotation)
         if (IsKeyPressed(KEY_R))
         {
             camera.zoom = 2.5f;
             camera.rotation = 0.0f;
-        }
-
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            initialMousePosition.x = GetMouseX();
-            initialMousePosition.y = GetMouseY();
-        }
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            printf("%f\n",initialMousePosition.x  - GetMouseX());
-            camera.target.x = (initialMousePosition.x  - GetMouseX()) / scale;
-            camera.target.y = (initialMousePosition.y  - GetMouseY()) / scale;
-        }
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            initialMousePosition.x = initialMousePosition.y = 0;
         }
 
 
@@ -97,6 +111,12 @@ int main(void) {
                     float t = (float) i / samples;
                     DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
                 }
+
+                // x
+                DrawText("1", 1 * RAD2DEG - MeasureText("1", 5), 0, 5, BLACK);
+                // y
+                DrawText("1", -5, (1 * RAD2DEG - MeasureText("1", 5)) *  1, 5, BLACK);
+                DrawText("1", -5, (1 * RAD2DEG - MeasureText("1", 5)) * -1, 5, BLACK);
             EndMode2D();
         EndDrawing();
         
