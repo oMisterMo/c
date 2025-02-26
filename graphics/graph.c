@@ -18,14 +18,18 @@ int main(void) {
 
 
     // vars
-    size_t samples = 8;
+
+    const float RADIUS = 2;
+    size_t samples = 16;
     float in[samples];
 
+    printf("\n=====================\n");
     for (size_t i = 0; i < samples; ++i) {
         float t = (float) i / samples;
         printf("t = %.2f, ", t);
         in[i] = sinf(2 * PI * t) ;
     }
+    printf("\n=====================\n\n");
 
     RenderTexture target = LoadRenderTexture(screenWidth, screenHeight);
 
@@ -92,7 +96,6 @@ int main(void) {
 
 
         // draw
-        const float RADIUS = 3;
         BeginDrawing();
             ClearBackground(RAYWHITE);
             BeginMode2D(camera);
@@ -100,9 +103,16 @@ int main(void) {
                 DrawLine(0, -100, 0, 100, BLACK);
                 // Draw x-axis
                 DrawLine(-100, 0, 100, 0, BLACK);
+                // x
+                DrawText("1", 1 * RAD2DEG - MeasureText("1", 5), 0, 5, BLACK);
+                // y
+                DrawText("1", -5, (1 * RAD2DEG - MeasureText("1", 5)) *  1, 5, BLACK);
+                DrawText("-1", -5, (1 * RAD2DEG - MeasureText("1", 5)) * -1, 5, BLACK);
+
+                // Draw Points
                 for (size_t i = 0; i < samples; ++i) {
                     float t = (float) i / samples;
-                    in[i] = sinf(2 * PI * t) ;
+                    // in[i] = sinf(2 * PI * t) ;
                     DrawCircle(t * RAD2DEG, in[i] * RAD2DEG, RADIUS, RED);
                 }
 
@@ -112,11 +122,6 @@ int main(void) {
                     DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
                 }
 
-                // x
-                DrawText("1", 1 * RAD2DEG - MeasureText("1", 5), 0, 5, BLACK);
-                // y
-                DrawText("1", -5, (1 * RAD2DEG - MeasureText("1", 5)) *  1, 5, BLACK);
-                DrawText("1", -5, (1 * RAD2DEG - MeasureText("1", 5)) * -1, 5, BLACK);
             EndMode2D();
         EndDrawing();
         
