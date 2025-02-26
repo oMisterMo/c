@@ -126,7 +126,7 @@ int main(void) {
 
         // update
         seconds += GetFrameTime();
-        printf("%.2f\n", sinf(seconds));
+        printf("%.2f secs, sinf() =%.2f\n", seconds, sinf(seconds));
         SetShaderValue(shader_1, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
 
         KeepRectOnScreen(&rect);

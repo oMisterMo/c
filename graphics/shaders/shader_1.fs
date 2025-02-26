@@ -18,20 +18,22 @@ uniform int screenHeight;                 // Height of the screen
 
 uniform float seconds;
 
-void basic();
+void lerp_green_blue();
+void lightning();
 
 // fragTexCoor is dependant on canvas/texture/what we are drawing
 // ran on each pixel
 void main()
 {
 
-    basic();
+    // lerp_green_blue();
+    // lightning();
 
 }
 
 
-void basic() {
-    float frequency = 4.0;
+void lerp_green_blue() {
+    float frequency = 2.0;
     float color = sin ( seconds * frequency );
 
     if (color < 0) color*=-1;
@@ -40,4 +42,12 @@ void basic() {
     float x = fragTexCoord.x;
     float y = fragTexCoord.y;
     finalColor = vec4(x, 1., color, 1); // r, g, b, a
+}
+
+void lightning() {
+    float frequency = 3.0;
+    float color = sin ( seconds * frequency );
+    if (color < 0.1) color = 0.1;
+
+    finalColor = vec4(color, color, color, 1); // r, g, b, a
 }
