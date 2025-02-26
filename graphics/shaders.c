@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "raylib.h"
+#include "raymath.h"
 
 typedef struct {
     Rectangle rect;
@@ -125,7 +126,7 @@ int main(void) {
 
         // update
         seconds += GetFrameTime();
-        printf("%.2f\n", seconds);
+        printf("%.2f\n", sinf(seconds));
         SetShaderValue(shader_1, secondsLoc, &seconds, SHADER_UNIFORM_FLOAT);
 
         KeepRectOnScreen(&rect);
