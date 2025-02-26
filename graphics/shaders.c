@@ -137,8 +137,8 @@ int main(void) {
             ClearBackground(WHITE);
 
             // Shader stuff - Texture height must be flipped
-            // BasicShader(&game);
-            IntermediateShader(&game);
+            BasicShader(&game);
+            // IntermediateShader(&game);
 
             // Normal drawing
             DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
