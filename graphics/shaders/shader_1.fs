@@ -18,13 +18,21 @@ uniform int screenHeight;                 // Height of the screen
 
 uniform float seconds;
 
+void basic();
+
 // fragTexCoor is dependant on canvas/texture/what we are drawing
 // ran on each pixel
 void main()
 {
 
-    float frequency = 1.0;
-    float color = sin ( seconds );
+    basic();
+
+}
+
+
+void basic() {
+    float frequency = 4.0;
+    float color = sin ( seconds * frequency );
 
     if (color < 0) color*=-1;
 
@@ -32,6 +40,4 @@ void main()
     float x = fragTexCoord.x;
     float y = fragTexCoord.y;
     finalColor = vec4(x, 1., color, 1); // r, g, b, a
-
 }
-
