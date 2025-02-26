@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include "raylib.h"
 
+typedef struct {
+    Rectangle rect;
+    RenderTexture2D target;
+    Texture2D texture;
+    Rectangle src;
+    Rectangle dest;
+    int screenWidth;
+    int screenHeight;
+} Game;
+
 void KeepRectOnScreen(Rectangle *rect) {
     if (rect->x > GetScreenWidth()) {
         rect->x = -rect->width;
@@ -8,6 +18,25 @@ void KeepRectOnScreen(Rectangle *rect) {
     if (rect->y > GetScreenHeight()) {
         rect->y = -rect->height;
     }
+}
+
+void BasicShader(Game *game) {
+    Rectangle rect = game->rect;
+    RenderTexture2D target = game->target;
+    int screenWidth = game->screenWidth;
+    int screenHeight = game->screenHeight;
+    Texture2D texture = game->texture;
+    Rectangle src = game->src;
+
+    // Shader on shape? [doesn't work on shapes]
+    // DrawRectangleRec(rect, RED);
+
+    // Reular texture - Overlayed with shader fragments [incorrect flip]
+    // DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
+
+    // Empty texture spanning the full screen
+    // DrawTexture(target.texture, 0, 0, WHITE);    [incorrect flip]
+    DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight }, (Vector2) { 0, 0 }, WHITE);
 }
 
 int main(void) {
@@ -42,10 +71,14 @@ int main(void) {
     // Shader shader = LoadShader(NULL, "./shaders/grayscale.fs");
     // Shader shader = LoadShader(NULL, NULL);
 
-
-    // printf("\n\nGetShaderLocation %d\n\n", GetShaderLocation(shader, "/shaders/simple"));
-    // SetShaderValue(shader, GetShaderLocation(shader, "screenWidth"), &screenWidth, SHADER_UNIFORM_INT);
-    // SetShaderValue(shader, 16, &screenHeight, SHADER_UNIFORM_INT);
+    Game game = {
+        .rect = rect,
+        .target = target,
+        .texture = texture,
+        .src = src,
+        .screenWidth = screenWidth,
+        .screenHeight = screenHeight,
+    };
 
     SetTargetFPS(60);
 
@@ -71,31 +104,17 @@ int main(void) {
         
         
         // draw
-
-        // 2D camera stuff
-        // BeginTextureMode(target);
-        //     ClearBackground(RED);
-        // EndTextureMode();
-
         BeginDrawing();
             ClearBackground(GRAY);
 
-            // Shader stuff
+            // Shader stuff - Texture height must be flipped
             BeginShaderMode(shader);
-                // Texture height must be flipped
-
-                // DrawRectangleRec(rect, RED);
-                // DrawTexture(target.texture, 0, 0, WHITE);
-                DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight }, (Vector2) { 0, 0 }, WHITE);
-                // DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
+                BasicShader(&game);
             EndShaderMode();
-        
-        // Normal drawing
-        DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
 
-
-    
-        DrawFPS(20, 20);
+            // Normal drawing
+            DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
+            DrawFPS(20, 20);
         EndDrawing();
     }
 
