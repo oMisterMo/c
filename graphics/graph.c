@@ -113,7 +113,7 @@ int main(void) {
                 for (size_t i = 0; i < samples; ++i) {
                     float t = (float) i / samples;
                     // in[i] = sinf(2 * PI * t) ;
-                    DrawCircle(t * RAD2DEG, in[i] * RAD2DEG, RADIUS, RED);
+                    DrawCircle(t * RAD2DEG, 1 - (in[i] * RAD2DEG), RADIUS, RED);
                 }
 
                 // Draw sample lines
