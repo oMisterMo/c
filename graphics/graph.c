@@ -8,7 +8,9 @@
 
 int main(void) {
 
-
+    printf("-------------------\n");
+    printf("Init Window\n");
+    printf("-------------------\n");
     int screenWidth = 900;
     int screenHeight = 600;
     InitWindow(screenWidth, screenHeight, "Graph");
@@ -25,81 +27,76 @@ int main(void) {
     }
 
     RenderTexture target = LoadRenderTexture(screenWidth, screenHeight);
-    float scale = 2;
-    target.texture.width * scale;
-    target.texture.height * scale;
-    float xOff = 100;
-    float yOff = 100;
 
     Camera2D camera = { 0 };
     camera.target = (Vector2){ 0 };
     camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom = 2.5f;
 
     SetTargetFPS(60);
+
+    printf("-------------------\n");
+    printf("GAME\n");
+    printf("-------------------\n");
+
     while (!WindowShouldClose()) {
 
+        // input
+        // Camera rotation controls
+        if (IsKeyDown(KEY_A)) camera.rotation--;
+        else if (IsKeyDown(KEY_S)) camera.rotation++;
 
-        // BeginTextureMode(target);
+        // Limit camera rotation to 80 degrees (-40 to 40)
+        if (camera.rotation > 40) camera.rotation = 40;
+        else if (camera.rotation < -40) camera.rotation = -40;
+        // Camera zoom controls
+        camera.zoom += ((float)GetMouseWheelMove()*0.05f);
 
-        //     DrawLine(xOff + 0, yOff + -100, xOff + 0,   yOff + 100, BLACK);
-        //     DrawLine(xOff + -100, yOff + 0, xOff + 100, yOff + 0, BLACK);
+        if (camera.zoom > 3.0f) camera.zoom = 3.0f;
+        else if (camera.zoom < 0.1f) camera.zoom = 0.1f;
+
+        // Camera reset (zoom and rotation)
+        if (IsKeyPressed(KEY_R))
+        {
+            camera.zoom = 2.5f;
+            camera.rotation = 0.0f;
+        }
 
 
-        //     for (size_t i = 0; i < samples; ++i) {
-        //         float t = (float) i / samples;
-        
-        //         in[i] = sinf(2 * PI * t) ;
-
-        //         DrawCircle(xOff + t * RAD2DEG, yOff + in[i] * RAD2DEG, 5, RED);
-        //     }
-
-        // EndTextureMode();
+        // update
 
 
-
-        const float scale = 4;
+        // draw
+        const float RADIUS = 3;
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-            DrawTexture(target.texture, 0, 0, WHITE);
-            // DrawTextureRec(
-            //     target.texture,
-            //     (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight },
-            //     (Vector2) { GetScreenWidth() / 2 - target.texture.width / 8, GetScreenHeight() / 2 - target.texture.height / 8 },
-            //     WHITE
-            // );
-            // Rectangle src = { 0, 0, (float)screenWidth, (float)-screenHeight };
-            // Rectangle dest = (Rectangle) { GetScreenWidth() / 2 - target.texture.width / 8, GetScreenHeight() / 2 - target.texture.height / 8, target.texture.width * scale, target.texture.height * scale };
-            // DrawTexturePro(
-            //     target.texture,
-            //     src,
-            //     dest,
-            //     (Vector2) {0}, 0,
-            //     WHITE
-            // );
-
-            // DrawTextureEx(target.texture, (Vector2) { - 200, - 100}, 0, 2, WHITE);
-
+            ClearBackground(RAYWHITE);
             BeginMode2D(camera);
-                DrawLine(xOff + 0, yOff + -100, xOff + 0,   yOff + 100, BLACK);
-                DrawLine(xOff + -100, yOff + 0, xOff + 100, yOff + 0, BLACK);
-
+                // Draw y-axis
+                DrawLine(0, -100, 0, 100, BLACK);
+                // Draw x-axis
+                DrawLine(-100, 0, 100, 0, BLACK);
                 for (size_t i = 0; i < samples; ++i) {
                     float t = (float) i / samples;
-            
                     in[i] = sinf(2 * PI * t) ;
+                    DrawCircle(t * RAD2DEG, in[i] * RAD2DEG, RADIUS, RED);
+                }
 
-                    DrawCircle(xOff + t * RAD2DEG, yOff + in[i] * RAD2DEG, 5, RED);
+                // Draw sample lines
+                for (size_t i = 0; i < samples; ++i) {
+                    float t = (float) i / samples;
+
+                    DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.3f));
                 }
             EndMode2D();
-
         EndDrawing();
         
     }
     
-    
+    printf("-------------------\n");
+    printf("Destroy\n");
+    printf("-------------------\n");
+
     UnloadRenderTexture(target);
     CloseWindow();
 
