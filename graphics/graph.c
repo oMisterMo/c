@@ -28,11 +28,14 @@ int main(void) {
 
     RenderTexture target = LoadRenderTexture(screenWidth, screenHeight);
 
+    Vector2 initialMousePosition = {};
+    float scale = 2.5f;
+
     Camera2D camera = { 0 };
     camera.target = (Vector2){ 0 };
     camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 2.5f;
+    camera.zoom = 1.0f * scale;
 
     SetTargetFPS(60);
 
@@ -57,6 +60,19 @@ int main(void) {
             camera.rotation = 0.0f;
         }
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            initialMousePosition.x = GetMouseX();
+            initialMousePosition.y = GetMouseY();
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            printf("%f\n",initialMousePosition.x  - GetMouseX());
+            camera.target.x = (initialMousePosition.x  - GetMouseX()) / scale;
+            camera.target.y = (initialMousePosition.y  - GetMouseY()) / scale;
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            initialMousePosition.x = initialMousePosition.y = 0;
+        }
+
 
         // update
 
@@ -79,7 +95,6 @@ int main(void) {
                 // Draw sample lines
                 for (size_t i = 0; i < samples; ++i) {
                     float t = (float) i / samples;
-
                     DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
                 }
             EndMode2D();
