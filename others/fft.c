@@ -2,20 +2,18 @@
 #include <math.h>
 
 #define PI atan2f(1, 1) * 4
+size_t samples = 8;
+// size_t samples = 4096 * 2;
 
-int main(void) {
+enum SAMPLE_SIZE {
+    SAMEPLE_LOW = 256,
+    SAMEPLE_MEDIUM = 512,
+    SAMEPLE_HIGH = 1024,
+    SAMEPLE_HIGHER = 2048,
+    SAMEPLE_HIGHEST = 4096,
+};
 
-    printf("%lf\n\n", PI);
-
-
-    size_t samples = 8;
-
-    // Sample size
-    float in[samples];
-
-    // Output measured in hz (0 hz, 1 hz, 2 hz, ... 8 hz)
-    float out[samples];
-
+void dft(float in[], float out[]) {
     for (size_t i = 0; i < samples; ++i) {
         float t = (float) i / samples;
         // printf("t = %.2f, ", t);
@@ -29,6 +27,20 @@ int main(void) {
             out[f] += in[i] * sinf( 2 * PI * f * t );
         }
     }
+}
+
+int main(void) {
+
+    printf("%lf\n\n", PI);
+
+
+    // Sample size
+    float in[samples];
+
+    // Output measured in hz (0 hz, 1 hz, 2 hz, ... 8 hz)
+    float out[samples];
+
+    dft(in, out);
 
     // Print frequencies
     printf("%8s %6s\n", "Frequency", "Value");
