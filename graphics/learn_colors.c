@@ -132,6 +132,7 @@ int main() {
         drawCursor(cursorTexture, cursorPressedTexture);
         drawScore(game.score);
         drawStars(stars);
+        DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));
 
         EndDrawing();
 
