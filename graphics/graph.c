@@ -31,7 +31,7 @@ Texture2D GenerateCheckedTexture() {
     int width = GetMonitorWidth(1);
     int height = GetMonitorHeight(1);
     // Dynamic memory allocation to store pixels data (Color type)
-    const float FADE = 0.2f;
+    const float FADE = 0.08f;
     Color *pixels = (Color *)malloc(width*height*sizeof(Color));
     for (int y = 0; y < height; y++)
     {
