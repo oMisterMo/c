@@ -63,3 +63,20 @@ void flags() {
     printf("is four set: %d\n", isFourSet);
 
 }
+
+void more_flags() {
+    // ATTEMPT 1 [00000001]
+    printf("%d\n", (1 << 0));
+    printf("%d\n", (1 << 1));
+    printf("%d\n", (1 << 2));
+    printf("%d\n", (1 << 3));
+    
+    // ATTEMPT 2 [00000001]
+    printf("============");
+    printf("\n");
+    for (int i = 0; i < 12; ++i) {
+        printf("%d\n", (1 << i));
+    }
+    printf("============");
+    printf("\n");
+}
