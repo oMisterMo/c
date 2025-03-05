@@ -1,10 +1,17 @@
 #include "raylib.h"
 #include "reasings.h"
+#include "raymath.h"
 #include "presentation.h"
 
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+
+int screenWidth = 960;
+int screenHeight = 600;
+
+int gameScreenWidth = 960;
+int gameScreenHeight = 600;
 
 
 #define NO_OF_TRAYS 3
@@ -46,6 +53,9 @@
 
 #define MIN_NO_OF_TRAYS 2   // unused
 #define MAX_NO_OF_TRAYS 8   // unused
+
+#define MAX(a, b) ((a)>(b)? (a) : (b))
+#define MIN(a, b) ((a)<(b)? (a) : (b))
 
 typedef enum {
     IDLE = 0,
@@ -106,6 +116,7 @@ typedef struct Game {
     int counter;
     Texture2D nPatchTexture;
     NPatchInfo nPatchSrc;
+    Vector2 virtualMouse;
 } Game;
 
 
@@ -137,8 +148,8 @@ void initTrays(Game *game) {
     int trayStartX = -(TRAY_WIDTH * NO_OF_TRAYS) / 2;
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         Rectangle dest = {
-            trayStartX + GetScreenWidth() / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
-            GetScreenHeight() - TRAY_HEIGHT - PADDING,
+            trayStartX + gameScreenWidth / 2 + (TRAY_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_TRAYS - 1)) / 2,
+            gameScreenHeight - TRAY_HEIGHT - PADDING,
             TRAY_WIDTH,
             TRAY_HEIGHT
         };
@@ -158,7 +169,7 @@ void initCards(Game *game) {
     int cardStartX = -(CARD_WIDTH * NO_OF_CARDS) / 2;
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Vector2 startPosition = {
-            cardStartX + GetScreenWidth() / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
+            cardStartX + gameScreenWidth / 2 + (CARD_WIDTH * i) + (i * GAP) - (GAP * (NO_OF_CARDS - 1)) / 2,
             PADDING
         };
         int id = GetRandomValue(0, NO_OF_TRAYS - 1);
@@ -193,7 +204,7 @@ void initCards(Game *game) {
     }
 }
 
-void handleInput(Game *game) {
+void handleInput(Game *game, float scale) {
     Tray *trays = game->trays;
     Card *cards = game->cards;
     Color *colors = game->colors;
@@ -206,7 +217,17 @@ void handleInput(Game *game) {
     }
 
 
-    Vector2 touchPosition = GetTouchPosition(0);
+    // Update virtual mouse (clamped mouse value behind game screen)
+    // Vector2 mouse = GetMousePosition();
+    // Vector2 touchPosition = GetTouchPosition(0);
+
+    Vector2 mouse = GetTouchPosition(0);
+    Vector2 virtualMouse = { 0 };
+    virtualMouse.x = (mouse.x - (GetScreenWidth() - (gameScreenWidth*scale))*0.5f)/scale;
+    virtualMouse.y = (mouse.y - (GetScreenHeight() - (gameScreenHeight*scale))*0.5f)/scale;
+    virtualMouse = Vector2Clamp(virtualMouse, (Vector2){ 0, 0 }, (Vector2){ (float)gameScreenWidth, (float)gameScreenHeight });
+
+    game->virtualMouse = virtualMouse;
 
     // Handle Tray
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
@@ -224,14 +245,14 @@ void handleInput(Game *game) {
         // Pointer arithmetic to get the next card
         Card *card = (cards + i);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(GetTouchPosition(0), card->dest)) {
+            if (CheckCollisionPointRec(virtualMouse, card->dest)) {
                 card->isDragging = true;
             }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (card->isDragging) {
-                card->dest.x = touchPosition.x - card->dest.width / 2;
-                card->dest.y = touchPosition.y - card->dest.height / 2;
+                card->dest.x = virtualMouse.x - card->dest.width / 2;
+                card->dest.y = virtualMouse.y - card->dest.height / 2;
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -263,7 +284,7 @@ void handleInput(Game *game) {
                         // Get free starts object
                         // Set the properties
                         // Add to list
-                        stars->position = (Vector2) { GetTouchX() - stars->texture->width / NUM_FRAMES_STARS / 2, GetTouchY() - stars->texture->height / 2 };
+                        stars->position = (Vector2) { virtualMouse.x - stars->texture->width / NUM_FRAMES_STARS / 2, virtualMouse.y - stars->texture->height / 2 };
                         stars->sheet.isAnimating = true;
 
 
@@ -278,7 +299,7 @@ void handleInput(Game *game) {
                     printf("Reset Card...\n");
                     if (isTweenCard && !isOff) {
                         card->state = TWEEN;
-                        card->currentPosition = (Vector2) { touchPosition.x - card->dest.width / 2, touchPosition.y - card->dest.height / 2 };
+                        card->currentPosition = (Vector2) { virtualMouse.x - card->dest.width / 2, virtualMouse.y - card->dest.height / 2 };
                     } else {
                         card->dest.x = card->targetPosition.x;
                         card->dest.y = card->targetPosition.y;
@@ -386,10 +407,10 @@ void drawBackground(Texture2D layers[], double *increment, int order[]) {
         int row = 0;
 
         // For each layer on the y axis
-        while (startY < GetScreenHeight() + height * 2) {
+        while (startY < gameScreenHeight + height * 2) {
 
             int index = order[row % 4];
-            int clampedW = (width - GetScreenWidth()) / 2;
+            int clampedW = (width - gameScreenWidth) / 2;
             int speed = 0;
 
             if (isPrarallaxBackground && !isOff) {
@@ -440,12 +461,13 @@ void drawCards(Card cards[], Texture2D check) {
         }
     }
 }
-void drawCursor(Texture2D cursor, Texture2D cursorPressed) {
+void drawCursor(Vector2 virtualMouse, Texture2D cursor, Texture2D cursorPressed, float scale) {
     if (isShowCursor && IsCursorOnScreen() && !isOff) {
+        virtualMouse = Vector2SubtractValue(virtualMouse, 17);
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            DrawTexture(cursorPressed, GetMouseX(), GetMouseY(), WHITE);
+            DrawTexture(cursorPressed, virtualMouse.x, virtualMouse.y, WHITE);
         } else {
-            DrawTexture(cursor, GetMouseX(), GetMouseY(), WHITE);
+            DrawTexture(cursor, virtualMouse.x, virtualMouse.y, WHITE);
         }
     }
 }

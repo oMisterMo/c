@@ -8,8 +8,7 @@ int main() {
     printf("-------------------\n");
     printf("INIT WINDOW\n");
     printf("-------------------\n");
-    int screenWidth = 960;
-    int screenHeight = 600;
+
     // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
     SetMousePosition(-10, -10);
@@ -25,6 +24,11 @@ int main() {
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
+    // Render texture initialization, used to hold the rendering result so we can easily resize it
+    RenderTexture2D target = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
+    // SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);  // Texture scale filter to use
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);  // Texture scale filter to use
+
     Texture2D checkTexture = LoadTexture("resources/sprites/check.png");
     Texture2D cloudsTexture[NO_OF_CLOUDS];
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
@@ -86,7 +90,8 @@ int main() {
         .counter = 0,
         .stars = &stars,
         .nPatchTexture = nPatchTexture,
-        .nPatchSrc = srcInfo
+        .nPatchSrc = srcInfo,
+        .virtualMouse = { 0 }
      };
 
     // Rectangle trays[NO_OF_TRAYS];
@@ -115,24 +120,37 @@ int main() {
     printf("-------------------\n");
 
     while(!WindowShouldClose()) {
+
+        // Compute required framebuffer scaling
+        float scale = MIN((float)GetScreenWidth()/gameScreenWidth, (float)GetScreenHeight()/gameScreenHeight);
+
         // Input
-        handleInput(&game);
+        handleInput(&game, scale);
 
         // Update
         updateCards(game.cards);
         updateStars(game.stars);
 
+        BeginTextureMode(target);
+            ClearBackground(WHITE);
+            drawBackground(cloudsTexture, &increment, order);
+            drawTrays(game.trays);
+            drawCards(game.cards, checkTexture);
+            drawCursor(game.virtualMouse, cursorTexture, cursorPressedTexture, scale);
+            drawScore(game.score);
+            drawStars(stars);
+            DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));
+            DrawFPS(gameScreenWidth - MeasureText("60 FPS", 20) - 20, 20);
+        EndTextureMode();
+
         // Draw
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        drawBackground(cloudsTexture, &increment, order);
-        drawTrays(game.trays);
-        drawCards(game.cards, checkTexture);
-        drawCursor(cursorTexture, cursorPressedTexture);
-        drawScore(game.score);
-        drawStars(stars);
-        DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));
+            ClearBackground(RAYWHITE);
+            ClearBackground(BLACK);
+            // Draw render texture to screen, properly scaled
+            DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
+                           (Rectangle){ (GetScreenWidth() - ((float)gameScreenWidth*scale))*0.5f, (GetScreenHeight() - ((float)gameScreenHeight*scale))*0.5f,
+                           (float)gameScreenWidth*scale, (float)gameScreenHeight*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
         EndDrawing();
 
@@ -141,7 +159,9 @@ int main() {
     printf("-------------------\n");
     printf("DESTROY\n");
     printf("-------------------\n");
+
     // Textures
+    UnloadRenderTexture(target);
     UnloadTexture(checkTexture);
     for (int i = 0; i < NO_OF_CLOUDS; ++i) {
         UnloadTexture(cloudsTexture[i]);
