@@ -326,10 +326,14 @@ void handleInput(Game *game, float scale) {
 
 }
 
+/**
+ * Card cards[] is interpreted as Card *card
+ */
 void updateCards(Card cards[]) {
     if (isTweenCard && !isOff) {
         for (int i = 0; i < NO_OF_CARDS; ++i) {
             Card *card = (cards + i);
+            // Card *card = &cards[i];
             if (card->state == TWEEN) {
                 card->frameCounter++;
                 // printf("cards[%d].frameCounter: %d\n", i,card->frameCounter);
