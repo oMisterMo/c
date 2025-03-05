@@ -443,7 +443,6 @@ void drawCards(Card cards[], Texture2D check) {
     for (int i = 0; i < NO_OF_CARDS; ++i) {
         Card card = cards[i];
         if (isDrawCard && !isOff) {
-
             DrawTextureNPatch(card.nPatchTexture, card.nPatchSrc, card.dest, (Vector2) { 0 }, 0, WHITE);
             DrawTexturePro(card.imgTexture, card.imgSrc, card.dest, (Vector2) { 0 }, 0, WHITE);
             // DrawRectangleRoundedLinesEx(card.dest, 0.3f, 16, 6, ColorAlpha(PINK, 0.5f));
@@ -463,6 +462,7 @@ void drawCards(Card cards[], Texture2D check) {
 }
 void drawCursor(Vector2 virtualMouse, Texture2D cursor, Texture2D cursorPressed, float scale) {
     if (isShowCursor && IsCursorOnScreen() && !isOff) {
+        // Subtract the offset of cursor tip
         virtualMouse = Vector2SubtractValue(virtualMouse, 17);
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             DrawTexture(cursorPressed, virtualMouse.x, virtualMouse.y, WHITE);
