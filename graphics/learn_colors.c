@@ -2,6 +2,15 @@
 #include "learn_colors.h"
 
 
+// Debug stuff
+bool DEBUG = true;
+bool HasValueChanged(float value, float previous) {
+    return value != previous;
+}
+float previousScale = 0;
+// End Debug
+
+
 int main() {
 
     // Setup config
@@ -118,11 +127,17 @@ int main() {
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
-
     while(!WindowShouldClose()) {
 
         // Compute required framebuffer scaling
         float scale = MIN((float)GetScreenWidth()/gameScreenWidth, (float)GetScreenHeight()/gameScreenHeight);
+
+        if (DEBUG) {
+            if (HasValueChanged(scale, previousScale)) {
+                printf("scale: %.2f\n", scale);
+                previousScale = scale;
+            }
+        }
 
         // Input
         handleInput(&game, scale);
@@ -136,7 +151,7 @@ int main() {
             drawBackground(cloudsTexture, &increment, order);
             drawTrays(game.trays);
             drawCards(game.cards, checkTexture);
-            drawCursor(game.virtualMouse, cursorTexture, cursorPressedTexture, scale);
+            drawCursor(game.virtualMouse, cursorTexture, cursorPressedTexture);
             drawScore(game.score);
             drawStars(stars);
             DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));

@@ -460,7 +460,7 @@ void drawCards(Card cards[], Texture2D check) {
         }
     }
 }
-void drawCursor(Vector2 virtualMouse, Texture2D cursor, Texture2D cursorPressed, float scale) {
+void drawCursor(Vector2 virtualMouse, Texture2D cursor, Texture2D cursorPressed) {
     if (isShowCursor && IsCursorOnScreen() && !isOff) {
         // Subtract the offset of cursor tip
         virtualMouse = Vector2SubtractValue(virtualMouse, 17);
