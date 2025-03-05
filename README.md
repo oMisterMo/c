@@ -36,7 +36,7 @@ cd graphics
 ```
 Now build the app, replacing &lt;file&gt; with the path of the c program
 ```
-cc <file> -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+cc <file> -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -Wall -Wextra -Werror -std=c99
 ```
 And execute using
 ```
