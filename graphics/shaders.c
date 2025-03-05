@@ -41,7 +41,7 @@ void BasicShader(Game *game) {
         // DrawTexturePro(texture, src, rect, (Vector2){ 0, 0 }, 0, WHITE);
 
         // Empty texture spanning the full screen
-        // DrawTexture(target.texture, 0, 0, WHITE);    [incorrect flip]
+        // DrawTexture(target.texture, 0, 0, WHITE);    //[incorrect flip]
         DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)screenWidth, (float)-screenHeight }, (Vector2) { 0, 0 }, WHITE);
     EndShaderMode();
 }
