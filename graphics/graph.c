@@ -17,6 +17,9 @@
 #include "raylib.h"
 #include "raymath.h"
 
+int screenWidth = 900;
+int screenHeight = 600;
+
 // #define PI atan2f(1, 1) * 4
 enum SAMPLE_SIZE {
     SAMEPLE_LOW = 256,
@@ -92,15 +95,25 @@ void HandleInput(Camera2D *camera) {
     }
 
     // Camera reset (zoom and rotation)
-    if (IsKeyPressed(KEY_R))
-    {
+    if (IsKeyPressed(KEY_R)) {
         camera->zoom = 2.5f;
         camera->rotation = 0.0f;
         camera->target = (Vector2) { 0 };
-        // camera->offset = (Vector2) { 0 };
+        camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
     }
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
+
+        if (IsWindowFullscreen()) {
+            printf("Fullscreen\n");
+            screenWidth = GetMonitorWidth(2);
+            screenHeight = GetMonitorHeight(2);
+        } else {
+            printf("Windowed\n");
+            screenWidth = 900;
+            screenHeight = 600;
+        }
+
         camera->target.x = 0;
         camera->target.y = 0;
     }
@@ -116,13 +129,13 @@ void DrawGrid2D() {
     DrawLine(-100, 1 * RAD2DEG, 100, 1 * RAD2DEG, Fade(GRAY, 0.2f));
     DrawLine(-100, -1 * RAD2DEG, 100, -1 * RAD2DEG, Fade(GRAY, 0.2f));
     // y
-    DrawText("1",
-        -5 - MeasureText("1", 5),   // x
-        (1 * RAD2DEG) * 1 - 3,      // y
-        5, BLACK);
     DrawText("-1",
-        -5 - MeasureText("-1", 5),  // x
-        (1 * RAD2DEG) * -1 - 3,     // y
+        -5 - MeasureText("-1", 5),      // x
+        (1 * RAD2DEG) * 1 - 3,          // y
+        5, BLACK);
+    DrawText("1",
+        -5 - MeasureText("1", 5),       // x
+        (1 * RAD2DEG) * -1 - 3,         // y
         5, BLACK);
 }
 void DrawSamplePoints(float *in) {
@@ -153,8 +166,7 @@ int main(void) {
     printf("-------------------\n");
     printf("Init Window\n");
     printf("-------------------\n");
-    int screenWidth = 900;
-    int screenHeight = 600;
+
     InitWindow(screenWidth, screenHeight, "Graph");
 
     printf("-------------------\n");
@@ -195,9 +207,12 @@ int main(void) {
         BeginDrawing();
             ClearBackground(RAYWHITE);
             DrawTexture(checked, 0, 0, Fade(WHITE, 0.5f));
+
             BeginMode2D(camera);
                 DrawGraph(in);
             EndMode2D();
+
+            DrawText(TextFormat("zoom: %.2f", camera.zoom), 20, 20, 20, BLACK);
         EndDrawing();
     }
     
