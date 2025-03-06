@@ -83,12 +83,7 @@ int main() {
         .frameSpeed = 10
      };
 
-    Animation stars = {
-        .texture = &starsTexture,
-        .position = (Vector2) { 0 },
-        .sheet = starsSheet,
-        .isAnimating = false
-     };
+    Animation stars[NO_OF_STARS];
 
     Game game = {
         .colors = (Color[]) { RED, GREEN, BLUE, ORANGE, PINK, PURPLE, SKYBLUE, GRAY },
@@ -97,13 +92,14 @@ int main() {
         .frameCounter = 0,
         .score = 0,
         .counter = 0,
-        .stars = &stars,
+        .stars = stars,
         .nPatchTexture = nPatchTexture,
         .nPatchSrc = srcInfo,
         .virtualMouse = { 0 }
      };
 
     // Rectangle trays[NO_OF_TRAYS];
+    initStars(stars, &starsTexture, starsSheet);
     initTrays(&game);
     initCards(&game);
 

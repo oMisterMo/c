@@ -26,6 +26,7 @@ int gameScreenHeight = 600;
 #define MAX_GESTURE_STRINGS 20
 #define NO_OF_COLORS 8
 #define NO_OF_CLOUDS 4      // 4 cloud sprites
+#define NO_OF_STARS 4
 #define NUM_FRAMES_STARS 8
 
 // https://gcc.gnu.org/onlinedocs/gcc-13.3.0/cpp/Defined.html - simplify
@@ -140,6 +141,17 @@ void SetRandomSourceRec(Rectangle *rect) {
     rect->y = 32 * GetRandomValue(0, 4);
 }
 
+void initStars(Animation *stars, Texture2D *starsTexture, Spritesheet starsSheet) {
+    for (int i = 0; i < NO_OF_STARS; ++i) {
+        stars[i] = (Animation) {
+            .texture = starsTexture,
+            .position = (Vector2) { 0 },
+            .sheet = starsSheet,
+            .isAnimating = false
+         };
+    }
+
+}
 void initTrays(Game *game) {
     Tray *trays = game->trays;
     Color *colors = game->colors;
@@ -280,14 +292,15 @@ void handleInput(Game *game, float scale) {
                         ++(game->score);
 
 
-
-                        // Get free starts object
-                        // Set the properties
-                        // Add to list
-                        stars->position = (Vector2) { virtualMouse.x - stars->texture->width / NUM_FRAMES_STARS / 2, virtualMouse.y - stars->texture->height / 2 };
-                        stars->isAnimating = true;
-
-
+                        // Find a slot thats not animating and start animating
+                        for (int i = 0; i < NO_OF_STARS; ++i) {
+                            Animation *star = stars + i;
+                            if (!star->isAnimating) {
+                                star->position = (Vector2) { virtualMouse.x - star->texture->width / NUM_FRAMES_STARS / 2, virtualMouse.y - star->texture->height / 2 };
+                                star->isAnimating = true;
+                                break;
+                            }
+                        }
 
 
                         if (isAudio && !isOff) PlaySFX(sfx.click);
@@ -369,32 +382,28 @@ void updateCards(Card cards[]) {
 }
 void updateStars(Animation *stars) {
     // Loop through all stars, and animate otherwise do nothing to empty array
-    if (!(stars->isAnimating)) return;
-    stars->sheet.frameCounter++;
+    for (int i = 0; i < NO_OF_STARS; ++i) {
+        Animation *star = stars + i;
 
-    // Slow down frame speed
-    if (stars->sheet.frameCounter >= (GetFPS() / stars->sheet.frameSpeed)) {
-        // Time to update current frame index and reset counter
-        stars->sheet.frameCounter = 0;
-        stars->sheet.currentFrame++;
-
-        // Ensure frame index stays within bounds
-        if (stars->sheet.currentFrame > NUM_FRAMES_STARS - 1) {
-
-
-
-            // Star animation is complete
-            // Reset it members
-            // Remove current reference from the list
-            stars->sheet.currentFrame = 0;
-            stars->isAnimating = false;
-
-
-
+        if (star->isAnimating) {
+            star->sheet.frameCounter++;
+            // Slow down frame speed
+            if (star->sheet.frameCounter >= (GetFPS() / star->sheet.frameSpeed)) {
+                // Time to update current frame index and reset counter
+                star->sheet.frameCounter = 0;
+                star->sheet.currentFrame++;
+                // Ensure frame index stays within bounds
+                if (star->sheet.currentFrame > NUM_FRAMES_STARS - 1) {
+                    // Star animation is complete
+                    // Reset it members
+                    // Remove current reference from the list
+                    star->sheet.currentFrame = 0;
+                    star->isAnimating = false;
+                }
+                // Update source rect (index * width)
+                star->sheet.frameRec.x = (float) star->sheet.currentFrame * (float) star->texture->width / NUM_FRAMES_STARS;
+            }
         }
-
-        // Update source rect (index * width)
-        stars->sheet.frameRec.x = (float) stars->sheet.currentFrame * (float) stars->texture->width / NUM_FRAMES_STARS;
 
     }
 }
@@ -478,10 +487,14 @@ void drawCursor(Vector2 virtualMouse, Texture2D cursor, Texture2D cursorPressed)
 void drawScore(int score) {
     DrawText((TextFormat("Score: %d", score)), 20, 20, 30, GRAY);
 }
-void drawStars(Animation stars) {
+void drawStars(Animation *stars) {
     // Loop through all stars, and draw otherwise do nothing to empty array
-    if (stars.isAnimating && isAnimateStars && !isOff) {
-        DrawTextureRec(*stars.texture, stars.sheet.frameRec, stars.position , WHITE);
+    for (int i = 0; i < NO_OF_STARS; ++i) {
+
+        Animation *star = stars + i;
+        if (star->isAnimating && isAnimateStars && !isOff) {
+            DrawTextureRec(*(star->texture), star->sheet.frameRec, star->position , WHITE);
+        }
     }
 }
 
