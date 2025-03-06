@@ -94,6 +94,8 @@ void declare_initialize() {
  */
 void multi_dimensional() {
     // 2 Col x 3 Rows
+    // 2 arrays, with 3 elements each
+    // [[],[],[]], [[],[],[]]
     int matrix[2][3] = { 
         {1, 4, 2}, 
         {3, 6, 8} 
