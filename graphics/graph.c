@@ -27,7 +27,7 @@ enum SAMPLE_SIZE {
 };
 
 const float RADIUS = 1;
-const size_t samples = 1 << 4;
+const size_t SAMPLES = 1 << 4;
 
 
 Texture2D GenerateCheckedTexture() {
@@ -127,8 +127,8 @@ void DrawGrid2D() {
 }
 void DrawSamplePoints(float *in) {
     // Draw Points
-    for (size_t i = 0; i < samples; ++i) {
-        float t = (float) i / samples;
+    for (size_t i = 0; i < SAMPLES; ++i) {
+        float t = (float) i / SAMPLES;
         // in[i] = sinf(2 * PI * t) ;
         float x = t * RAD2DEG;
         float y = (in[i] * RAD2DEG);
@@ -137,8 +137,8 @@ void DrawSamplePoints(float *in) {
 }
 void DrawVerticalSampleLines() {
     // Draw sample lines
-    for (size_t i = 0; i < samples; ++i) {
-        float t = (float) i / samples;
+    for (size_t i = 0; i < SAMPLES; ++i) {
+        float t = (float) i / SAMPLES;
         DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
     }
 }
@@ -165,9 +165,9 @@ int main(void) {
     printf("-------------------\n");
     printf("Init Variables\n");
     printf("-------------------\n");
-    float in[samples];
-    for (size_t i = 0; i < samples; ++i) {
-        float t = (float) i / samples;
+    float in[SAMPLES];
+    for (size_t i = 0; i < SAMPLES; ++i) {
+        float t = (float) i / SAMPLES;
         in[i] = sinf(2 * PI * t);
         // printf("t = %.2f, ", t);
     }
