@@ -149,18 +149,31 @@ void multi_dimensional_pointers() {
     // 2 Col x 3 Rows
     // 2 arrays, with 3 elements each
     // [[],[],[]], [[],[],[]]
-    int matrix[2][3] = {
+    int arr[2][3] = {
         {1, 4, 2},
         {3, 6, 8}
     };
 
-    // arr[i][j] = *(arr[i] + j)
-    // arr[i][j] = *(*(arr + i) + j)
+    // 1D array
+    // arr[i] =         arr[i]
+    // arr[i] =         *(arr + i)
+
+    // 2D array
+    // arr[i][j] =      arr[i][j]
+    // arr[i][j] =      *(arr[i] + j)
+    // arr[i][j] =      *(*(arr + i) + j)
+
+    // 3D array
+    // arr[i][j][k] =   arr[i][j][k]
+    // arr[i][j][k] =   *(arr[i][j] + k)
+    // arr[i][j][k] =   *(*(arr[i] + j) + k)
+    // arr[i][j][k] =   *(*(*(arr + i) + j) + k)
+
     // Loop and print the values
     int cols, rows;
     for (cols = 0; cols < 2; cols++) {
         for (rows = 0; rows < 3; rows++) {
-            printf("%d ", *(*(matrix + cols) + rows));
+            printf("%d ", *(*(arr + cols) + rows));
         }
         printf("\n");
     }
@@ -168,7 +181,15 @@ void multi_dimensional_pointers() {
     printf("\n");
 
     // A pointer to an array of 3 elements
-    int (*p)[3] = matrix;
+    int (*p)[3] = arr;
+
+    printf("-----------\n");
+    printf("arr:       %p\n", arr);
+    printf("*arr:      %p\n", *arr);
+    printf("arr[0]:    %p\n", arr[0]);
+    printf("arr[0][0]: %p\n", &arr[0][0]);
+    printf("-----------\n");
+    printf("\n");
 
     printf("%p\n", p);
     printf("%p\n", p + 1);
@@ -180,10 +201,26 @@ void multi_dimensional_pointers() {
     printf("[0][2]: %d\n", first_col[2]);
     printf("[1][2]: %d\n", second_col[2]);
 
-    printf("\n");
-    // printf("sizeof(matrix[0]): %ld\n", sizeof(matrix[0]));
-    // printf("sizeof(p): %ld\n", sizeof(matrix[0]));
+    // printf("\n");
+    // printf("sizeof(arr[0]): %ld\n", sizeof(arr[0]));
+    // printf("sizeof(p): %ld\n", sizeof(arr[0]));
     // printf("%ld\n", (p + 1) - p);
     // printf("%ld\n", (p + 2) - (p + 1));
 
+}
+
+void array_1d(int *arr) {
+    printf("%d\n", arr[0]);
+}
+
+void array_2d(int (*arr)[2]) {
+    printf("%d\n", arr[0][0]);
+}
+
+void array_2d_(int arr[][2]) {
+    printf("%d\n", arr[0][0]);
+}
+
+void array_3d(int (*arr)[2][2]) {
+    printf("%d\n", arr[0][0][1]);
 }
