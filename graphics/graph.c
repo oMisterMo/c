@@ -27,7 +27,7 @@ enum SAMPLE_SIZE {
 };
 
 const float RADIUS = 1;
-const size_t samples = 8;
+const size_t samples = 1 << 4;
 
 
 Texture2D GenerateCheckedTexture() {
@@ -106,7 +106,7 @@ void HandleInput(Camera2D *camera) {
     }
 }
 
-void DrawGraph(float *in) {
+void DrawGrid2D() {
     // Draw y-axis
     DrawLine(0, -100, 0, 100, BLACK);
     // Draw x-axis
@@ -124,7 +124,8 @@ void DrawGraph(float *in) {
         -5 - MeasureText("-1", 5),  // x
         (1 * RAD2DEG) * -1 - 3,     // y
         5, BLACK);
-
+}
+void DrawSamplePoints(float *in) {
     // Draw Points
     for (size_t i = 0; i < samples; ++i) {
         float t = (float) i / samples;
@@ -133,12 +134,18 @@ void DrawGraph(float *in) {
         float y = (in[i] * RAD2DEG);
         DrawCircle(x, -y, RADIUS, RED);
     }
-
+}
+void DrawVerticalSampleLines() {
     // Draw sample lines
     for (size_t i = 0; i < samples; ++i) {
         float t = (float) i / samples;
         DrawLine(t * RAD2DEG, -100, t * RAD2DEG, 100, Fade(GRAY, 0.2f));
     }
+}
+void DrawGraph(float *in) {
+    DrawGrid2D();
+    DrawSamplePoints(in);
+    DrawVerticalSampleLines();
 }
 
 int main(void) {
@@ -162,7 +169,7 @@ int main(void) {
     for (size_t i = 0; i < samples; ++i) {
         float t = (float) i / samples;
         in[i] = sinf(2 * PI * t);
-        printf("t = %.2f, ", t);
+        // printf("t = %.2f, ", t);
     }
 
     // Camera
