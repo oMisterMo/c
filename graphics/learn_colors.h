@@ -68,13 +68,13 @@ typedef struct Spritesheet {
     int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
     int frameCounter;
     int frameSpeed;
-    bool isAnimating;
 } Spritesheet;
 
 typedef struct Animation {
     Texture2D *texture;
     Vector2 position;
     Spritesheet sheet;
+    bool isAnimating;
 } Animation;
 
 typedef struct Card {
@@ -285,7 +285,7 @@ void handleInput(Game *game, float scale) {
                         // Set the properties
                         // Add to list
                         stars->position = (Vector2) { virtualMouse.x - stars->texture->width / NUM_FRAMES_STARS / 2, virtualMouse.y - stars->texture->height / 2 };
-                        stars->sheet.isAnimating = true;
+                        stars->isAnimating = true;
 
 
 
@@ -369,7 +369,7 @@ void updateCards(Card cards[]) {
 }
 void updateStars(Animation *stars) {
     // Loop through all stars, and animate otherwise do nothing to empty array
-    if (!(stars->sheet.isAnimating)) return;
+    if (!(stars->isAnimating)) return;
     stars->sheet.frameCounter++;
 
     // Slow down frame speed
@@ -387,7 +387,7 @@ void updateStars(Animation *stars) {
             // Reset it members
             // Remove current reference from the list
             stars->sheet.currentFrame = 0;
-            stars->sheet.isAnimating = false;
+            stars->isAnimating = false;
 
 
 
@@ -480,7 +480,7 @@ void drawScore(int score) {
 }
 void drawStars(Animation stars) {
     // Loop through all stars, and draw otherwise do nothing to empty array
-    if (stars.sheet.isAnimating && isAnimateStars && !isOff) {
+    if (stars.isAnimating && isAnimateStars && !isOff) {
         DrawTextureRec(*stars.texture, stars.sheet.frameRec, stars.position , WHITE);
     }
 }

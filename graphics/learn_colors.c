@@ -80,14 +80,14 @@ int main() {
         .currentFrame = 0,
         .currentLine = 0,
         .frameCounter = 0,
-        .frameSpeed = 10,
-        .isAnimating = false
+        .frameSpeed = 10
      };
 
     Animation stars = {
         .texture = &starsTexture,
         .position = (Vector2) { 0 },
-        .sheet = starsSheet
+        .sheet = starsSheet,
+        .isAnimating = false
      };
 
     Game game = {
