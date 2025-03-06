@@ -5,6 +5,7 @@ void array_pointers();
 void simple_pointers();
 void pointer_arithmetic();
 void function_pointers(int*, int*);
+void multi_dimensional_pointers();
 
 /**
  * Pointers are variables that store the memory address of another variable.
@@ -17,12 +18,13 @@ void function_pointers(int*, int*);
  */
 int main() {
     
-    simple_pointers();
-
+    // simple_pointers();
     // array_pointers();
 
     // int a = 1, b = 2;
     // function_pointers(&a, &b);
+
+    multi_dimensional_pointers();
 
     printf("\n");
     return 0;
@@ -141,4 +143,47 @@ void function_pointers(int* a, int* b) {
     (*a) *= 2;
     (*b) *= 2;
     printf("after: (%d  %d)\n", *a, *b);
+}
+
+void multi_dimensional_pointers() {
+    // 2 Col x 3 Rows
+    // 2 arrays, with 3 elements each
+    // [[],[],[]], [[],[],[]]
+    int matrix[2][3] = {
+        {1, 4, 2},
+        {3, 6, 8}
+    };
+
+    // arr[i][j] = *(arr[i] + j)
+    // arr[i][j] = *(*(arr + i) + j)
+    // Loop and print the values
+    int cols, rows;
+    for (cols = 0; cols < 2; cols++) {
+        for (rows = 0; rows < 3; rows++) {
+            printf("%d ", *(*(matrix + cols) + rows));
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+    // A pointer to an array of 3 elements
+    int (*p)[3] = matrix;
+
+    printf("%p\n", p);
+    printf("%p\n", p + 1);
+    printf("%p\n", p + 2);
+
+    int *first_col = *p;
+    int *second_col = *(p + 1);
+    printf("\n");
+    printf("[0][2]: %d\n", first_col[2]);
+    printf("[1][2]: %d\n", second_col[2]);
+
+    printf("\n");
+    // printf("sizeof(matrix[0]): %ld\n", sizeof(matrix[0]));
+    // printf("sizeof(p): %ld\n", sizeof(matrix[0]));
+    // printf("%ld\n", (p + 1) - p);
+    // printf("%ld\n", (p + 2) - (p + 1));
+
 }
