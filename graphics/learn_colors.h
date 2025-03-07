@@ -7,11 +7,13 @@
 #include <stdbool.h>
 #include <math.h>
 
-int screenWidth = 960;
-int screenHeight = 600;
+const int INITIAL_SCREEN_WIDTH = 2880 / 3;
+const int INITIAL_SCREEN_HEIGHT = 1920 / 3;
 
-int gameScreenWidth = 960;
-int gameScreenHeight = 600;
+int screenWidth = INITIAL_SCREEN_WIDTH;
+int screenHeight = INITIAL_SCREEN_HEIGHT;
+int gameScreenWidth = INITIAL_SCREEN_WIDTH;
+int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
 
 
 #define NO_OF_TRAYS 3
@@ -222,7 +224,16 @@ void handleInput(Game *game, float scale) {
     Color *colors = game->colors;
     Animation *stars = game->stars;
 
-    if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
+        if (IsWindowFullscreen()) {
+            screenWidth  = GetMonitorWidth(GetCurrentMonitor());
+            screenHeight = GetMonitorHeight(GetCurrentMonitor());
+        } else {
+            screenWidth = INITIAL_SCREEN_WIDTH;
+            screenHeight = INITIAL_SCREEN_HEIGHT;
+        }
+    }
     if (IsKeyPressed(KEY_R)) {
         reset(&game->score);
         initCards(game);
@@ -235,8 +246,8 @@ void handleInput(Game *game, float scale) {
 
     Vector2 mouse = GetTouchPosition(0);
     Vector2 virtualMouse = { 0 };
-    virtualMouse.x = (mouse.x - (GetScreenWidth() - (gameScreenWidth*scale))*0.5f)/scale;
-    virtualMouse.y = (mouse.y - (GetScreenHeight() - (gameScreenHeight*scale))*0.5f)/scale;
+    virtualMouse.x = (mouse.x - (screenWidth - (gameScreenWidth*scale))*0.5f)/scale;
+    virtualMouse.y = (mouse.y - (screenHeight - (gameScreenHeight*scale))*0.5f)/scale;
     virtualMouse = Vector2Clamp(virtualMouse, (Vector2){ 0, 0 }, (Vector2){ (float)gameScreenWidth, (float)gameScreenHeight });
 
     game->virtualMouse = virtualMouse;
