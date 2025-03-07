@@ -1,4 +1,5 @@
-// RAYLIB_H
+#ifndef LEARN_COLORS_
+#define LEARN_COLORS_
 
 #include "raylib.h"
 
@@ -39,3 +40,5 @@ void UnloadSFX() {
     UnloadSound(sfx.popup);
     CloseAudioDevice();
 }
+
+#endif // LEARN_COLORS_
