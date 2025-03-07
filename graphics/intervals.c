@@ -7,13 +7,13 @@ typedef void (*Function)();
 
 typedef struct Timer {
     // Public members
-    int duration;
+    float duration;
     bool repeat;
     bool autostart;
     Function callback;
 
     // Private members, please no edit
-    int _start_time;
+    float _start_time;
     bool _active;
 } Timer;
 
@@ -24,18 +24,18 @@ void ActivateTimer(Timer *t) {
 
 void DeactivateTimer(Timer *t) {
     t->_active = false;
-    t->_start_time = 0;
+    t->_start_time = 0.0f;
     if (t->repeat) {
         ActivateTimer(t);
     }
 }
 
-void InitTimer(Timer *t, int duration, bool repeat, bool autostart, Function callback) {
+void InitTimer(Timer *t, float duration, bool repeat, bool autostart, Function callback) {
     t->duration = duration;
     t->repeat = repeat;
     t->callback = callback;
 
-    t-> _start_time = 0;
+    t-> _start_time = 0.0f;
     t->_active = false;
 
     if (autostart) {
@@ -50,8 +50,8 @@ void UpdateTimer(Timer *t) {
             // Reached the time
 
             printf("\n\n");
-            printf("start: %d\n", t->_start_time);
-            printf(":) %d seconds\n", t->duration);
+            printf("start: %.2f\n", t->_start_time);
+            printf(":) %.2f seconds\n", t->duration);
             if (t->callback != NULL) {
                 // RUN THE CALLBACK, I DONT KNOW HOW YET.
                 t->callback();
@@ -85,7 +85,7 @@ int main() {
     // ATTEMPT 2
     printf("sizeof(Timer): %ld\n", sizeof(Timer));
     Timer t = { 0 };
-    InitTimer(&t, 2, true, true, callback);
+    InitTimer(&t, 1.5f, true, true, callback);
 
     SetTargetFPS(60);
     printf("-------------------\n");
