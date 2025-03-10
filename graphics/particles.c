@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "raylib.h"
+#include "math.h"
 
 
 typedef enum {
@@ -52,7 +53,7 @@ int main() {
     printf("size of Game: %ld\n", sizeof(Game));
 
     Rectangle src = { 0, 0, star.width, star.height };
-    Rectangle dest = { (GetScreenWidth() - star. width ) / 2, (GetScreenHeight() - star. height ) / 2,
+    Rectangle dest = { (GetScreenWidth()) / 2, (GetScreenHeight()) / 2,
         star.width, star.height };
 
     
@@ -73,7 +74,11 @@ int main() {
         ClearBackground(BLACK);
 
 
-        DrawTexturePro(star, src, dest, (Vector2) { 0 }, 0 , WHITE);
+        DrawTexturePro(star, src, dest, (Vector2) { star.width / 2, star.height / 2 },
+        sinf(GetTime()) * 180 , WHITE);
+
+        // DrawRectangleRec(src, BLUE);
+        DrawRectangleRec(dest, RED);
 
 
         EndDrawing();
