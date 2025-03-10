@@ -24,17 +24,6 @@ typedef struct Animation {
 
 typedef struct Game {
     int id;
-    // Card cards[NO_OF_CARDS];
-    // Tray trays[NO_OF_TRAYS];
-    // Color *colors;
-    // Texture2D *cardTextures;
-    // Texture2D *trayTexture;
-    // Animation *stars;
-    // int frameCounter;
-    // int score;
-    // int counter;
-    // Texture2D nPatchTexture;
-    // NPatchInfo nPatchSrc;
 } Game;
 
 
@@ -54,12 +43,17 @@ int main() {
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
+    Texture2D star = LoadTexture("resources/sprites/star-fill.png");
 
     printf("-------------------\n");
     printf("Init Variables\n");
     printf("-------------------\n");
     Game game = { 0 };
     printf("size of Game: %ld\n", sizeof(Game));
+
+    Rectangle src = { 0, 0, star.width, star.height };
+    Rectangle dest = { (GetScreenWidth() - star. width ) / 2, (GetScreenHeight() - star. height ) / 2,
+        star.width, star.height };
 
     
     SetTargetFPS(60);
@@ -76,7 +70,10 @@ int main() {
 
         // Draw
         BeginDrawing();
-        ClearBackground(DARKGRAY);
+        ClearBackground(BLACK);
+
+
+        DrawTexturePro(star, src, dest, (Vector2) { 0 }, 0 , WHITE);
 
 
         EndDrawing();
@@ -87,6 +84,7 @@ int main() {
     printf("DESTROY\n");
     printf("-------------------\n");
 
+    UnloadTexture(star);
     CloseWindow();
 
 
