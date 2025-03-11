@@ -21,29 +21,29 @@ typedef enum {
 } TweenState;
 
 typedef struct Spritesheet {
-    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
+    Rectangle srcRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
     int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
     int frameCounter;
     int frameSpeed;
-    bool isAnimating;
 } Spritesheet;
 
 typedef struct Animation {
     Texture2D texture;          // multiple images
-    Vector2 position;
+    Rectangle position;
     Vector2 velocity;
     Vector2 acceleration;
     Spritesheet sheet;
-    Rectangle src;
+    Vector2 origin;
+    bool isAnimating;
 } Animation;
 
 typedef struct Sprite {
     Texture2D texture;          // single image
-    Vector2 position;
+    Rectangle position;
     Vector2 velocity;
     Vector2 acceleration;
-    Rectangle src;
+    Vector2 origin;
 } Sprite;
 
 typedef struct Game {
@@ -148,6 +148,19 @@ int main() {
     Rectangle flowerSrc = { 0, 0, flowerW, flowerH };
     Rectangle flowerDest = { 0, 0, flowerW, flowerH };
     Vector2 flowersOrigin = { flowerDest.width / 2, flowerDest.height / 2 };
+    Animation flower = {
+        .texture = flowers,
+        .sheet = {
+            .currentFrame = 0,
+            .currentLine = 0,
+            .frameCounter = 0,
+            .frameSpeed = 0,
+            .srcRec = (Rectangle) { 0, 0, flowerW, flowerH }
+        },
+        .position = (Rectangle) { flowerDest.x, flowerDest.y, flowerW, flowerH },
+        .origin = (Vector2) { flowerDest.width / 2, flowerDest.height / 2 },
+        .isAnimating = false,
+    };
 
     // Camera
     Camera2D camera = { 0 };
@@ -167,7 +180,9 @@ int main() {
         // Input
         HandleInput(&camera);
         // Update
-
+        // flower.position.x++;
+        // camera.target.x = flower.position.x;
+        // camera.target.y = flower.position.y;
         // Draw
         BeginDrawing();
             ClearBackground(BLACK);
@@ -180,7 +195,8 @@ int main() {
 
                 // Draw shape
                 // DrawTexturePro(star, src, dest, origin, sinf(GetTime()) * 90 , WHITE);
-                DrawTexturePro(flowers, flowerSrc, flowerDest, flowersOrigin, sinf(GetTime()) * 90 , WHITE);
+                // DrawTexturePro(flowers, flowerSrc, flowerDest, flowersOrigin, sinf(GetTime()) * 90 , WHITE);
+                DrawTexturePro(flower.texture, flower.sheet.srcRec, flower.position, flower.origin, sinf(GetTime()) * 90 , WHITE);
             EndMode2D();
         EndDrawing();
 
