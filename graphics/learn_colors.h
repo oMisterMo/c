@@ -66,7 +66,7 @@ typedef enum {
 } TweenState;
 
 typedef struct Spritesheet {
-    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
+    Rectangle srcRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis. ( frameRect.x * currentFrame )
     int currentLine;            // The current frame, y-axis. ( frameRect.y * currentLine )
     int frameCounter;
@@ -412,7 +412,7 @@ void updateStars(Animation *stars) {
                     star->isAnimating = false;
                 }
                 // Update source rect (index * width)
-                star->sheet.frameRec.x = (float) star->sheet.currentFrame * (float) star->texture->width / NUM_FRAMES_STARS;
+                star->sheet.srcRec.x = (float) star->sheet.currentFrame * (float) star->texture->width / NUM_FRAMES_STARS;
             }
         }
 
@@ -504,7 +504,7 @@ void drawStars(Animation *stars) {
 
         Animation *star = stars + i;
         if (star->isAnimating && isAnimateStars && !isOff) {
-            DrawTextureRec(*(star->texture), star->sheet.frameRec, star->position , WHITE);
+            DrawTextureRec(*(star->texture), star->sheet.srcRec, star->position , WHITE);
         }
     }
 }

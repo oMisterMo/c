@@ -9,7 +9,7 @@
 #define NUM_LINES_SLIME 3
 
 typedef struct Spritesheet {
-    Rectangle frameRec;         // Draw a part of a texture defined by a rectangle
+    Rectangle srcRec;         // Draw a part of a texture defined by a rectangle
     int currentFrame;           // The current frame, x-axis
     int currentLine;            // The current frame, y-axis
     int frameCounter;
@@ -33,7 +33,7 @@ void updateBunny(Spritesheet *bunnySheet, Texture2D bunnyTexture) {
         if (bunnySheet->currentFrame > NUM_FRAMES_BUNNY - 2) bunnySheet->currentFrame = 0;
 
         // Update source rect
-        bunnySheet->frameRec.x = (float) bunnySheet->currentFrame * (float) bunnyTexture.width / NUM_FRAMES_BUNNY;
+        bunnySheet->srcRec.x = (float) bunnySheet->currentFrame * (float) bunnyTexture.width / NUM_FRAMES_BUNNY;
 
 
     }
@@ -51,7 +51,7 @@ void updateButton(Spritesheet *buttonSheet, Texture2D buttonTexture) {
 
         if (buttonSheet->currentLine > NUM_LINES_BUTTON - 1) buttonSheet->currentLine = 0;
 
-        buttonSheet->frameRec.y = (float) buttonSheet->currentLine * (float) buttonTexture.height / NUM_LINES_BUTTON;
+        buttonSheet->srcRec.y = (float) buttonSheet->currentLine * (float) buttonTexture.height / NUM_LINES_BUTTON;
     }
 }
 
@@ -79,8 +79,8 @@ void updateSlime(Spritesheet *slimeSheet, Texture2D slimeTexture) {
         slimeSheet->frameCounter = 0;
 
 
-        slimeSheet->frameRec.x = frameWidth * slimeSheet->currentFrame;
-        slimeSheet->frameRec.y = frameHeight * slimeSheet->currentLine;
+        slimeSheet->srcRec.x = frameWidth * slimeSheet->currentFrame;
+        slimeSheet->srcRec.y = frameHeight * slimeSheet->currentLine;
 
     }
 }
@@ -98,14 +98,14 @@ int main() {
 
     //============================
     Spritesheet bunnySheet = { 0 };
-    bunnySheet.frameRec = (Rectangle) { 0, 0, bunnyTexture.width / NUM_FRAMES_BUNNY, bunnyTexture.height };
+    bunnySheet.srcRec = (Rectangle) { 0, 0, bunnyTexture.width / NUM_FRAMES_BUNNY, bunnyTexture.height };
     bunnySheet.currentFrame = 0;
     bunnySheet.currentLine = 0;
     bunnySheet.frameCounter = 0;
     bunnySheet.frameSpeed = 5;
     //============================
     Spritesheet buttonSheet = { 0 };
-    buttonSheet.frameRec = (Rectangle) { 0, 0, buttonTexture.width, buttonTexture.height / NUM_LINES_BUTTON };
+    buttonSheet.srcRec = (Rectangle) { 0, 0, buttonTexture.width, buttonTexture.height / NUM_LINES_BUTTON };
     buttonSheet.currentLine = 0;
     buttonSheet.frameCounter = 0;
     buttonSheet.frameSpeed = 1;
@@ -113,7 +113,7 @@ int main() {
     float frameWidth =  (float) (slimeTexture.width / NUM_FRAMES_SLIME);
     float frameHeight = (float) (slimeTexture.height / NUM_LINES_SLIME);
     Spritesheet slimeSheet = { 0 };
-    slimeSheet.frameRec = (Rectangle) { 0, 0, frameWidth, frameHeight };
+    slimeSheet.srcRec = (Rectangle) { 0, 0, frameWidth, frameHeight };
     slimeSheet.currentLine = 0;
     slimeSheet.frameCounter = 0;
     slimeSheet.frameSpeed = 4;
@@ -132,9 +132,9 @@ int main() {
         BeginDrawing();
         ClearBackground(ORANGE);
 
-        DrawTextureRec(bunnyTexture, bunnySheet.frameRec, (Vector2) { 0 } , WHITE);
-        DrawTextureRec(buttonTexture, buttonSheet.frameRec, (Vector2) { bunnyTexture.width / NUM_FRAMES_BUNNY, 0 } , WHITE);
-        DrawTextureRec(slimeTexture, slimeSheet.frameRec, (Vector2) { 0, bunnyTexture.height } , WHITE);
+        DrawTextureRec(bunnyTexture, bunnySheet.srcRec, (Vector2) { 0 } , WHITE);
+        DrawTextureRec(buttonTexture, buttonSheet.srcRec, (Vector2) { bunnyTexture.width / NUM_FRAMES_BUNNY, 0 } , WHITE);
+        DrawTextureRec(slimeTexture, slimeSheet.srcRec, (Vector2) { 0, bunnyTexture.height } , WHITE);
 
         EndDrawing();
 
