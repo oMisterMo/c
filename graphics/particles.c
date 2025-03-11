@@ -44,7 +44,8 @@ int main() {
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
-    Texture2D star = LoadTexture("resources/sprites/star-fill.png");
+    // Texture2D star = LoadTexture("resources/sprites/star-fill.png");
+    Texture2D star = LoadTexture("resources/sprites/stars_icon_hover.png");
 
     printf("-------------------\n");
     printf("Init Variables\n");
@@ -55,6 +56,7 @@ int main() {
     Rectangle src = { 0, 0, star.width, star.height };
     Rectangle dest = { (GetScreenWidth()) / 2, (GetScreenHeight()) / 2,
         star.width, star.height };
+    Vector2 origin = { star.width / 2, star.height / 2 };
 
     
     SetTargetFPS(60);
@@ -74,12 +76,13 @@ int main() {
         ClearBackground(BLACK);
 
 
-        DrawTexturePro(star, src, dest, (Vector2) { star.width / 2, star.height / 2 },
-        sinf(GetTime()) * 180 , WHITE);
-
+        // Draw bounds
         // DrawRectangleRec(src, BLUE);
-        DrawRectangleRec(dest, RED);
+        // DrawRectanglePro(dest, origin, 0, Fade(RED, 0.4f));
 
+        // Draw shape
+        DrawTexturePro(star, src, dest, origin,
+        sinf(GetTime()) * 90 , WHITE);
 
         EndDrawing();
 
