@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include "raylib.h"
+#include "raymath.h"
 #include "math.h"
 
+const int INITIAL_WIDTH = 960;
+const int INITIAL_HEIGHT = 600;
+int screenWidth = INITIAL_WIDTH;
+int screenHeight = INITIAL_HEIGHT;
 
 typedef enum {
     IDLE = 0,
@@ -28,14 +33,67 @@ typedef struct Game {
 } Game;
 
 
+void HandleInput(Camera2D *camera) {
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        Vector2 delta = GetMouseDelta();
+        delta = Vector2Scale(delta, -1.0f/camera->zoom);
+        camera->target = Vector2Add(camera->target, delta);
+    }
+
+    // Camera zoom center of screen
+    camera->zoom += ((float)GetMouseWheelMove()*0.4f);
+
+    // Zoom based on mouse wheel
+    float wheel = GetMouseWheelMove();
+    if (wheel != 0){
+        // Get the world point that is under the mouse
+        Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), *camera);
+
+        // Set the offset to where the mouse is
+        camera->offset = GetMousePosition();
+
+        // Set the target to match, so that the camera maps the world space point
+        // under the cursor to the screen space point under the cursor at any zoom
+        camera->target = mouseWorldPos;
+
+        // Zoom increment
+        float scaleFactor = 1.0f + (0.25f*fabsf(wheel));
+        if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
+        camera->zoom = Clamp(camera->zoom*scaleFactor, 1.0f, 64.0f);
+    }
+
+    // Camera reset (zoom and rotation)
+    if (IsKeyPressed(KEY_R)) {
+        camera->zoom = 1.0f;
+        camera->rotation = 0.0f;
+        camera->target = (Vector2) { 0 };
+        camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
+    }
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
+
+        if (IsWindowFullscreen()) {
+            printf("Fullscreen\n");
+            screenWidth = GetMonitorWidth(2);
+            screenHeight = GetMonitorHeight(2);
+        } else {
+            printf("Windowed\n");
+            screenWidth = INITIAL_WIDTH;
+            screenHeight = INITIAL_HEIGHT;
+        }
+
+        camera->target.x = 0;
+        camera->target.y = 0;
+    }
+}
+
+
 int main() {
 
     // Setup config
     printf("-------------------\n");
     printf("INIT WINDOW\n");
     printf("-------------------\n");
-    int screenWidth = 960;
-    int screenHeight = 600;
     // SetConfigFlags( FLAG_WINDOW_UNDECORATED );
     InitWindow(screenWidth, screenHeight, "Learn Colors");
 
@@ -54,9 +112,16 @@ int main() {
     printf("size of Game: %ld\n", sizeof(Game));
 
     Rectangle src = { 0, 0, star.width, star.height };
-    Rectangle dest = { (GetScreenWidth()) / 2, (GetScreenHeight()) / 2,
+    Rectangle dest = { 0, 0,
         star.width, star.height };
     Vector2 origin = { star.width / 2, star.height / 2 };
+
+    // Camera
+    Camera2D camera = { 0 };
+    camera.target = (Vector2){ 0 };
+    camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 
     
     SetTargetFPS(60);
@@ -65,25 +130,23 @@ int main() {
     printf("GAME\n");
     printf("-------------------\n");
 
-
     while(!WindowShouldClose()) {
         // Input
-
+        HandleInput(&camera);
         // Update
 
         // Draw
         BeginDrawing();
         ClearBackground(BLACK);
+            BeginMode2D(camera);
+                // Draw bounds
+                // DrawRectangleRec(src, BLUE);
+                // DrawRectanglePro(dest, origin, 0, Fade(RED, 0.4f));
 
-
-        // Draw bounds
-        // DrawRectangleRec(src, BLUE);
-        // DrawRectanglePro(dest, origin, 0, Fade(RED, 0.4f));
-
-        // Draw shape
-        DrawTexturePro(star, src, dest, origin,
-        sinf(GetTime()) * 90 , WHITE);
-
+                // Draw shape
+                DrawTexturePro(star, src, dest, origin,
+                sinf(GetTime()) * 90 , WHITE);
+            EndMode2D();
         EndDrawing();
 
     }
