@@ -30,10 +30,19 @@ typedef struct Spritesheet {
 } Spritesheet;
 
 typedef struct Animation {
-    Texture2D *texture;
+    Texture2D texture;          // multiple images
     Vector2 position;
+    Vector2 velocity;
+    Vector2 acceleration;
     Spritesheet sheet;
 } Animation;
+
+typedef struct Sprite {
+    Texture2D texture;          // single image
+    Vector2 position;
+    Vector2 velocity;
+    Vector2 acceleration;
+};
 
 typedef struct Game {
     int id;
