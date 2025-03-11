@@ -8,6 +8,8 @@ const int INITIAL_HEIGHT = 600;
 int screenWidth = INITIAL_WIDTH;
 int screenHeight = INITIAL_HEIGHT;
 
+const int GRID_LINE_LENGTH = 10500;
+
 typedef enum {
     IDLE = 0,
     TWEEN,
@@ -137,8 +139,10 @@ int main() {
 
         // Draw
         BeginDrawing();
-        ClearBackground(BLACK);
+            ClearBackground(BLACK);
             BeginMode2D(camera);
+            DrawLine(-GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, 0, Fade(WHITE, 0.3f));
+            DrawLine(0, -GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, Fade(WHITE, 0.3f));
                 // Draw bounds
                 // DrawRectangleRec(src, BLUE);
                 // DrawRectanglePro(dest, origin, 0, Fade(RED, 0.4f));
