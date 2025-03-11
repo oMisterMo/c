@@ -8,6 +8,7 @@ const int INITIAL_SCREEN_WIDTH = 960;
 const int INITIAL_SCREEN_HEIGHT = 600;
 const float INITIAL_CAMERA_ZOOM = 2.5f;
 const float INITIAL_CAMERA_ROATION = 0.0f; // deg
+const int NO_OF_FLOWERS = 8;
 
 int screenWidth = INITIAL_SCREEN_WIDTH;
 int screenHeight = INITIAL_SCREEN_HEIGHT;
@@ -125,11 +126,17 @@ int main() {
     Game game = { 0 };
     printf("size of Game: %ld\n", sizeof(Game));
 
+    // Star
     Rectangle src = { 0, 0, star.width, star.height };
-    Rectangle dest = { 0, 0,
-        star.width, star.height };
+    Rectangle dest = { 0, 0, star.width, star.height };
     Vector2 origin = { star.width / 2, star.height / 2 };
-    Rectangle flowerSrc = { 0, 0, flowers.width / 8, flowers.height / 2 };
+
+    // Flower
+    int flowerW = flowers.width / NO_OF_FLOWERS;
+    int flowerH = flowers.height / 2;
+    Rectangle flowerSrc = { 0, 0, flowerW, flowerH };
+    Rectangle flowerDest = { 0, 0, flowerW, flowerH };
+    Vector2 flowersOrigin = { flowerDest.width / 2, flowerDest.height / 2 };
 
     // Camera
     Camera2D camera = { 0 };
@@ -162,7 +169,7 @@ int main() {
 
                 // Draw shape
                 // DrawTexturePro(star, src, dest, origin, sinf(GetTime()) * 90 , WHITE);
-                DrawTexturePro(flowers, flowerSrc, dest, origin, sinf(GetTime()) * 90 , WHITE);
+                DrawTexturePro(flowers, flowerSrc, flowerDest, flowersOrigin, sinf(GetTime()) * 90 , WHITE);
             EndMode2D();
         EndDrawing();
 
