@@ -35,6 +35,7 @@ typedef struct Animation {
     Vector2 velocity;
     Vector2 acceleration;
     Spritesheet sheet;
+    Rectangle src;
 } Animation;
 
 typedef struct Sprite {
@@ -42,6 +43,7 @@ typedef struct Sprite {
     Vector2 position;
     Vector2 velocity;
     Vector2 acceleration;
+    Rectangle src;
 } Sprite;
 
 typedef struct Game {
