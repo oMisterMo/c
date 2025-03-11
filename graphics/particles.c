@@ -38,6 +38,29 @@ typedef struct Game {
     int id;
 } Game;
 
+void ToggleFullscreenCamera(Camera2D *camera) {
+    ToggleFullscreen();
+
+    if (IsWindowFullscreen()) {
+        printf("Fullscreen\n");
+        screenWidth = GetMonitorWidth(2);
+        screenHeight = GetMonitorHeight(2);
+    } else {
+        printf("Windowed\n");
+        screenWidth = INITIAL_SCREEN_WIDTH;
+        screenHeight = INITIAL_SCREEN_HEIGHT;
+    }
+
+    camera->target.x = 0;
+    camera->target.y = 0;
+}
+
+void ResetCamera(Camera2D *camera) {
+    camera->zoom = INITIAL_CAMERA_ZOOM;
+    camera->rotation = INITIAL_CAMERA_ROATION;
+    camera->target = (Vector2) { 0 };
+    camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
+}
 
 void HandleInput(Camera2D *camera) {
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
@@ -70,26 +93,10 @@ void HandleInput(Camera2D *camera) {
 
     // Camera reset (zoom and rotation)
     if (IsKeyPressed(KEY_R)) {
-        camera->zoom = INITIAL_CAMERA_ZOOM;
-        camera->rotation = INITIAL_CAMERA_ROATION;
-        camera->target = (Vector2) { 0 };
-        camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
+        ResetCamera(camera);
     }
     if (IsKeyPressed(KEY_F)) {
-        ToggleFullscreen();
-
-        if (IsWindowFullscreen()) {
-            printf("Fullscreen\n");
-            screenWidth = GetMonitorWidth(2);
-            screenHeight = GetMonitorHeight(2);
-        } else {
-            printf("Windowed\n");
-            screenWidth = INITIAL_SCREEN_WIDTH;
-            screenHeight = INITIAL_SCREEN_HEIGHT;
-        }
-
-        camera->target.x = 0;
-        camera->target.y = 0;
+        ToggleFullscreenCamera(camera);
     }
 }
 
