@@ -42,7 +42,7 @@ typedef struct Sprite {
     Vector2 position;
     Vector2 velocity;
     Vector2 acceleration;
-};
+} Sprite;
 
 typedef struct Game {
     int id;
