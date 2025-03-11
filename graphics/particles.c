@@ -3,12 +3,16 @@
 #include "raymath.h"
 #include "math.h"
 
-const int INITIAL_WIDTH = 960;
-const int INITIAL_HEIGHT = 600;
-int screenWidth = INITIAL_WIDTH;
-int screenHeight = INITIAL_HEIGHT;
+// CONSTANTS
+const int INITIAL_SCREEN_WIDTH = 960;
+const int INITIAL_SCREEN_HEIGHT = 600;
+const float INITIAL_CAMERA_ZOOM = 2.5f;
+const float INITIAL_CAMERA_ROATION = 0.0f; // deg
 
-const int GRID_LINE_LENGTH = 10500;
+int screenWidth = INITIAL_SCREEN_WIDTH;
+int screenHeight = INITIAL_SCREEN_HEIGHT;
+
+const int GRID_LINE_LENGTH = 10500; // I chose a randomly large number
 
 typedef enum {
     IDLE = 0,
@@ -66,8 +70,8 @@ void HandleInput(Camera2D *camera) {
 
     // Camera reset (zoom and rotation)
     if (IsKeyPressed(KEY_R)) {
-        camera->zoom = 1.0f;
-        camera->rotation = 0.0f;
+        camera->zoom = INITIAL_CAMERA_ZOOM;
+        camera->rotation = INITIAL_CAMERA_ROATION;
         camera->target = (Vector2) { 0 };
         camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
     }
@@ -80,8 +84,8 @@ void HandleInput(Camera2D *camera) {
             screenHeight = GetMonitorHeight(2);
         } else {
             printf("Windowed\n");
-            screenWidth = INITIAL_WIDTH;
-            screenHeight = INITIAL_HEIGHT;
+            screenWidth = INITIAL_SCREEN_WIDTH;
+            screenHeight = INITIAL_SCREEN_HEIGHT;
         }
 
         camera->target.x = 0;
@@ -106,6 +110,7 @@ int main() {
     printf("-------------------\n");
     // Texture2D star = LoadTexture("resources/sprites/star-fill.png");
     Texture2D star = LoadTexture("resources/sprites/stars_icon_hover.png");
+    Texture2D flowers = LoadTexture("resources/sprites/flowers.png");
 
     printf("-------------------\n");
     printf("Init Variables\n");
@@ -117,13 +122,14 @@ int main() {
     Rectangle dest = { 0, 0,
         star.width, star.height };
     Vector2 origin = { star.width / 2, star.height / 2 };
+    Rectangle flowerSrc = { 0, 0, flowers.width / 8, flowers.height / 2 };
 
     // Camera
     Camera2D camera = { 0 };
-    camera.target = (Vector2){ 0 };
+    camera.target = (Vector2) { 0 };
     camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.rotation = INITIAL_CAMERA_ROATION;
+    camera.zoom = INITIAL_CAMERA_ZOOM;
 
     
     SetTargetFPS(60);
@@ -141,15 +147,15 @@ int main() {
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode2D(camera);
-            DrawLine(-GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, 0, Fade(WHITE, 0.3f));
-            DrawLine(0, -GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, Fade(WHITE, 0.3f));
+            DrawLine(-GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, 0, Fade(WHITE, 0.1f));
+            DrawLine(0, -GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, Fade(WHITE, 0.1f));
                 // Draw bounds
                 // DrawRectangleRec(src, BLUE);
                 // DrawRectanglePro(dest, origin, 0, Fade(RED, 0.4f));
 
                 // Draw shape
-                DrawTexturePro(star, src, dest, origin,
-                sinf(GetTime()) * 90 , WHITE);
+                // DrawTexturePro(star, src, dest, origin, sinf(GetTime()) * 90 , WHITE);
+                DrawTexturePro(flowers, flowerSrc, dest, origin, sinf(GetTime()) * 90 , WHITE);
             EndMode2D();
         EndDrawing();
 
@@ -160,6 +166,7 @@ int main() {
     printf("-------------------\n");
 
     UnloadTexture(star);
+    UnloadTexture(flowers);
     CloseWindow();
 
 
