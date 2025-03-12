@@ -96,7 +96,7 @@ void Reset(Game *game) {
 void HandleInput(Game *game) {
     Camera2D *camera = &(game->camera);
 
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+    if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
         Vector2 delta = GetMouseDelta();
         delta = Vector2Scale(delta, -1.0f/camera->zoom);
         camera->target = Vector2Add(camera->target, delta);
@@ -157,7 +157,8 @@ int main() {
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
     // Texture2D star = LoadTexture("resources/sprites/star-fill.png");
-    Texture2D star = LoadTexture("resources/sprites/stars_icon_hover.png");
+    // Texture2D star = LoadTexture("resources/sprites/stars_icon_hover.png");
+    Texture2D star = LoadTexture("resources/sprites/mario.png");
     Texture2D flowers = LoadTexture("resources/sprites/flowers.png");
 
     printf("-------------------\n");
