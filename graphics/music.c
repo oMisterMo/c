@@ -8,11 +8,17 @@
 
 #define ARRAY_LEN(xs) sizeof(xs) / sizeof(xs[0])
 
-typedef struct {
+const int INITIAL_SCREEN_WIDTH = 2880 / 3;
+const int INITIAL_SCREEN_HEIGHT = 1920 / 3;
+
+int screenWidth = INITIAL_SCREEN_WIDTH;
+int screenHeight = INITIAL_SCREEN_HEIGHT;
+
+typedef struct Frame {
     float left;
     float right;
 } Frame;
-typedef struct {
+typedef struct Game {
     Music music;
     float timePlayed;
 } Game;
@@ -144,15 +150,24 @@ void HandleInput(Game *game) {
             ResumeMusicStream(music);
         }
     }
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
+        if (IsWindowFullscreen()) {
+            screenWidth  = GetMonitorWidth(GetCurrentMonitor());
+            screenHeight = GetMonitorHeight(GetCurrentMonitor());
+        } else {
+            screenWidth = INITIAL_SCREEN_WIDTH;
+            screenHeight = INITIAL_SCREEN_HEIGHT;
+        }
+    }
 }
 
 void Update(Game *game) {
     Music music = game->music;
-    float timePlayed = game->timePlayed;
 
     // Get normalized time played for current music stream
-    timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
-    if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
+    game->timePlayed = GetMusicTimePlayed(music) / GetMusicTimeLength(music);
+    if (game->timePlayed > 1.0f) game->timePlayed = 1.0f;   // Make sure time played is no longer than music
 }
 
 void Draw(Game *game) {
@@ -160,8 +175,8 @@ void Draw(Game *game) {
     float timePlayed = game->timePlayed;
 
     // Draw main
-    int w = GetScreenWidth();
-    int h = GetScreenHeight();
+    int w = screenWidth;
+    int h = screenHeight;
 
     // float cell_width = (float) w / (float) 1000;
     float cell_width = (float) w / (float) global_frames_count;
@@ -191,10 +206,10 @@ void Draw(Game *game) {
     const char* FRAME_COUNT = "Global frame count: ";
     const char* TOTAL_FRAMES = "Elements: ";
     DrawText(TextFormat("%s%d", FRAME_COUNT, music.frameCount),
-        GetScreenWidth() - MeasureText(FRAME_COUNT, TEXT_SIZE) - MeasureText(TextFormat("%d", music.frameCount), TEXT_SIZE)  - 20,
+        screenWidth - MeasureText(FRAME_COUNT, TEXT_SIZE) - MeasureText(TextFormat("%d", music.frameCount), TEXT_SIZE)  - 20,
         20, TEXT_SIZE, WHITE);
     DrawText(TextFormat("%s%d", TOTAL_FRAMES, ARRAY_LEN(global_frames)),
-        GetScreenWidth() - MeasureText(TOTAL_FRAMES, TEXT_SIZE) - MeasureText(TextFormat("%d", ARRAY_LEN(global_frames)), TEXT_SIZE) - 20,
+        screenWidth - MeasureText(TOTAL_FRAMES, TEXT_SIZE) - MeasureText(TextFormat("%d", ARRAY_LEN(global_frames)), TEXT_SIZE) - 20,
         20 + 50,
         TEXT_SIZE,
         WHITE);
@@ -205,14 +220,14 @@ int main(void) {
     printf("-------------------\n");
     printf("Init Window\n");
     printf("-------------------\n");
-    InitWindow(900, 600, "Music");
+    InitWindow(screenWidth, screenHeight, "Music");
 
     printf("-------------------\n");
     printf("Init Audio\n");
     printf("-------------------\n");
     InitAudioDevice();              // Initialize audio device
-    Music music = LoadMusicStream("resources/music/country.mp3");
-    // Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
+    // Music music = LoadMusicStream("resources/music/country.mp3");
+    Music music = LoadMusicStream("resources/music/Monsters - Conner Youngblood.mp3");
     // LogMusicData(music);
 
     PlayMusicStream(music);
@@ -222,9 +237,9 @@ int main(void) {
 
     float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
     bool pause = false;             // Music playing paused
-    Rectangle musicPlayer = { 0, 0, GetScreenWidth() * .7, 100 };
-    musicPlayer.x = (GetScreenWidth() - musicPlayer.width) / 2;
-    musicPlayer.y = (GetScreenHeight() - musicPlayer.height) / 2;
+    Rectangle musicPlayer = { 0, 0, screenWidth * .7, 100 };
+    musicPlayer.x = (screenWidth - musicPlayer.width) / 2;
+    musicPlayer.y = (screenHeight - musicPlayer.height) / 2;
 
     Game game = {
         .music = music,
@@ -249,10 +264,8 @@ int main(void) {
 
         // draw
         BeginDrawing();
-        ClearBackground(BLACK);
-
-        Draw(&game);
-
+            ClearBackground(BLACK);
+            Draw(&game);
         EndDrawing();
     }
 
