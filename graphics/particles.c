@@ -50,6 +50,9 @@ typedef struct Sprite {
 
 typedef struct Game {
     int id;
+    Camera2D camera;
+    Animation flower;
+    bool go;
 } Game;
 
 bool CheckCollisionPointRecPro(Vector2 point, Rectangle rec, Vector2 origin) {
@@ -84,7 +87,15 @@ void ResetCamera(Camera2D *camera) {
     camera->offset = (Vector2) { screenWidth/2.0f, screenHeight/2.0f  };
 }
 
-void HandleInput(Camera2D *camera) {
+void Reset(Game *game) {
+    game->flower.position.x = 0;
+    game->flower.position.y = 0;
+    ResetCamera(&(game->camera));
+}
+
+void HandleInput(Game *game) {
+    Camera2D *camera = &(game->camera);
+
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         Vector2 delta = GetMouseDelta();
         delta = Vector2Scale(delta, -1.0f/camera->zoom);
@@ -115,13 +126,21 @@ void HandleInput(Camera2D *camera) {
 
     // Camera reset (zoom and rotation)
     if (IsKeyPressed(KEY_R)) {
-        ResetCamera(camera);
+        // ResetCamera(camera);
+        Reset(game);
     }
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreenCamera(camera);
     }
 }
 
+void Update(Game *game) {
+    if (game->go) {
+        game->flower.position.x++;
+        game->camera.target.x = game->flower.position.x;
+        game->camera.target.y = game->flower.position.y;
+    }
+}
 
 int main() {
 
@@ -144,8 +163,6 @@ int main() {
     printf("-------------------\n");
     printf("Init Variables\n");
     printf("-------------------\n");
-    Game game = { 0 };
-    printf("size of Game: %ld\n", sizeof(Game));
 
     // Star
     Rectangle src = { 0, 0, star.width, star.height };
@@ -158,7 +175,7 @@ int main() {
     Rectangle flowerSrc = { 0, 0, flowerW, flowerH };
     Rectangle flowerDest = { 0, 0, flowerW, flowerH };
     Vector2 flowersOrigin = { flowerDest.width / 2, flowerDest.height / 2 };
-    Animation flower = {
+    Animation f = {
         .texture = flowers,
         .sheet = {
             .currentFrame = 0,
@@ -173,11 +190,20 @@ int main() {
     };
 
     // Camera
-    Camera2D camera = { 0 };
-    camera.target = (Vector2) { 0 };
-    camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
-    camera.rotation = INITIAL_CAMERA_ROATION;
-    camera.zoom = INITIAL_CAMERA_ZOOM;
+    Camera2D c = { 0 };
+    c.target = (Vector2) { 0 };
+    c.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
+    c.rotation = INITIAL_CAMERA_ROATION;
+    c.zoom = INITIAL_CAMERA_ZOOM;
+
+    bool g = false;
+
+    // Game
+    Game game = { 0 };
+    game.camera = c;
+    game.go = g;
+    game.flower = f;
+    printf("size of Game: %ld\n", sizeof(Game));
 
     
     SetTargetFPS(60);
@@ -185,34 +211,31 @@ int main() {
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
-    bool go = false;
 
     while(!WindowShouldClose()) {
-        // Input
 
+        // Input
         // Get the world point that is under the mouse
-        Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+        Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), game.camera);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRecPro(mouseWorldPos, flower.position, flower.origin)) {
+            if (CheckCollisionPointRecPro(mouseWorldPos, game.flower.position, game.flower.origin)) {
                 printf("YES - Left\n");
-                go = true;
+                game.go = true;
             }
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
             printf("STOP\n");
-            go = false;
+            game.go = false;
         }
-        HandleInput(&camera);
+        HandleInput(&game);
+
         // Update
-        if (go) {
-            flower.position.x++;
-            camera.target.x = flower.position.x;
-            camera.target.y = flower.position.y;
-        }
+        Update(&game);
+
         // Draw
         BeginDrawing();
             ClearBackground(BLACK);
-            BeginMode2D(camera);
+            BeginMode2D(game.camera);
             DrawLine(-GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, 0, Fade(WHITE, 0.1f));
             DrawLine(0, -GRID_LINE_LENGTH, 0, GRID_LINE_LENGTH, Fade(WHITE, 0.1f));
                 // Draw bounds
@@ -222,7 +245,7 @@ int main() {
                 // Draw shape
                 // DrawTexturePro(star, src, dest, origin, sinf(GetTime()) * 90 , WHITE);
                 // DrawTexturePro(flowers, flowerSrc, flowerDest, flowersOrigin, sinf(GetTime()) * 90 , WHITE);
-                DrawTexturePro(flower.texture, flower.sheet.srcRec, flower.position, flower.origin, sinf(GetTime()) * 90 , WHITE);
+                DrawTexturePro(game.flower.texture, game.flower.sheet.srcRec, game.flower.position, game.flower.origin, sinf(GetTime()) * 90 , WHITE);
             EndMode2D();
         EndDrawing();
 
