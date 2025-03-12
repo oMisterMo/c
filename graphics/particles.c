@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include "stdbool.h"
+#include "math.h"
+
 #include "raylib.h"
 #include "raymath.h"
-#include "math.h"
 
 // CONSTANTS
 const int INITIAL_SCREEN_WIDTH = 960;
@@ -49,6 +51,14 @@ typedef struct Sprite {
 typedef struct Game {
     int id;
 } Game;
+
+bool CheckCollisionPointRecPro(Vector2 point, Rectangle rec, Vector2 origin) {
+    bool collision = false;
+
+    if ((point.x >= rec.x - origin.x) && (point.x < (rec.x - origin.x + rec.width)) && (point.y >= rec.y - origin.y) && (point.y < (rec.y - origin.y + rec.height))) collision = true;
+
+    return collision;
+}
 
 void ToggleFullscreenCamera(Camera2D *camera) {
     ToggleFullscreen();
@@ -175,14 +185,30 @@ int main() {
     printf("-------------------\n");
     printf("GAME\n");
     printf("-------------------\n");
+    bool go = false;
 
     while(!WindowShouldClose()) {
         // Input
+
+        // Get the world point that is under the mouse
+        Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointRecPro(mouseWorldPos, flower.position, flower.origin)) {
+                printf("YES - Left\n");
+                go = true;
+            }
+        }
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+            printf("STOP\n");
+            go = false;
+        }
         HandleInput(&camera);
         // Update
-        // flower.position.x++;
-        // camera.target.x = flower.position.x;
-        // camera.target.y = flower.position.y;
+        if (go) {
+            flower.position.x++;
+            camera.target.x = flower.position.x;
+            camera.target.y = flower.position.y;
+        }
         // Draw
         BeginDrawing();
             ClearBackground(BLACK);

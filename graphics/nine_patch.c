@@ -8,8 +8,7 @@ Rectangle GetRandomSource() {
     return (Rectangle) { SIZE * GetRandomValue(0, 1), SIZE * GetRandomValue(0, 4), SIZE, SIZE };
 }
 
-bool CheckCollisionPointRecPro(Vector2 point, Rectangle rec, Vector2 origin)
-{
+bool CheckCollisionPointRecPro(Vector2 point, Rectangle rec, Vector2 origin) {
     bool collision = false;
 
     if ((point.x >= rec.x - origin.x) && (point.x < (rec.x - origin.x + rec.width)) && (point.y >= rec.y - origin.y) && (point.y < (rec.y - origin.y + rec.height))) collision = true;
