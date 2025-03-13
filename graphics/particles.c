@@ -312,6 +312,7 @@ int main() {
                 // DrawTexturePro(flowers, flowerSrc, flowerDest, flowersOrigin, sinf(GetTime()) * 90 , WHITE);
                 DrawTexturePro(game.flower.texture, game.flower.sheet.srcRec, game.flower.position, game.flower.origin, sinf(GetTime()) * 90 , WHITE);
             EndMode2D();
+            DrawFPS(20, 20);
         EndDrawing();
 
     }
