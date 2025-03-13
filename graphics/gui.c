@@ -4,6 +4,15 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+void HandleInput(Rectangle *rect) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), *rect)){
+            printf("touched\n");
+            rect->width *= 1.2;
+            rect->height *= 1.2;
+        }
+    }
+}
 void DrawGame(Rectangle rect) {
     ClearBackground(YELLOW);
     DrawRectangleRec(rect, BLACK);
@@ -31,35 +40,24 @@ int main(void) {
 
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
-        // handle input
 
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(GetMousePosition(), rect)){
-                printf("touched\n");
-                rect.width *= 1.2;
-                rect.height *= 1.2;
-            }
-        }
+        // handle input
+        HandleInput(&rect);
 
         // update
         rect.x++;
 
         // draw
         BeginDrawing();
-        
-        // Draw GAME
-        DrawGame(rect);
-        
-        // Draw GUI
-        DrawGUI(&showMessageBox);
 
-        DrawFPS(20, 20);
+            DrawGame(rect);
+            DrawGUI(&showMessageBox);
+            DrawFPS(20, 20);
+
         EndDrawing();
     }
 
     CloseWindow();
 
-
     return 0;
 }
-
