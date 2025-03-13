@@ -151,14 +151,7 @@ void HandleInput(Game *game) {
     }
 }
 
-void Update(Game *game) {
-    // Move flower to the right
-    if (game->go) {
-        game->flower.position.x++;
-        game->camera.target.x = game->flower.position.x;
-        game->camera.target.y = game->flower.position.y;
-    }
-
+void TweenFlower(Game *game) {
     // Handle tween
     if (game->tween.state == TWEEN) {
         // Update counter
@@ -190,6 +183,17 @@ void Update(Game *game) {
             game->flower.position.y = game->tween.targetPosition.y;
         }
     }
+}
+
+void Update(Game *game) {
+    // Move flower to the right
+    if (game->go) {
+        game->flower.position.x++;
+        game->camera.target.x = game->flower.position.x;
+        game->camera.target.y = game->flower.position.y;
+    }
+
+    TweenFlower(game);
 }
 
 int main() {
