@@ -92,7 +92,7 @@ typedef struct Card {
     Vector2 targetPosition;     // Could be consts
     int state;                  // IDLE | TWEEN
     int frameCounter;           // Current time in tween
-    float duration;             // How long to tween
+    float duration;             // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
 
     // img
     Texture2D nPatchTexture;

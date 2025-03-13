@@ -19,11 +19,11 @@ typedef enum {
 } TweenState;
 
 typedef struct Tween {
-    Vector2 startPosition;      // Tween start
+    Vector2 currentPosition;      // Tween start
     Vector2 targetPosition;     // Tween end [could be consts]
     int state;                  // IDLE | TWEENING
     int frameCounter;           // Current time in tween
-    int duration;               // How long to tween
+    int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
 } Tween;
 
 typedef struct Sprite {
@@ -69,7 +69,7 @@ int main() {
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
     Rectangle bounds = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Tween tween = { 0 };
-    tween.startPosition = (Vector2) { bounds.x, bounds.y };
+    tween.currentPosition = (Vector2) { bounds.x, bounds.y };
     tween.targetPosition = (Vector2) { GetScreenWidth() - bunny.width , center.y };
     tween.state = IDLE;
     tween.frameCounter = 0;
@@ -185,8 +185,8 @@ void updateMo(GameObject *mo) {
             // Tween
             mo->bounds.x  = EaseElasticOut(
                 (float) mo->tween.frameCounter,
-                mo->tween.startPosition.x,
-                mo->tween.targetPosition.x - mo->tween.startPosition.x,
+                mo->tween.currentPosition.x,
+                mo->tween.targetPosition.x - mo->tween.currentPosition.x,
                 mo->tween.duration
             );
 
@@ -197,7 +197,7 @@ void updateMo(GameObject *mo) {
 
 
                 // Set final position
-                mo->bounds.x = mo->tween.startPosition.x;
+                mo->bounds.x = mo->tween.currentPosition.x;
             }
         }
 }

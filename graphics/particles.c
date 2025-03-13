@@ -4,11 +4,12 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include "reasings.h"
 
 // CONSTANTS
 const int INITIAL_SCREEN_WIDTH = 960;
 const int INITIAL_SCREEN_HEIGHT = 600;
-const float INITIAL_CAMERA_ZOOM = 2.5f;
+const float INITIAL_CAMERA_ZOOM = 1.0f;
 const float INITIAL_CAMERA_ROATION = 0.0f; // deg
 const int NO_OF_FLOWERS = 8;
 
@@ -21,6 +22,14 @@ typedef enum {
     IDLE = 0,
     TWEEN,
 } TweenState;
+
+typedef struct Tween {
+    Vector2 currentPosition;      // Tween start
+    Vector2 targetPosition;     // Tween end [could be consts]
+    int state;                  // IDLE | TWEENING
+    int frameCounter;           // Current time in tween
+    int duration;               // How long to tween
+} Tween;
 
 typedef struct Spritesheet {
     Rectangle srcRec;         // Draw a part of a texture defined by a rectangle
@@ -53,6 +62,7 @@ typedef struct Game {
     Camera2D camera;
     Animation flower;
     bool go;
+    Tween tween;
 } Game;
 
 bool CheckCollisionPointRecPro(Vector2 point, Rectangle rec, Vector2 origin) {
@@ -88,9 +98,16 @@ void ResetCamera(Camera2D *camera) {
 }
 
 void Reset(Game *game) {
-    game->flower.position.x = 0;
-    game->flower.position.y = 0;
-    ResetCamera(&(game->camera));
+    // Jump to start
+    // game->flower.position.x = 0;
+    // game->flower.position.y = 0;
+
+    // Tween to stuff
+    game->tween.currentPosition.x = game->flower.position.x;
+    game->tween.currentPosition.y = game->flower.position.y;
+    game->tween.state = TWEEN;
+
+    // ResetCamera(&(game->camera));
 }
 
 void HandleInput(Game *game) {
@@ -135,10 +152,43 @@ void HandleInput(Game *game) {
 }
 
 void Update(Game *game) {
+    // Move flower to the right
     if (game->go) {
         game->flower.position.x++;
         game->camera.target.x = game->flower.position.x;
         game->camera.target.y = game->flower.position.y;
+    }
+
+    // Handle tween
+    if (game->tween.state == TWEEN) {
+        // Update counter
+        game->tween.frameCounter++;
+
+        // Get tween position
+        float x = EaseBackOut(
+            (float) game->tween.frameCounter,
+            game->tween.currentPosition.x,
+            game->tween.targetPosition.x - game->tween.currentPosition.x,
+            game->tween.duration
+        );
+        float y = EaseBackOut(
+            (float) game->tween.frameCounter,
+            game->tween.currentPosition.y,
+            game->tween.targetPosition.y - game->tween.currentPosition.y,
+            game->tween.duration
+        );
+
+        // Update position
+        game->flower.position.x = x;
+        game->flower.position.y = y;
+
+        // Set final destination once complete
+        if (game->tween.frameCounter >= game->tween.duration) {
+            game->tween.frameCounter = 0;
+            game->tween.state = IDLE;
+            game->flower.position.x = game->tween.targetPosition.x;
+            game->flower.position.y = game->tween.targetPosition.y;
+        }
     }
 }
 
@@ -190,6 +240,15 @@ int main() {
         .isAnimating = false,
     };
 
+    // Tween
+    Tween t = {
+        .duration = 60,
+        .frameCounter = 0,
+        .state = IDLE,
+        .currentPosition = (Vector2) {0},
+        .targetPosition = (Vector2) {0}
+    };
+
     // Camera
     Camera2D c = { 0 };
     c.target = (Vector2) { 0 };
@@ -204,6 +263,7 @@ int main() {
     game.camera = c;
     game.go = g;
     game.flower = f;
+    game.tween = t;
     printf("size of Game: %ld\n", sizeof(Game));
 
     
