@@ -156,7 +156,6 @@ int main() {
 
         // Draw
         BeginDrawing();
-            ClearBackground(RAYWHITE);
             ClearBackground(BLACK);
             // Draw render texture to screen, properly scaled
             DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
