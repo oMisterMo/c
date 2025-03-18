@@ -76,7 +76,7 @@ int main() {
     SetRandomSourceRec(&blueSrc);
 
     Spritesheet starsSheet = {
-        .srcRec = (Rectangle) { 0, 0, starsTexture.width / NUM_FRAMES_STARS, starsTexture.height },
+        .srcRec = (Rectangle) { 0, 0, starsTexture.width / NO_FRAMES_STARS, starsTexture.height },
         .currentFrame = 0,
         .currentLine = 0,
         .frameCounter = 0,

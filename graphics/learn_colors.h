@@ -15,21 +15,15 @@ int screenHeight = INITIAL_SCREEN_HEIGHT;
 int gameScreenWidth = INITIAL_SCREEN_WIDTH;
 int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
 
-
 #define NO_OF_TRAYS 3
 #define NO_OF_CARDS 4
 #define GAP 70              // Space between cards & trays
 #define PADDING 70          // Space above & below
 
-
-
-
-#define MAX_TOUCH_POINTS 10
-#define MAX_GESTURE_STRINGS 20
 #define NO_OF_COLORS 8
 #define NO_OF_CLOUDS 4      // 4 cloud sprites
 #define NO_OF_STARS 4
-#define NUM_FRAMES_STARS 8
+#define NO_FRAMES_STARS 8
 
 // https://gcc.gnu.org/onlinedocs/gcc-13.3.0/cpp/Defined.html - simplify
 // #if (defined(isDrawTray) && isDrawTray < 1)
@@ -43,7 +37,6 @@ int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
     #define TRAY_HEIGHT 183
 #endif
 
-
 #if (isDrawCard < 1)
     // Size of card without texture
     #define CARD_WIDTH 100
@@ -53,9 +46,6 @@ int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
     #define CARD_WIDTH 128
     #define CARD_HEIGHT 128
 #endif
-
-#define MIN_NO_OF_TRAYS 2   // unused
-#define MAX_NO_OF_TRAYS 8   // unused
 
 #define MAX(a, b) ((a)>(b)? (a) : (b))
 #define MIN(a, b) ((a)<(b)? (a) : (b))
@@ -311,7 +301,7 @@ void handleInput(Game *game, float scale) {
                         for (int i = 0; i < NO_OF_STARS; ++i) {
                             Animation *star = stars + i;
                             if (!star->isAnimating) {
-                                star->position = (Vector2) { virtualMouse.x - star->texture->width / NUM_FRAMES_STARS / 2, virtualMouse.y - star->texture->height / 2 };
+                                star->position = (Vector2) { virtualMouse.x - star->texture->width / NO_FRAMES_STARS / 2, virtualMouse.y - star->texture->height / 2 };
                                 star->isAnimating = true;
                                 break;
                             }
@@ -408,7 +398,7 @@ void updateStars(Animation *stars) {
                 star->sheet.frameCounter = 0;
                 star->sheet.currentFrame++;
                 // Ensure frame index stays within bounds
-                if (star->sheet.currentFrame > NUM_FRAMES_STARS - 1) {
+                if (star->sheet.currentFrame > NO_FRAMES_STARS - 1) {
                     // Star animation is complete
                     // Reset it members
                     // Remove current reference from the list
@@ -416,7 +406,7 @@ void updateStars(Animation *stars) {
                     star->isAnimating = false;
                 }
                 // Update source rect (index * width)
-                star->sheet.srcRec.x = (float) star->sheet.currentFrame * (float) star->texture->width / NUM_FRAMES_STARS;
+                star->sheet.srcRec.x = (float) star->sheet.currentFrame * (float) star->texture->width / NO_FRAMES_STARS;
             }
         }
 
