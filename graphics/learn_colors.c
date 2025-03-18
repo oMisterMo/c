@@ -156,12 +156,14 @@ int main() {
 
         // Draw
         BeginDrawing();
+        // BeginScissorMode(0, 0, GetScreenWidth(), 200);
             ClearBackground(BLACK);
             // Draw render texture to screen, properly scaled
             DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
                            (Rectangle){ (screenWidth - ((float)gameScreenWidth*scale))*0.5f, (screenHeight - ((float)gameScreenHeight*scale))*0.5f,
                            (float)gameScreenWidth*scale, (float)gameScreenHeight*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
+        // EndScissorMode();
         EndDrawing();
 
     }
