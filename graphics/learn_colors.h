@@ -225,13 +225,17 @@ void handleInput(Game *game, float scale) {
     Animation *stars = game->stars;
 
     if (IsKeyPressed(KEY_F)) {
-        ToggleFullscreen();
-        if (IsWindowFullscreen()) {
-            screenWidth  = GetMonitorWidth(GetCurrentMonitor());
-            screenHeight = GetMonitorHeight(GetCurrentMonitor());
+        if (!IsWindowFullscreen()) {
+            int monitor = GetCurrentMonitor();
+            screenWidth  = GetMonitorWidth(monitor);
+            screenHeight = GetMonitorHeight(monitor);
+            SetWindowSize(screenWidth, screenHeight);
+            ToggleFullscreen();
         } else {
+            ToggleFullscreen();
             screenWidth = INITIAL_SCREEN_WIDTH;
             screenHeight = INITIAL_SCREEN_HEIGHT;
+            SetWindowSize(screenWidth, screenHeight);
         }
     }
     if (IsKeyPressed(KEY_R)) {
