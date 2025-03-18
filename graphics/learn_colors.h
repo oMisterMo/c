@@ -425,7 +425,7 @@ void updateStars(Animation *stars) {
 
 void drawBackground(Texture2D layers[], double *increment, int order[]) {
     if (isDrawBackground && !isOff) {
-        (*increment) += 0.02 / 25;
+        (*increment) += (0.09) * GetFrameTime();
 
         int width = layers[0].width;
         int height = layers[0].height;
