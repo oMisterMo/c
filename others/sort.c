@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define NO_OF_ELEMENTS 5
 
@@ -15,17 +16,21 @@ int ascending (const void *a, const void *b) {
 }
 
 // General Purpose
+bool IsEmpty(char *title) {
+    return (title == NULL || title == "");
+}
 void PopulateArray(int *arr, int len) {
     for (int i = 0; i < len; ++i) {
         arr[i] = rand() % 99;
     }
 }
-void PrintArray(int *arr, int len) {
+void PrintArray(int *arr, int len, char *title) {
+    printf("========= %s =========\n", IsEmpty(title) ? "Print Array" : title);
     for (int i = 0; i < len - 1; ++i) {
         printf("%d, ", arr[i]);
     }
     printf("%d", arr[len - 1]);
-    printf("\n");
+    printf("\n\n");
 }
 
 int main(void) {
@@ -38,17 +43,17 @@ int main(void) {
     int arr[NO_OF_ELEMENTS];
     PopulateArray(arr, NO_OF_ELEMENTS);
 
-    printf("==================\n");
-    PrintArray(arr, NO_OF_ELEMENTS);
-    printf("==================\n");
+    // printf("==================\n");
+    PrintArray(arr, NO_OF_ELEMENTS, "Original");
+    // printf("==================\n");
 
     // Sort descending
     qsort(arr, NO_OF_ELEMENTS, sizeof(arr[0]), descending);
-    PrintArray(arr, NO_OF_ELEMENTS);
+    PrintArray(arr, NO_OF_ELEMENTS, "Descending");
 
     // Sort ascending
     qsort(arr, NO_OF_ELEMENTS, sizeof(arr[0]), ascending);
-    PrintArray(arr, NO_OF_ELEMENTS);
+    PrintArray(arr, NO_OF_ELEMENTS, "Ascending");
 
 
     printf("\n");
