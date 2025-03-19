@@ -5,6 +5,8 @@ struct Vector2 {
     float y;
 };
 
+// typedef struct Vector2 Vector2;  // Now you can just use Vector2
+
 struct Vector3 {
     float x;
     float y;
