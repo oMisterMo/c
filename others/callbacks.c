@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-// Simplify, create new type called 'callback'
+// Simplify, create new type called 'Callback'
+// Callback var_name = function(int)
 typedef float (*Callback)(int);
 
 /**
@@ -29,9 +30,30 @@ float cube_callback(int i) {
  */
 int main(void) {
 
-    // printf("Hello world!\n");
     float result = calculate(2, cube_callback);
     printf("result: %.2f\n", result);
+    // --------------------------------------
+
+
+
+
+    // --------------------------------------
+    // More on function pointers
+
+    // step 1 - create regular definition
+    // int *ptr;                   // points to an int
+    // float *func_ptr (int);      // points to a function
+
+    // step 2 - wrap with parenthesis due to precedence
+    int (*ptr);
+    float (*func_ptr) (int);
+
+    // step 3 - you can assign it a value
+    int num = 3;
+    ptr = &num;
+    func_ptr = cube_callback;
+
+    printf("%.2f\n",func_ptr(3));
 
     return 0;
 }
