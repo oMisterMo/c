@@ -7,8 +7,11 @@
 
 // Callbacks
 int descending (const void *a, const void *b) {
-    // Cast void pointer -> Integer pointer
-    // Then deference to get the value
+    // There are no generic types
+    // So you have to jump through extra hoops
+
+    // 1. Cast void pointer -> Integer pointer
+    // 2. Deference to get the value
     return *(int*) b -  *(int*) a;
 }
 int ascending (const void *a, const void *b) {
