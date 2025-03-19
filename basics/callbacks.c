@@ -1,17 +1,18 @@
 #include <stdio.h>
 
-// typedef float (*cb)(int) Mo;
+// Simplify, create new type called 'callback'
+typedef float (*Callback)(int);
 
 /**
  * Define a calculate function that takes in
  * an integer and an operation.asm
  * 
  * @param num number to apply operation
- * @param cb callback function, takes an integer and returns a float, 
+ * @param Callback callback function, takes an integer and returns a float, 
  *
  * @return the result of the operation on the integer
  */
-float calculate(int num, float (*cb)(int)) {
+float calculate(int num, Callback cb) {
     return cb(num);
 }
 
