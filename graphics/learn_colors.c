@@ -126,7 +126,7 @@ int main() {
     while(!WindowShouldClose()) {
 
         // Compute required framebuffer scaling
-        float scale = MIN((float)screenWidth/gameScreenWidth, (float)screenHeight/gameScreenHeight);
+        float scale = MIN((float) screenWidth / gameScreenWidth, (float )screenHeight / gameScreenHeight);
 
         if (DEBUG) {
             if (HasValueChanged(scale, previousScale)) {
@@ -151,17 +151,21 @@ int main() {
             drawScore(game.score);
             drawStars(stars);
             DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));
-            DrawFPS(gameScreenWidth - MeasureText("60 FPS", 20) - 20, 20);
+            DrawFPS(gameScreenWidth /2 , gameScreenHeight/2);
         EndTextureMode();
 
+
         // Draw
+        float x = (screenWidth - ((float) gameScreenWidth * scale)) * 0.5f;
+        float y = (screenHeight - ((float) gameScreenHeight * scale)) * 0.5f;
+        Rectangle renderSource = { 0.0f, 0.0f, (float) target.texture.width, (float) -target.texture.height };
+        Rectangle renderDest = { x, y, (float) gameScreenWidth * scale, (float) gameScreenHeight * scale };
+        Vector2 origin = { 0, 0 };
         BeginDrawing();
         // BeginScissorMode(0, 0, GetScreenWidth(), 200);
             ClearBackground(BLACK);
             // Draw render texture to screen, properly scaled
-            DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
-                           (Rectangle){ (screenWidth - ((float)gameScreenWidth*scale))*0.5f, (screenHeight - ((float)gameScreenHeight*scale))*0.5f,
-                           (float)gameScreenWidth*scale, (float)gameScreenHeight*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+            DrawTexturePro(target.texture, renderSource, renderDest, origin, 0.0f, WHITE);
 
         // EndScissorMode();
         EndDrawing();
