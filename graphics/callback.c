@@ -54,6 +54,7 @@ int main(void) {
             if (CheckCollisionPointRec(GetMousePosition(), box.source)) {
                 printf("HIT\n");
                 box.callback(&box);
+                // DoTheThing(&box);
             }
         }
 
