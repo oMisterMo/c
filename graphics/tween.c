@@ -40,10 +40,6 @@ typedef struct GameObject {
     Tween tween;
 } GameObject;
 
-int normalize(int value, int min, int max);
-float lerp(float norm, int min, int max);
-float linearTween(float currentTime, float start, float change, float duration);
-void logger(int frameCounter);
 
 void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo);
 void updateMo(GameObject *mo);
@@ -129,27 +125,6 @@ int main() {
 
 
 
-
-
-void logger(int frameCounter) {
-    printf("getFrameTime: %f\n", GetFrameTime());   // Time since last frame (dt)
-    printf("getTime: %lf\n", GetTime());            // Elapsed time (seconds)
-    printf("frameCounter: %d\n", frameCounter);     // Elapased frames
-}
-
-int normalize(int value, int min, int max) {
-    // value - min  = amount of value that lies within range
-    // max - min    = range
-    return (value - min) / (max - min);
-}
-
-float lerp(float norm, int min, int max) {
-    return (max - min) * norm + min;
-}
-
-float linearTween(float currentTime, float start, float change, float duration) {
-    return change * currentTime / duration + start;
-}
 
 void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
