@@ -47,6 +47,16 @@ int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
     #define CARD_HEIGHT 128
 #endif
 
+// Comment out the line below to remove all debug related stuff
+#define DEBUG 1
+
+#ifdef DEBUG
+    bool HasValueChanged(float value, float previous) {
+        return value != previous;
+    }
+    float previousScale = 0;
+#endif
+
 #define MAX(a, b) ((a)>(b)? (a) : (b))
 #define MIN(a, b) ((a)<(b)? (a) : (b))
 

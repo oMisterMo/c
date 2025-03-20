@@ -2,17 +2,6 @@
 #include "learn_colors.h"
 
 
-// Comment out this line to remove all debug stuff
-#define DEBUG 1
-
-#ifdef DEBUG
-    bool HasValueChanged(float value, float previous) {
-        return value != previous;
-    }
-    float previousScale = 0;
-#endif
-
-
 int main() {
 
     // Setup config
