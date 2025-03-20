@@ -25,6 +25,10 @@ float cube_callback(int i) {
     return i * i * i;
 }
 
+int add(int a, int b) {
+    return a + b;
+}
+
 /**
  * Function Pointers aka Callbacks
  */
@@ -47,13 +51,20 @@ int main(void) {
     // step 2 - wrap with parenthesis due to precedence
     int (*ptr);
     float (*func_ptr) (int);
+    int (*function_ptr) (int, int);
 
     // step 3 - you can assign it a value
     int num = 3;
     ptr = &num;
     func_ptr = cube_callback;
+    function_ptr = &add;    // add == &add
 
     printf("%.2f\n",func_ptr(3));
+    printf("%d\n", (*function_ptr) (1, 2));
+
+    printf("\n\n");
+    printf("%p\n", add);
+    printf("%p\n", &add);
 
     return 0;
 }
