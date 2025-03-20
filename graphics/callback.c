@@ -35,6 +35,8 @@ int main(void) {
 
     Box box = { 0 };
     box.source = (Rectangle) { 100, 100, 300, 200 };
+    box.source.x = (GetScreenWidth() - box.source.width) / 2;
+    box.source.y = (GetScreenHeight() - box.source.height) / 2;
     box.color = PINK;
     box.callback = DoTheThing;
 
