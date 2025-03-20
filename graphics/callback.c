@@ -20,11 +20,15 @@ typedef struct Box {
 //     cb(box);
 // }
 
+void CenterBox(Box *box) {
+    box->source.x = (GetScreenWidth() - box->source.width) / 2;
+    box->source.y = (GetScreenHeight() - box->source.height) / 2;
+}
 void DoTheThing(Box *box) {
     box->color.r = GetRandomValue(0, 255);
     box->color.g = GetRandomValue(0, 255);
     box->color.b = GetRandomValue(0, 255);
-    box->color.a = 200;
+    box->color.a = 120;
 }
 
 int main(void) {
@@ -35,11 +39,11 @@ int main(void) {
 
     Box box = { 0 };
     box.source = (Rectangle) { 100, 100, 300, 200 };
-    box.source.x = (GetScreenWidth() - box.source.width) / 2;
-    box.source.y = (GetScreenHeight() - box.source.height) / 2;
     box.color = PINK;
     box.callback = DoTheThing;
 
+    // Modify the values set
+    CenterBox(&box);
     DoTheThing(&box);
 
 
