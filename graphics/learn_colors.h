@@ -302,10 +302,13 @@ void handleInput(Game *game, float scale) {
                 if (hit) {
                     // Well done, but has it already entered the zone?
                     if (card->reachedTarget) continue;
-                    printf("HIT %d\n", game->counter);
+
+                    #if defined(DEBUG)
+                        printf("HIT %d\n", game->counter);
+                    #endif
+
                     if (!card->scoredPoints) {
                         ++(game->score);
-
 
                         // Find a slot thats not animating and start animating
                         for (int i = 0; i < NO_OF_STARS; ++i) {
@@ -317,14 +320,17 @@ void handleInput(Game *game, float scale) {
                             }
                         }
 
-
                         if (isAudio && !isOff) PlaySFX(sfx.click);
                     }
                     card->reachedTarget = true;
                     card->scoredPoints = true;
                 } else {
                     // No, tween the card back to its original position
-                    printf("Reset Card...\n");
+
+                    #if defined(DEBUG)
+                        printf("Reset Card...\n");
+                    #endif
+
                     if (isTweenCard && !isOff) {
                         card->state = TWEEN;
                         card->currentPosition = (Vector2) { virtualMouse.x - card->dest.width / 2, virtualMouse.y - card->dest.height / 2 };
@@ -364,8 +370,6 @@ void updateCards(Card cards[]) {
             // Card *card = &cards[i];
             if (card->state == TWEEN) {
                 card->frameCounter++;
-                // printf("cards[%d].frameCounter: %d\n", i,card->frameCounter);
-
 
                 float x = EaseBackOut(
                         (float) card->frameCounter,
@@ -389,7 +393,6 @@ void updateCards(Card cards[]) {
                     card->dest.x = card->targetPosition.x;
                     card->dest.y = card->targetPosition.y;
                 }
-
 
             }
         }
