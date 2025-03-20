@@ -2,13 +2,15 @@
 #include "learn_colors.h"
 
 
-// Debug stuff
-bool DEBUG = true;
-bool HasValueChanged(float value, float previous) {
-    return value != previous;
-}
-float previousScale = 0;
-// End Debug
+// Comment out this line to remove all debug stuff
+#define DEBUG 1
+
+#ifdef DEBUG
+    bool HasValueChanged(float value, float previous) {
+        return value != previous;
+    }
+    float previousScale = 0;
+#endif
 
 
 int main() {
@@ -128,12 +130,12 @@ int main() {
         // Compute required framebuffer scaling
         float scale = MIN((float) screenWidth / gameScreenWidth, (float )screenHeight / gameScreenHeight);
 
-        if (DEBUG) {
+        #if defined(DEBUG)
             if (HasValueChanged(scale, previousScale)) {
                 printf("scale: %.2f\n", scale);
                 previousScale = scale;
             }
-        }
+        #endif
 
         // Input
         handleInput(&game, scale);
