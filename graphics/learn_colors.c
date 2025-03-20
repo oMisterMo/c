@@ -142,7 +142,7 @@ int main() {
             drawScore(game.score);
             drawStars(stars);
             DrawRectangleLinesEx((Rectangle){0,0,screenWidth,screenHeight}, 1, Fade(BLACK, 0.2));
-            DrawFPS(gameScreenWidth /2 , gameScreenHeight/2);
+            DrawFPS(gameScreenWidth - MeasureText("60 FPS", 20) - 20, 20);
         EndTextureMode();
 
 
