@@ -143,6 +143,19 @@ void SetRandomSourceRec(Rectangle *rect) {
     rect->y = 32 * GetRandomValue(0, 4);
 }
 
+int CompareTrays(const void* a, const void* b) {
+    // Attempt 1 - Deference input
+    // Tray A = (* (Tray*) a);  // typecastint to Tray* and deference to get the value
+    // Tray B = (* (Tray*) b);
+
+    // Attempt 2 - Access pointer members
+    const Tray *A = (const Tray*) a;  // typecastint to Tray*
+    const Tray *B = (const Tray*) b;
+    // printf("\nid: %d\n", A.id);
+    // return A.id - B.id;
+    // return B.id - A.id;
+    // return B->id - A->id;
+}
 void initStars(Animation *stars, Texture2D *starsTexture, Spritesheet starsSheet) {
     for (int i = 0; i < NO_OF_STARS; ++i) {
         stars[i] = (Animation) {
