@@ -103,8 +103,8 @@ typedef struct Card {
 
 typedef struct Tray {
     Texture2D *texture;
-    Rectangle dest;
     Color color;
+    Rectangle dest;
 } Tray;
 
 typedef struct Game {
@@ -170,8 +170,8 @@ void initTrays(Game *game) {
 
         trays[i] = (Tray) {
             .texture = texture,
-            .dest = dest,
-            .color = colors[i]
+            .color = colors[i],
+            .dest = dest
         };
     }
 }
