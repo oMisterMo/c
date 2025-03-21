@@ -121,7 +121,14 @@ int main() {
 
         #if defined(DEBUG)
             if (HasValueChanged(scale, previousScale)) {
+                Vector2 dpi = GetWindowScaleDPI();
+                int monitor = GetCurrentMonitor();
+                printf("monitor: %s %d\n", GetMonitorName(monitor), monitor);
                 printf("scale: %.2f\n", scale);
+                printf("resolution: %d x %d\n", screenWidth, screenHeight);
+                printf("render: %d x %d\n", GetRenderWidth(), GetRenderHeight());
+                // printf("dpi: %.2f, %.2f\n", dpi.x, dpi.y);
+                printf("----------------\n");
                 previousScale = scale;
             }
         #endif
