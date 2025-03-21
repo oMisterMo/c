@@ -3,5 +3,7 @@ test.c
 temp.c
 *.txt
 
+graphics/settings
+
 out/
 .vscode/
