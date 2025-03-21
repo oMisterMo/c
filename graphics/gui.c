@@ -6,6 +6,7 @@
 
 typedef struct GUI {
     bool showMessageBox;
+    bool graphics_checkbox;
 } GUI;
 
 void HandleInput(Rectangle *rect) {
@@ -25,13 +26,40 @@ void DrawGame(Rectangle rect) {
 
 void DrawGUI(GUI *gui) {
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-    if (GuiButton((Rectangle){ 24, 24, 120, 30 }, "#191#Show Message")) gui->showMessageBox = true;
-    if (gui->showMessageBox) {
-        int result = GuiMessageBox((Rectangle){ 85, 70, 250, 100 },
-            "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
 
-        if (result >= 0) gui->showMessageBox = false;
-    }
+    static int PAD = 24;
+    static int GAP = 50;
+    float w = 20;float w_small = 20;float w_long = 120;
+    float h = 20;
+    float x = PAD;
+    float y = GetScreenHeight() - h - PAD;
+
+    Rectangle r = { x, y, w, h };
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+    if (GuiCheckBox(r, "Graphics", &gui->graphics_checkbox));
+    r.y -= GAP;
+
+
+
+    r.width = w_long;
+    if (GuiButton(r, "#191#Show Message")) gui->showMessageBox = true;
+
+
+    // When opened
+    // if (gui->showMessageBox) {
+    //     int result = GuiMessageBox((Rectangle){ 85, 70, 250, 100 },
+    //         "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
+    //     if (result >= 0) gui->showMessageBox = false;
+    // }
 
 }
 
@@ -57,8 +85,8 @@ int main(void) {
 
         // draw
         BeginDrawing();
-
-            DrawGame(rect);
+            // ClearBackground(BLACK);
+            // DrawGame(rect);
             DrawGUI(&gui);
             DrawFPS(20, 20);
 
