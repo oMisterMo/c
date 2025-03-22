@@ -218,11 +218,14 @@ int main() {
         float x = 1.5f, y = 0.0f, z = 0.0f;
 
         if (currentTime - timeLastSpawn > spawnInterval) {
-            float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 100);
+            float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 0);
+            // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
             if (p < -1.0f) p = -1.0f;
             if (p > 1.0f) p = 1.0f;
             float np = (p + 1.0f)/2.0f;
-            pos.x = np * GetScreenWidth();
+            // pos.x = np * GetScreenWidth();
+
+            mo.bounds.x = np * GetScreenWidth();
 
             printf("result %.2f\n", np);
         }
@@ -234,8 +237,8 @@ int main() {
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
-        float size = 15;
-        DrawCircle(pos.x, pos.y, size, BLACK);
+        // float size = 15;
+        // DrawCircle(pos.x, pos.y, size, BLACK);
         DrawMo(mo);
 
         EndDrawing();
