@@ -1,23 +1,13 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <math.h>   // For sin(), cos(), floor()
+#include <stdlib.h> // For rand()
+
 #include "raylib.h"
 #include "reasings.h"
 #include "stb_perlin.h"
 
-#include <stdio.h>
-#include <stdbool.h>
 
-#include <math.h>   // For sin(), cos(), floor()
-#include <stdlib.h> // For rand()
-
-
-#define NO_OF_RECTS 1
-#define NO_OF_SPACES (NO_OF_RECTS + 1)
-#define RECT_WIDTH 100
-#define RECT_HEIGHT 100
-#define TOTAL_WIDTH RECT_WIDTH * NO_OF_RECTS
-#define MAX(a, b) (a > b ? a : b)
-#define MIN(a, b) (a < b ? a : b)
-
-Vector2 colors[1024] = { 0 }; 
 
 typedef enum {
     IDLE = 0,
@@ -153,7 +143,7 @@ void updateMo(GameObject *mo) {
         }
     }
 }
-void drawMo(GameObject mo) {
+void DrawMo(GameObject mo) {
     // Draw Mo
     // DrawRectangleRec(mo.bounds, WHITE);
     DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
@@ -205,29 +195,16 @@ int main() {
      Texture2D perlinTexture = LoadTextureFromImage(perlin);
      UnloadImage(perlin);
 
-    // Rectangle stuff
-    Vector2 startRect = { 20, GetScreenHeight() - RECT_HEIGHT - 20 };
-    Vector2 endRect = { GetScreenWidth() - RECT_WIDTH - 20, startRect.y };
-    int frameCounter = 0;
-
-
-    // for (int i = 0; i < 1024; ++i) {
-    //     colors[i].x =  perlinNoise(GetTime() * 20);
-    //     colors[i].y = GetScreenHeight() / 2 + perlinNoise(GetTime());
-    // }
 
     float spawnInterval = 0.3f; // Every 1 second
     float timeLastSpawn = 0.0;
     int index = 0;
 
-    int frameCount = 0;
     Vector2 pos = { 0, GetScreenHeight() / 2 };
 
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
-        frameCount++;
-
         // ---------------------------------------------
         // Input
         // ---------------------------------------------
@@ -237,67 +214,33 @@ int main() {
         // Update
         // ---------------------------------------------
     
-        // float currentTime = GetTime();
-        // if (currentTime - timeLastSpawn > spawnInterval) {
-
-        //     colors[index].x =  perlinNoise(GetTime());
-        //     colors[index].y = GetScreenHeight() / 2 + perlinNoise(GetTime());
-
-        //     printf("index: %.2f\n", perlinNoise(0.5));
-        //     index++;
-        //     index %= 1024;
-        // }
-
         float currentTime = GetTime();
         float x = 1.5f, y = 0.0f, z = 0.0f;
 
         if (currentTime - timeLastSpawn > spawnInterval) {
-            // x = 100 * perlinNoise(0.005 * frameCount);
-            // y = 100 * perlinNoise(0.005 * frameCount + 100);
             float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 100);
             if (p < -1.0f) p = -1.0f;
             if (p > 1.0f) p = 1.0f;
             float np = (p + 1.0f)/2.0f;
-            // pos.x = (p + 1)/2 * GetScreenWidth();
             pos.x = np * GetScreenWidth();
-            // y = GetScreenHeight() / 2;
 
             printf("result %.2f\n", np);
-            // printf("time %.2f\n", GetTime());
-
-            // timeLastSpawn = GetTime();
-
-            // x *= GetScreenWidth();
-            // x += GetScreenWidth() / 2;
-
         }
 
 
         // ApplyPerlinScreenShake(&mo);
         // updateMo(&mo);
 
-        // ---------------------------------------------
-        // Draw
-        // ---------------------------------------------
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
-        // drawMo(mo);
-        // DrawTexture(perlinTexture, 0, 0, WHITE);
         float size = 15;
         DrawCircle(pos.x, pos.y, size, BLACK);
-        // DrawCircle(x, y, size, BLACK);
-        // for (int i = 0; i < 1024; ++i) {
-        //     // DrawPixel(colors[i].x, colors[i].y, BLACK);
-        //     // DrawCircle(colors[i].x + (i * size), colors[i].y, size, BLACK);
-        // }
+        DrawMo(mo);
 
         EndDrawing();
     }
 
-    // ---------------------------------------------
-    // Destroy
-    // ---------------------------------------------
     UnloadTexture(bunny);
     CloseWindow();
 }
