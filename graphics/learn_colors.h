@@ -15,8 +15,6 @@ int screenHeight = INITIAL_SCREEN_HEIGHT;
 int gameScreenWidth = INITIAL_SCREEN_WIDTH;
 int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
 
-float shakeDuration = 0.0f;     // Duration of the shake effect
-float shakeIntensity = 0.0f;    // Intensity of the shake (pixels)
 
 #define NO_OF_TRAYS 3
 #define NO_OF_CARDS 4
@@ -108,6 +106,10 @@ typedef struct Tray {
     Texture2D *texture;
     Color color;
     Rectangle dest;
+    bool isShaking;
+    float shakeDuration;     // Duration of the shake effect
+    float shakeIntensity;    // Intensity of the shake (pixels)
+    Vector2 originalPosition;
 } Tray;
 
 typedef struct Game {
@@ -145,18 +147,22 @@ void SetRandomSourceRec(Rectangle *rect) {
     rect->x =  32 * GetRandomValue(0, 1);
     rect->y = 32 * GetRandomValue(0, 4);
 }
-void ApplyShake(float *elementX, float *elementY) {
-    if (shakeDuration > 0.0f) {
+void ApplyShake(Tray *tray, float *elementX, float *elementY) {
+    if (tray->shakeDuration > 0.0f) {
         // Generate random offsets within the intensity range
-        float offsetX = (GetRandomValue(0, 100) / 100.0f - 0.5f) * shakeIntensity * 2.0f;
-        float offsetY = (GetRandomValue(0, 100) / 100.0f - 0.5f) * shakeIntensity * 2.0f;
+        float offsetX = (GetRandomValue(0, 100) / 100.0f - 0.5f) * tray->shakeIntensity * 2.0f;
+        float offsetY = (GetRandomValue(0, 100) / 100.0f - 0.5f) * tray->shakeIntensity * 2.0f;
 
         // Apply offsets to the element's position
         *elementX += offsetX;
         *elementY += offsetY;
 
         // Decrease shake duration over time
-        shakeDuration -= 0.016f; // Assuming ~16ms frame time
+        tray->shakeDuration -= 0.016f; // Assuming ~16ms frame time
+    } else {
+        tray->isShaking = false;
+        tray->dest.x = tray->originalPosition.x;
+        tray->dest.y = tray->originalPosition.y;
     }
 }
 
@@ -202,7 +208,11 @@ void initTrays(Game *game) {
         trays[i] = (Tray) {
             .texture = texture,
             .color = colors[i],
-            .dest = dest
+            .dest = dest,
+            .isShaking = false,
+            .shakeDuration = 0.0f,
+            .shakeIntensity = 0.0f,
+            .originalPosition = { dest.x, dest.y }
         };
     }
 }
@@ -321,8 +331,10 @@ void handleInput(Game *game, float scale) {
                 bool hit = false;
                 int sum = 0;
 
+                Tray *tray;
                 for (int j = 0; j < NO_OF_TRAYS; ++j) {
-                    if (CheckCollisionRecs(card->dest, trays[j].dest) && ColorIsEqual(card->color, colors[j])) {
+                    tray = trays + j;
+                    if (CheckCollisionRecs(card->dest, tray->dest) && ColorIsEqual(card->color, colors[j])) {
                         hit = true;
                         ++(game->counter);
                         break;
@@ -350,9 +362,11 @@ void handleInput(Game *game, float scale) {
                                 break;
                             }
                         }
+
                         // Apply screen shake to the current Tray
-                        shakeDuration = 0.5f;   // Shake for 0.5 seconds
-                        shakeIntensity = 5.0f;  // Shake ny up to 10 pixels
+                        tray->isShaking = true;   // Shake for 0.5 seconds
+                        tray->shakeDuration = 0.10f;   // Shake for 0.5 seconds
+                        tray->shakeIntensity = 1.0f;  // Shake ny up to 10 pixels
 
                         if (isAudio && !isOff) PlaySFX(sfx.click);
                     }
@@ -436,8 +450,9 @@ void updateTrays(Tray *trays) {
     for (int i = 0; i < NO_OF_TRAYS; ++i) {
         // Tray *tray = (game->trays + i);
         Tray *tray = &trays[i];
-
-        ApplyShake(&tray->dest.x, &tray->dest.y);
+        if (tray->isShaking) {
+            ApplyShake(&trays[i], &tray->dest.x, &tray->dest.y);
+        }
     }
 }
 void updateStars(Animation *stars) {
