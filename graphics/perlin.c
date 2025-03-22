@@ -282,7 +282,7 @@ int main() {
     printf("-------------------\n");
     Texture2D cursorTexture = LoadTexture("resources/ui/icon_hand_1.png");
     Texture2D cursorPressedTexture = LoadTexture("resources/ui/icon_hand_2.png");
-    Texture2D bunny = LoadTexture("resources/sprites/piece.png");
+    Texture2D bunnyTexture = LoadTexture("resources/sprites/piece.png");
     // Create perlin texture -> Not needed
     Image perlin = GenImagePerlinNoise(100, 100, 0, 0, 1.0f);
     Texture2D perlinTexture = LoadTextureFromImage(perlin);
@@ -293,7 +293,7 @@ int main() {
     printf("INIT VARIABLES\n");
     printf("-------------------\n");
     GameObject mo = {
-        .texture = bunny,
+        .texture = bunnyTexture,
         .shake = {
             .isShaking = false,
             .shakeDuration = 0.0f,
@@ -302,6 +302,7 @@ int main() {
         },
         .mouseover = false
      };
+     // Init the reset of the unasigned GameObject members
     InitMo(&mo);
 
     // Random stuff
@@ -346,7 +347,7 @@ int main() {
 
     UnloadTexture(cursorTexture);
     UnloadTexture(cursorPressedTexture);
-    UnloadTexture(bunny);
+    UnloadTexture(bunnyTexture);
     UnloadTexture(perlinTexture);
     CloseWindow();
 }
