@@ -7,6 +7,9 @@
 #include "reasings.h"
 #include "stb_perlin.h"
 
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 768
+
 
 
 typedef enum {
@@ -95,7 +98,19 @@ void ApplyPerlinScreenShake(GameObject *obj) {
 
 
 // THE GOOD STUFF
-void OnLeftClick(Vector2 center, GameObject *mo) {
+void InitMo(GameObject *mo) {
+    Rectangle bounds = { 0, SCREEN_HEIGHT / 2  - mo->texture.height / 2, mo->texture.width, mo->texture.height };
+    Tween tween = { 0 };
+    tween.currentPosition = (Vector2) { bounds.x, bounds.y };
+    tween.targetPosition = (Vector2) { GetScreenWidth() - mo->texture.width , SCREEN_HEIGHT / 2 };
+    tween.state = IDLE;
+    tween.frameCounter = 0;
+    tween.duration = 60 * 2;
+
+    mo->tween = tween;
+    mo->bounds = bounds;
+}
+void OnLeftClick(GameObject *mo) {
     printf("left mouse pressed...\n");
     if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
         // reset mo
@@ -112,9 +127,9 @@ void OnRightClick(GameObject *mo) {
     mo->shakeDuration = 0.5f;
     mo->shakeIntensity = 0.5f;
 }
-void HandleInput(Vector2 center, GameObject *mo) {
+void HandleInput(GameObject *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        OnLeftClick(center, mo);
+        OnLeftClick(mo);
     }
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         OnRightClick(mo);
@@ -186,56 +201,50 @@ void DrawMo(GameObject mo) {
 
 int main() {
 
-    // ---------------------------------------------
-    // Setup
-    // ---------------------------------------------
-    InitWindow(1024, 768, "Tween");
+    printf("-------------------\n");
+    printf("INIT WINDOW\n");
+    printf("-------------------\n");
+
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Perlin");
     SetMousePosition(-1, -1);
 
 
-    // ---------------------------------------------
-    // Initialize
-    // ---------------------------------------------
-    Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
-
-    // Mo stuff
+    printf("-------------------\n");
+    printf("LOAD TEXTURES\n");
+    printf("-------------------\n");
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
-    Rectangle bounds = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
-    Tween tween = { 0 };
-    tween.currentPosition = (Vector2) { bounds.x, bounds.y };
-    tween.targetPosition = (Vector2) { GetScreenWidth() - bunny.width , center.y };
-    tween.state = IDLE;
-    tween.frameCounter = 0;
-    tween.duration = 60 * 2;
-    // Designated initializers
+    // Create perlin texture -> Not needed
+    Image perlin = GenImagePerlinNoise(100, 100, 0, 0, 1.0f);
+    Texture2D perlinTexture = LoadTextureFromImage(perlin);
+    UnloadImage(perlin);
+
+
+    printf("-------------------\n");
+    printf("INIT VARIABLES\n");
+    printf("-------------------\n");
     GameObject mo = {
         .texture = bunny,
-        .bounds = bounds,
-        .tween = tween,
-
         .shakeDuration = 0.0f,
         .shakeIntensity = 0.0f,
         .noiseTime = 0.0f
      };
+    InitMo(&mo);
 
-
-     Image perlin = GenImagePerlinNoise(100, 100, 0, 0, 1.0f);
-     Texture2D perlinTexture = LoadTextureFromImage(perlin);
-     UnloadImage(perlin);
-
-
+    // Random stuff
     float spawnInterval = 0.3f; // Every 1 second
     float timeLastSpawn = 0.0;
     int index = 0;
-
     Vector2 pos = { 0, GetScreenHeight() / 2 };
 
     SetTargetFPS(60);
 
+    printf("-------------------\n");
+    printf("GAME\n");
+    printf("-------------------\n");
     while(!WindowShouldClose()) {
 
         // Input
-        HandleInput(center, &mo);
+        HandleInput(&mo);
 
         // Update
         UpdatePerlin(&mo, timeLastSpawn, spawnInterval);
@@ -252,6 +261,10 @@ int main() {
 
         EndDrawing();
     }
+
+    printf("-------------------\n");
+    printf("DESTROY\n");
+    printf("-------------------\n");
 
     UnloadTexture(bunny);
     UnloadTexture(perlinTexture);
