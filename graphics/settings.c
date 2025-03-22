@@ -18,16 +18,9 @@
 
 char *filename = "settings";
 
-void SaveCurrentSettings() {
-    int monitor = GetCurrentMonitor();
-    bool fullscreen = IsWindowFullscreen();
-
-    // char *text = TextFormat("monitor %d\nfullscreen %d\n", monitor, fullscreen);
-    char buf[256];
-    snprintf(buf, sizeof(buf), "monitor=%d\nfullscreen=%d\n", monitor, fullscreen);
-    SaveFileText(filename, buf);
-}
-
+/**
+ * Called just after InitWindow to set the correct settings
+ */
 void LoadCurrentSettings() {
     char *file = LoadFileText(filename);
     // char *data = LoadFileData(filename, sizeof(*file));
@@ -44,6 +37,19 @@ void LoadCurrentSettings() {
     }
 
     UnloadFileText(file);
+}
+
+/**
+ * Called when exiting the application to save the current state
+ */
+void SaveCurrentSettings() {
+    int monitor = GetCurrentMonitor();
+    bool fullscreen = IsWindowFullscreen();
+
+    // char *text = TextFormat("monitor %d\nfullscreen %d\n", monitor, fullscreen);
+    char buf[256];
+    snprintf(buf, sizeof(buf), "monitor=%d\nfullscreen=%d\n", monitor, fullscreen);
+    SaveFileText(filename, buf);
 }
 
 int main(void) {
