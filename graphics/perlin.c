@@ -159,7 +159,7 @@ void UpdateMo(GameObject *mo) {
     }
 }
 float GetPerlin(float time) {
-    float p = stb_perlin_noise3(time / 2, 0.0f, 0.0f, 0, 0, 0);
+    float p = stb_perlin_noise3(time / 3 , 0.0f, 0.0f, 0, 0, 0);
     // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
 
     // Clamp between -1.0f and 1.0f
@@ -177,12 +177,12 @@ void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
     if (currentTime - timeLastSpawn > spawnInterval) {
 
         float x = GetPerlin(currentTime);
-        // float y = GetPerlin(currentTime);
+        float y = GetPerlin(currentTime + 10000);
 
         // Multiply by size
         // pos.x = np * GetScreenWidth();
         mo->bounds.x = x * GetScreenWidth();
-        // mo->bounds.y = y * GetScreenHeight();
+        mo->bounds.y = y * GetScreenHeight();
         printf("result %.2f\n", x);
 
     }
@@ -191,7 +191,7 @@ void DrawMo(GameObject mo) {
     // Draw Mo
     // DrawRectangleRec(mo.bounds, WHITE);
     DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
-    DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+    // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
 }
 
 
