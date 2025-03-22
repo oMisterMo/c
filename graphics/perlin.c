@@ -39,20 +39,24 @@ typedef struct Sprite {
     Tween tween;
 } Sprite;
 
+typedef struct Shake {
+    bool isShaking;
+    float shakeDuration;  // Duration of the shake effect
+    float shakeIntensity; // Intensity of the shake (in pixels)
+    float noiseTime;      // Time step for Perlin noise
+} Shake;
+
 typedef struct GameObject {
     Texture2D texture;
     Rectangle bounds;
     Tween tween;
 
-    // Shake
-    float shakeDuration;  // Duration of the shake effect
-    float shakeIntensity; // Intensity of the shake (in pixels)
-    float noiseTime;      // Time step for Perlin noise
+    Shake shake;
 } GameObject;
 
 
 
-// UGGGGHH
+// UGGGGHH - THE BAD STUFF
 // Gradient function for smooth interpolation
 float grad(int hash, float x) {
     int h = hash & 15; // Limit to 4 bits
@@ -81,23 +85,6 @@ float perlinNoise(float x) {
     // Linearly interpolate between the gradients
     return lerp(u, grad(A, x), grad(B, x - 1));
 }
-void ApplyPerlinScreenShake(GameObject *obj) {
-    if (obj->shakeDuration > 0.0f) {
-        // Use Perlin noise to generate offsets
-        obj->bounds.x = obj->bounds.x +  perlinNoise(obj->noiseTime) * obj->shakeIntensity;
-        obj->bounds.y = obj->bounds.y +  perlinNoise(obj->noiseTime + 100.0f) * obj->shakeIntensity; // Offset for Y-axis
-
-        // Increment noiseTime to get new noise values each frame
-        obj->noiseTime += 0.1f;
-
-        // Reduce the shake duration over time
-        obj->shakeDuration -= 0.016f; // Assuming a frame time of ~16ms
-    } else {
-        // Reset offsets when shake is done
-        obj->bounds.x = (GetScreenWidth() - obj->bounds.width) / 2;
-        obj->bounds.y = (GetScreenHeight() - obj->bounds.height) / 2;
-    }
-}
 
 
 
@@ -115,45 +102,6 @@ void InitMo(GameObject *mo) {
 
     mo->tween = tween;
     mo->bounds = bounds;
-}
-void OnLeftClick(GameObject *mo) {
-    printf("left mouse pressed...\n");
-    if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
-        // reset mo
-        mo->tween.state = TWEENING;
-        return;
-    }
-
-    // Reset all
-
-    // reset mo
-    mo->tween.state = TWEENING;
-}
-void OnRightClick(GameObject *mo) {
-    mo->shakeDuration = 0.5f;
-    mo->shakeIntensity = 0.5f;
-}
-void HandleInput(GameObject *mo) {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        OnLeftClick(mo);
-    }
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        OnRightClick(mo);
-    }
-    if (IsKeyPressed(KEY_F)) {
-        if (!IsWindowFullscreen()) {
-            int monitor = GetCurrentMonitor();
-            SCREEN_WIDTH  = GetMonitorWidth(monitor);
-            SCREEN_HEIGHT = GetMonitorHeight(monitor);
-            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-            ToggleFullscreen();
-        } else {
-            ToggleFullscreen();
-            SCREEN_WIDTH = BASE_SCREEN_WIDTH;
-            SCREEN_HEIGHT = BASE_SCREEN_HEIGHT;
-            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-        }
-    }
 }
 void UpdateMo(GameObject *mo) {
     if (mo->tween.state == TWEENING) {
@@ -178,6 +126,76 @@ void UpdateMo(GameObject *mo) {
         }
     }
 }
+void DrawMo(GameObject mo) {
+    // Draw Mo
+    // DrawRectangleRec(mo.bounds, WHITE);
+    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
+    // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+}
+
+
+void OnLeftClick(GameObject *mo) {
+    printf("left mouse pressed...\n");
+    if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
+        // reset mo
+        mo->tween.state = TWEENING;
+        return;
+    }
+
+    // Reset all
+
+    // reset mo
+    mo->tween.state = TWEENING;
+}
+void OnRightClick(GameObject *mo) {
+    mo->shake.isShaking = true;
+    mo->shake.shakeDuration = 0.5f;
+    mo->shake.shakeIntensity = 0.5f;
+}
+void ApplyPerlinScreenShake(GameObject *obj) {
+    if (obj->shake.shakeDuration > 0.0f) {
+        // Use Perlin noise to generate offsets
+        obj->bounds.x = obj->bounds.x +  perlinNoise(obj->shake.noiseTime) * obj->shake.shakeIntensity;
+        obj->bounds.y = obj->bounds.y +  perlinNoise(obj->shake.noiseTime + 100.0f) * obj->shake.shakeIntensity; // Offset for Y-axis
+
+        // Increment noiseTime to get new noise values each frame
+        obj->shake.noiseTime += 0.1f;
+
+        // Reduce the shake duration over time
+        obj->shake.shakeDuration -= 0.016f; // Assuming a frame time of ~16ms
+    }
+    else {
+        printf("DONE SHAKING.\n");
+        // Reset offsets when shake is done
+        obj->shake.isShaking = false;
+        // obj->bounds.x = (GetScreenWidth() - obj->bounds.width) / 2;
+        // obj->bounds.y = (GetScreenHeight() - obj->bounds.height) / 2;
+    }
+}
+void HandleInput(GameObject *mo) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        OnLeftClick(mo);
+    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        OnRightClick(mo);
+    }
+    if (IsKeyPressed(KEY_F)) {
+        if (!IsWindowFullscreen()) {
+            int monitor = GetCurrentMonitor();
+            SCREEN_WIDTH  = GetMonitorWidth(monitor);
+            SCREEN_HEIGHT = GetMonitorHeight(monitor);
+            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+            ToggleFullscreen();
+        } else {
+            ToggleFullscreen();
+            SCREEN_WIDTH = BASE_SCREEN_WIDTH;
+            SCREEN_HEIGHT = BASE_SCREEN_HEIGHT;
+            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+    }
+}
+
+
 float GetPerlin(float time) {
     float p = stb_perlin_noise3(time / 3 , 0.0f, 0.0f, 0, 0, 0);
     // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
@@ -203,16 +221,11 @@ void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
         // pos.x = np * GetScreenWidth();
         mo->bounds.x = x * GetScreenWidth();
         mo->bounds.y = y * GetScreenHeight();
-        printf("result %.2f\n", x);
+        // printf("result %.2f\n", x);
 
     }
 }
-void DrawMo(GameObject mo) {
-    // Draw Mo
-    // DrawRectangleRec(mo.bounds, WHITE);
-    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
-    // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
-}
+
 
 
 
@@ -245,9 +258,12 @@ int main() {
     printf("-------------------\n");
     GameObject mo = {
         .texture = bunny,
-        .shakeDuration = 0.0f,
-        .shakeIntensity = 0.0f,
-        .noiseTime = 0.0f
+        .shake = {
+            .isShaking = false,
+            .shakeDuration = 0.0f,
+            .shakeIntensity = 0.0f,
+            .noiseTime = 0.0f
+        }
      };
     InitMo(&mo);
 
@@ -270,7 +286,9 @@ int main() {
         // Update
         UpdatePerlin(&mo, timeLastSpawn, spawnInterval);
         // UpdateMo(&mo);
-        // ApplyPerlinScreenShake(&mo);
+        if (mo.shake.isShaking) {
+            ApplyPerlinScreenShake(&mo);
+        }
 
         // Draw
         BeginDrawing();
