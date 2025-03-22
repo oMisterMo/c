@@ -138,6 +138,7 @@ int main() {
 
         // Update
         updateCards(game.cards);
+        updateTrays(game.trays);
         updateStars(game.stars);
 
         BeginTextureMode(target);

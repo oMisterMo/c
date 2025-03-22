@@ -15,6 +15,9 @@ int screenHeight = INITIAL_SCREEN_HEIGHT;
 int gameScreenWidth = INITIAL_SCREEN_WIDTH;
 int gameScreenHeight = INITIAL_SCREEN_HEIGHT;
 
+float shakeDuration = 0.0f;     // Duration of the shake effect
+float shakeIntensity = 0.0f;    // Intensity of the shake (pixels)
+
 #define NO_OF_TRAYS 3
 #define NO_OF_CARDS 4
 #define GAP 70              // Space between cards & trays
@@ -142,6 +145,21 @@ void SetRandomSourceRec(Rectangle *rect) {
     rect->x =  32 * GetRandomValue(0, 1);
     rect->y = 32 * GetRandomValue(0, 4);
 }
+void ApplyShake(float *elementX, float *elementY) {
+    if (shakeDuration > 0.0f) {
+        // Generate random offsets within the intensity range
+        float offsetX = (GetRandomValue(0, 100) / 100.0f - 0.5f) * shakeIntensity * 2.0f;
+        float offsetY = (GetRandomValue(0, 100) / 100.0f - 0.5f) * shakeIntensity * 2.0f;
+
+        // Apply offsets to the element's position
+        *elementX += offsetX;
+        *elementY += offsetY;
+
+        // Decrease shake duration over time
+        shakeDuration -= 0.016f; // Assuming ~16ms frame time
+    }
+}
+
 
 int CompareTrays(const void* a, const void* b) {
     // Attempt 1 - Deference input
@@ -332,6 +350,9 @@ void handleInput(Game *game, float scale) {
                                 break;
                             }
                         }
+                        // Apply screen shake to the current Tray
+                        shakeDuration = 0.5f;   // Shake for 0.5 seconds
+                        shakeIntensity = 5.0f;  // Shake ny up to 10 pixels
 
                         if (isAudio && !isOff) PlaySFX(sfx.click);
                     }
@@ -409,6 +430,14 @@ void updateCards(Card cards[]) {
 
             }
         }
+    }
+}
+void updateTrays(Tray *trays) {
+    for (int i = 0; i < NO_OF_TRAYS; ++i) {
+        // Tray *tray = (game->trays + i);
+        Tray *tray = &trays[i];
+
+        ApplyShake(&tray->dest.x, &tray->dest.y);
     }
 }
 void updateStars(Animation *stars) {
