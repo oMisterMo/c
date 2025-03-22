@@ -51,8 +51,9 @@ typedef struct GameObject {
     Texture2D texture;
     Rectangle bounds;
     Tween tween;
-
     Shake shake;
+    bool mouseover;
+    //Perlin perlin?
 } GameObject;
 
 
@@ -92,6 +93,25 @@ float perlinNoise(float x) {
 
 
 // THE GOOD STUFF
+
+void OnLeftClick(GameObject *mo) {
+    printf("left down...\n");
+    if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
+        // reset mo
+        mo->tween.state = TWEENING;
+        return;
+    }
+
+    // Reset
+    mo->tween.state = TWEENING;
+}
+void OnRightClick(GameObject *mo) {
+    printf("right down...\n");
+    mo->shake.isShaking = true;
+    mo->shake.shakeDuration = 0.5f;
+    mo->shake.shakeIntensity = 0.5f;
+}
+
 void InitMo(GameObject *mo) {
     Rectangle bounds = { 0, SCREEN_HEIGHT / 2  - mo->texture.height / 2, mo->texture.width, mo->texture.height };
     Tween tween = { 0 };
@@ -103,6 +123,22 @@ void InitMo(GameObject *mo) {
 
     mo->tween = tween;
     mo->bounds = bounds;
+}
+void InputMo(GameObject *mo, Vector2 mouse) {
+    // Mouse over
+    if (CheckCollisionPointRec(mouse, mo->bounds)) {
+        mo->mouseover = true;
+    } else {
+        mo->mouseover = false;
+    }
+
+    // Mouse down
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        OnLeftClick(mo);
+    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        OnRightClick(mo);
+    }
 }
 void UpdateMo(GameObject *mo) {
     if (mo->tween.state == TWEENING) {
@@ -129,9 +165,14 @@ void UpdateMo(GameObject *mo) {
 }
 void DrawMo(GameObject mo) {
     // Draw Mo
-    // DrawRectangleRec(mo.bounds, WHITE);
-    DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
-    // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+
+    if (mo.mouseover) {
+        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, YELLOW);
+    } else {
+        // DrawRectangleRec(mo.bounds, WHITE);
+        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
+        // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+    }
 }
 
 
@@ -147,25 +188,6 @@ void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
     }
 }
 
-void OnLeftClick(GameObject *mo) {
-    printf("left down...\n");
-    if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
-        // reset mo
-        mo->tween.state = TWEENING;
-        return;
-    }
-
-    // Reset all
-
-    // reset mo
-    mo->tween.state = TWEENING;
-}
-void OnRightClick(GameObject *mo) {
-    printf("right down...\n");
-    mo->shake.isShaking = true;
-    mo->shake.shakeDuration = 0.5f;
-    mo->shake.shakeIntensity = 0.5f;
-}
 void ApplyPerlinScreenShake(GameObject *obj) {
     if (obj->shake.shakeDuration > 0.0f) {
         // Use Perlin noise to generate offsets
@@ -186,13 +208,8 @@ void ApplyPerlinScreenShake(GameObject *obj) {
         // obj->bounds.y = (GetScreenHeight() - obj->bounds.height) / 2;
     }
 }
-void HandleInput(GameObject *mo) {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        OnLeftClick(mo);
-    }
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        OnRightClick(mo);
-    }
+void HandleInput(GameObject *mo, Vector2 mouse) {
+    // General input
     if (IsKeyPressed(KEY_F)) {
         if (!IsWindowFullscreen()) {
             int monitor = GetCurrentMonitor();
@@ -207,6 +224,9 @@ void HandleInput(GameObject *mo) {
             SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         }
     }
+
+    // Game input
+    InputMo(mo, mouse);
 }
 
 
@@ -279,7 +299,8 @@ int main() {
             .shakeDuration = 0.0f,
             .shakeIntensity = 0.0f,
             .noiseTime = 0.0f
-        }
+        },
+        .mouseover = false
      };
     InitMo(&mo);
 
@@ -298,7 +319,7 @@ int main() {
 
         // Input
         Vector2 mouse = GetMousePosition();
-        HandleInput(&mo);
+        HandleInput(&mo, mouse);
 
         // Update
         UpdatePerlin(&mo, timeLastSpawn, spawnInterval);
