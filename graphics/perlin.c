@@ -158,31 +158,32 @@ void UpdateMo(GameObject *mo) {
         }
     }
 }
+float GetPerlin(float time) {
+    float p = stb_perlin_noise3(time / 2, 0.0f, 0.0f, 0, 0, 0);
+    // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
+
+    // Clamp between -1.0f and 1.0f
+    if (p < -1.0f) p = -1.0f;
+    if (p > 1.0f) p = 1.0f;
+
+    // We need to normalize the data from [-1..1] to [0..1]
+    float np = (p + 1.0f) / 2.0f;
+
+    return np;
+}
 void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
     float currentTime = GetTime();
-    float x = 1.5f, y = 0.0f, z = 0.0f;
 
     if (currentTime - timeLastSpawn > spawnInterval) {
 
-
-
-        float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 0);
-        // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
-
-        // Clamp between -1.0f and 1.0f
-        if (p < -1.0f) p = -1.0f;
-        if (p > 1.0f) p = 1.0f;
-
-        // We need to normalize the data from [-1..1] to [0..1]
-        float np = (p + 1.0f)/2.0f;
-
+        float x = GetPerlin(currentTime);
+        // float y = GetPerlin(currentTime);
 
         // Multiply by size
         // pos.x = np * GetScreenWidth();
-        mo->bounds.x = np * GetScreenWidth();
-        printf("result %.2f\n", np);
-
-
+        mo->bounds.x = x * GetScreenWidth();
+        // mo->bounds.y = y * GetScreenHeight();
+        printf("result %.2f\n", x);
 
     }
 }
