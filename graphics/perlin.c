@@ -112,7 +112,7 @@ void OnRightClick(GameObject *mo) {
     mo->shakeDuration = 0.5f;
     mo->shakeIntensity = 0.5f;
 }
-void handleInput(Vector2 center, GameObject *mo) {
+void HandleInput(Vector2 center, GameObject *mo) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         OnLeftClick(center, mo);
     }
@@ -120,7 +120,7 @@ void handleInput(Vector2 center, GameObject *mo) {
         OnRightClick(mo);
     }
 }
-void updateMo(GameObject *mo) {
+void UpdateMo(GameObject *mo) {
     if (mo->tween.state == TWEENING) {
         mo->tween.frameCounter++;
 
@@ -141,6 +141,34 @@ void updateMo(GameObject *mo) {
             // Set final position
             mo->bounds.x = mo->tween.currentPosition.x;
         }
+    }
+}
+void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
+    float currentTime = GetTime();
+    float x = 1.5f, y = 0.0f, z = 0.0f;
+
+    if (currentTime - timeLastSpawn > spawnInterval) {
+
+
+
+        float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 0);
+        // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
+
+        // Clamp between -1.0f and 1.0f
+        if (p < -1.0f) p = -1.0f;
+        if (p > 1.0f) p = 1.0f;
+
+        // We need to normalize the data from [-1..1] to [0..1]
+        float np = (p + 1.0f)/2.0f;
+
+
+        // Multiply by size
+        // pos.x = np * GetScreenWidth();
+        mo->bounds.x = np * GetScreenWidth();
+        printf("result %.2f\n", np);
+
+
+
     }
 }
 void DrawMo(GameObject mo) {
@@ -205,46 +233,28 @@ int main() {
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
-        // ---------------------------------------------
+
         // Input
-        // ---------------------------------------------
-        handleInput(center, &mo);
+        HandleInput(center, &mo);
 
-        // ---------------------------------------------
         // Update
-        // ---------------------------------------------
-    
-        float currentTime = GetTime();
-        float x = 1.5f, y = 0.0f, z = 0.0f;
-
-        if (currentTime - timeLastSpawn > spawnInterval) {
-            float p = stb_perlin_noise3(currentTime, y, z, 0, 0, 0);
-            // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
-            if (p < -1.0f) p = -1.0f;
-            if (p > 1.0f) p = 1.0f;
-            float np = (p + 1.0f)/2.0f;
-            // pos.x = np * GetScreenWidth();
-
-            mo.bounds.x = np * GetScreenWidth();
-
-            printf("result %.2f\n", np);
-        }
-
-
+        UpdatePerlin(&mo, timeLastSpawn, spawnInterval);
+        // UpdateMo(&mo);
         // ApplyPerlinScreenShake(&mo);
-        // updateMo(&mo);
 
+        // Draw
         BeginDrawing();
-        ClearBackground(SKYBLUE);
 
-        // float size = 15;
-        // DrawCircle(pos.x, pos.y, size, BLACK);
-        DrawMo(mo);
+            ClearBackground(SKYBLUE);
+            // float size = 15;
+            // DrawCircle(pos.x, pos.y, size, BLACK);
+            DrawMo(mo);
 
         EndDrawing();
     }
 
     UnloadTexture(bunny);
+    UnloadTexture(perlinTexture);
     CloseWindow();
 }
 
