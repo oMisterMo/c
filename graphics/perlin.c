@@ -5,6 +5,7 @@
 
 #include "raylib.h"
 #include "reasings.h"
+#include "raymath.h"
 #include "stb_perlin.h"
 
 // #define SCREEN_WIDTH 1024
@@ -134,8 +135,20 @@ void DrawMo(GameObject mo) {
 }
 
 
+void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
+    if (IsCursorOnScreen()) {
+        // Subtract the offset of cursor tip
+        mouse = Vector2SubtractValue(mouse, 17);
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            DrawTexture(cursorPressed, mouse.x, mouse.y, WHITE);
+        } else {
+            DrawTexture(cursor, mouse.x, mouse.y, WHITE);
+        }
+    }
+}
+
 void OnLeftClick(GameObject *mo) {
-    printf("left mouse pressed...\n");
+    printf("left down...\n");
     if (CheckCollisionPointRec(GetMousePosition(), mo->bounds)) {
         // reset mo
         mo->tween.state = TWEENING;
@@ -148,6 +161,7 @@ void OnLeftClick(GameObject *mo) {
     mo->tween.state = TWEENING;
 }
 void OnRightClick(GameObject *mo) {
+    printf("right down...\n");
     mo->shake.isShaking = true;
     mo->shake.shakeDuration = 0.5f;
     mo->shake.shakeIntensity = 0.5f;
@@ -246,6 +260,8 @@ int main() {
     printf("-------------------\n");
     printf("LOAD TEXTURES\n");
     printf("-------------------\n");
+    Texture2D cursorTexture = LoadTexture("resources/ui/icon_hand_1.png");
+    Texture2D cursorPressedTexture = LoadTexture("resources/ui/icon_hand_2.png");
     Texture2D bunny = LoadTexture("resources/sprites/piece.png");
     // Create perlin texture -> Not needed
     Image perlin = GenImagePerlinNoise(100, 100, 0, 0, 1.0f);
@@ -281,6 +297,7 @@ int main() {
     while(!WindowShouldClose()) {
 
         // Input
+        Vector2 mouse = GetMousePosition();
         HandleInput(&mo);
 
         // Update
@@ -297,6 +314,7 @@ int main() {
             // float size = 15;
             // DrawCircle(pos.x, pos.y, size, BLACK);
             DrawMo(mo);
+            drawCursor(mouse, cursorTexture, cursorPressedTexture);
 
         EndDrawing();
     }
@@ -305,6 +323,8 @@ int main() {
     printf("DESTROY\n");
     printf("-------------------\n");
 
+    UnloadTexture(cursorTexture);
+    UnloadTexture(cursorPressedTexture);
     UnloadTexture(bunny);
     UnloadTexture(perlinTexture);
     CloseWindow();
