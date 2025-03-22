@@ -337,6 +337,7 @@ int main() {
             // DrawCircle(pos.x, pos.y, size, BLACK);
             DrawMo(mo);
             drawCursor(mouse, cursorTexture, cursorPressedTexture);
+            DrawFPS(SCREEN_WIDTH - MeasureText("FPS: 60", 20) - 20, 20);
 
         EndDrawing();
     }
