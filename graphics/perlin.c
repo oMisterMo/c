@@ -7,8 +7,14 @@
 #include "reasings.h"
 #include "stb_perlin.h"
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
+// #define SCREEN_WIDTH 1024
+// #define SCREEN_HEIGHT 768
+
+const int BASE_SCREEN_WIDTH = 2880 / 3;
+const int BASE_SCREEN_HEIGHT = 1920 / 3;
+
+int SCREEN_WIDTH = BASE_SCREEN_WIDTH;
+int SCREEN_HEIGHT = BASE_SCREEN_HEIGHT;
 
 
 
@@ -133,6 +139,20 @@ void HandleInput(GameObject *mo) {
     }
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         OnRightClick(mo);
+    }
+    if (IsKeyPressed(KEY_F)) {
+        if (!IsWindowFullscreen()) {
+            int monitor = GetCurrentMonitor();
+            SCREEN_WIDTH  = GetMonitorWidth(monitor);
+            SCREEN_HEIGHT = GetMonitorHeight(monitor);
+            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+            ToggleFullscreen();
+        } else {
+            ToggleFullscreen();
+            SCREEN_WIDTH = BASE_SCREEN_WIDTH;
+            SCREEN_HEIGHT = BASE_SCREEN_HEIGHT;
+            SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
     }
 }
 void UpdateMo(GameObject *mo) {
