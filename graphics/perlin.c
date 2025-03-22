@@ -56,6 +56,10 @@ typedef struct GameObject {
     //Perlin perlin?
 } GameObject;
 
+void InitMo(GameObject *mo);
+void InputMo(GameObject *mo, Vector2 mouse);
+void UpdateMo(GameObject *mo, float timeLastSpawn, float spawnInterval);
+void DrawMo(GameObject mo);
 
 
 // UGGGGHH - THE BAD STUFF
@@ -112,69 +116,6 @@ void OnRightClick(GameObject *mo) {
     mo->shake.shakeIntensity = 0.5f;
 }
 
-void InitMo(GameObject *mo) {
-    Rectangle bounds = { 0, SCREEN_HEIGHT / 2  - mo->texture.height / 2, mo->texture.width, mo->texture.height };
-    Tween tween = { 0 };
-    tween.currentPosition = (Vector2) { bounds.x, bounds.y };
-    tween.targetPosition = (Vector2) { GetScreenWidth() - mo->texture.width , SCREEN_HEIGHT / 2 };
-    tween.state = IDLE;
-    tween.frameCounter = 0;
-    tween.duration = 60 * 2;
-
-    mo->tween = tween;
-    mo->bounds = bounds;
-}
-void InputMo(GameObject *mo, Vector2 mouse) {
-    // Mouse over
-    if (CheckCollisionPointRec(mouse, mo->bounds)) {
-        mo->mouseover = true;
-    } else {
-        mo->mouseover = false;
-    }
-
-    // Mouse down
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        OnLeftClick(mo);
-    }
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        OnRightClick(mo);
-    }
-}
-void UpdateMo(GameObject *mo) {
-    if (mo->tween.state == TWEENING) {
-        mo->tween.frameCounter++;
-
-        // Tween
-        mo->bounds.x  = EaseElasticOut(
-            (float) mo->tween.frameCounter,
-            mo->tween.currentPosition.x,
-            mo->tween.targetPosition.x - mo->tween.currentPosition.x,
-            mo->tween.duration
-        );
-
-        // Tween complete
-        if (mo->tween.frameCounter >= mo->tween.duration) {
-            mo->tween.frameCounter = 0;
-            mo->tween.state = IDLE;
-
-
-            // Set final position
-            mo->bounds.x = mo->tween.currentPosition.x;
-        }
-    }
-}
-void DrawMo(GameObject mo) {
-    // Draw Mo
-
-    if (mo.mouseover) {
-        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, YELLOW);
-    } else {
-        // DrawRectangleRec(mo.bounds, WHITE);
-        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
-        // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
-    }
-}
-
 
 void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
     if (IsCursorOnScreen()) {
@@ -188,7 +129,7 @@ void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
     }
 }
 
-void ApplyPerlinScreenShake(GameObject *obj) {
+void ShakeMo(GameObject *obj) {
     if (obj->shake.shakeDuration > 0.0f) {
         // Use Perlin noise to generate offsets
         obj->bounds.x = obj->bounds.x +  perlinNoise(obj->shake.noiseTime) * obj->shake.shakeIntensity;
@@ -243,7 +184,7 @@ float GetPerlin(float time) {
 
     return np;
 }
-void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
+void PerlinMo(GameObject *mo, float timeLastSpawn, float spawnInterval) {
     float currentTime = GetTime();
 
     if (currentTime - timeLastSpawn > spawnInterval) {
@@ -259,8 +200,75 @@ void UpdatePerlin(GameObject *mo, float timeLastSpawn, float spawnInterval) {
 
     }
 }
+void TweenMo(GameObject *mo) {
+    if (mo->tween.state == TWEENING) {
+        mo->tween.frameCounter++;
+
+        // Tween
+        mo->bounds.x  = EaseElasticOut(
+            (float) mo->tween.frameCounter,
+            mo->tween.currentPosition.x,
+            mo->tween.targetPosition.x - mo->tween.currentPosition.x,
+            mo->tween.duration
+        );
+
+        // Tween complete
+        if (mo->tween.frameCounter >= mo->tween.duration) {
+            mo->tween.frameCounter = 0;
+            mo->tween.state = IDLE;
 
 
+            // Set final position
+            mo->bounds.x = mo->tween.currentPosition.x;
+        }
+    }
+}
+
+
+void InitMo(GameObject *mo) {
+    Rectangle bounds = { 0, SCREEN_HEIGHT / 2  - mo->texture.height / 2, mo->texture.width, mo->texture.height };
+    Tween tween = { 0 };
+    tween.currentPosition = (Vector2) { bounds.x, bounds.y };
+    tween.targetPosition = (Vector2) { GetScreenWidth() - mo->texture.width , SCREEN_HEIGHT / 2 };
+    tween.state = IDLE;
+    tween.frameCounter = 0;
+    tween.duration = 60 * 2;
+
+    mo->tween = tween;
+    mo->bounds = bounds;
+}
+void InputMo(GameObject *mo, Vector2 mouse) {
+    // Mouse over
+    if (CheckCollisionPointRec(mouse, mo->bounds)) {
+        mo->mouseover = true;
+    } else {
+        mo->mouseover = false;
+    }
+
+    // Mouse down
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        OnLeftClick(mo);
+    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        OnRightClick(mo);
+    }
+}
+void UpdateMo(GameObject *mo, float timeLastSpawn, float spawnInterval) {
+    PerlinMo(mo, timeLastSpawn, spawnInterval);
+    if (mo->shake.isShaking) {
+        ShakeMo(mo);
+    }
+    // TweenMo(mo);
+}
+void DrawMo(GameObject mo) {
+    if (mo.mouseover) {
+        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, YELLOW);
+    } else {
+        // DrawRectangleRec(mo.bounds, WHITE);
+        DrawTextureV(mo.texture, (Vector2) { mo.bounds.x, mo.bounds.y }, WHITE);
+        // DrawText(TextFormat("x %.1f\ny %.1f", mo.bounds.x, mo.bounds.y), mo.bounds.x + mo.texture.width / 2 - 50, mo.bounds.y - 50, 20, WHITE);
+    }
+}
 
 
 
@@ -323,11 +331,7 @@ int main() {
         HandleInput(&mo, mouse);
 
         // Update
-        UpdatePerlin(&mo, timeLastSpawn, spawnInterval);
-        // UpdateMo(&mo);
-        if (mo.shake.isShaking) {
-            ApplyPerlinScreenShake(&mo);
-        }
+        UpdateMo(&mo, timeLastSpawn, spawnInterval);
 
         // Draw
         BeginDrawing();
