@@ -58,7 +58,7 @@ typedef struct GameObject {
 
 void InitMo(GameObject *mo);
 void InputMo(GameObject *mo, Vector2 mouse);
-void UpdateMo(GameObject *mo, float timeLastSpawn, float spawnInterval);
+void UpdateMo(GameObject *mo);
 void DrawMo(GameObject mo);
 
 
@@ -184,21 +184,17 @@ float GetPerlin(float time) {
 
     return np;
 }
-void PerlinMo(GameObject *mo, float timeLastSpawn, float spawnInterval) {
+void PerlinMo(GameObject *mo) {
     float currentTime = GetTime();
 
-    if (currentTime - timeLastSpawn > spawnInterval) {
+    float x = GetPerlin(currentTime);
+    float y = GetPerlin(currentTime + 10000);
 
-        float x = GetPerlin(currentTime);
-        float y = GetPerlin(currentTime + 10000);
-
-        // Multiply by size
-        // pos.x = np * GetScreenWidth();
-        mo->bounds.x = x * GetScreenWidth();
-        mo->bounds.y = y * GetScreenHeight();
-        // printf("result %.2f\n", x);
-
-    }
+    // Multiply by size
+    // pos.x = np * GetScreenWidth();
+    mo->bounds.x = x * GetScreenWidth();
+    mo->bounds.y = y * GetScreenHeight();
+    // printf("result %.2f\n", x);
 }
 void TweenMo(GameObject *mo) {
     if (mo->tween.state == TWEENING) {
@@ -253,8 +249,8 @@ void InputMo(GameObject *mo, Vector2 mouse) {
         OnRightClick(mo);
     }
 }
-void UpdateMo(GameObject *mo, float timeLastSpawn, float spawnInterval) {
-    PerlinMo(mo, timeLastSpawn, spawnInterval);
+void UpdateMo(GameObject *mo) {
+    PerlinMo(mo);
     if (mo->shake.isShaking) {
         ShakeMo(mo);
     }
@@ -314,9 +310,6 @@ int main() {
     InitMo(&mo);
 
     // Random stuff
-    float spawnInterval = 0.3f; // Every 1 second
-    float timeLastSpawn = 0.0;
-    int index = 0;
     Vector2 pos = { 0, GetScreenHeight() / 2 };
 
     SetTargetFPS(60);
@@ -331,7 +324,7 @@ int main() {
         HandleInput(&mo, mouse);
 
         // Update
-        UpdateMo(&mo, timeLastSpawn, spawnInterval);
+        UpdateMo(&mo);
 
         // Draw
         BeginDrawing();
