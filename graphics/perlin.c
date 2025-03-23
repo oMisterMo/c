@@ -25,10 +25,10 @@ typedef enum {
 } TweenState;
 
 typedef struct Tween {
-    Vector2 currentPosition;      // Tween start
-    Vector2 targetPosition;     // Tween end [could be consts]
     int state;                  // IDLE | TWEENING
     int frameCounter;           // Current time in tween
+    Vector2 currentPosition;    // Tween start
+    Vector2 targetPosition;     // Tween end [could be consts]
     int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
 } Tween;
 
@@ -117,7 +117,7 @@ void OnRightClick(GameObject *mo) {
 }
 
 
-void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
+void DrawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
     if (IsCursorOnScreen()) {
         // Subtract the offset of cursor tip
         mouse = Vector2SubtractValue(mouse, 17);
@@ -130,23 +130,25 @@ void drawCursor(Vector2 mouse, Texture2D cursor, Texture2D cursorPressed) {
 }
 
 void ShakeMo(GameObject *obj) {
-    if (obj->shake.shakeDuration > 0.0f) {
-        // Use Perlin noise to generate offsets
-        obj->bounds.x = obj->bounds.x +  perlinNoise(obj->shake.noiseTime) * obj->shake.shakeIntensity;
-        obj->bounds.y = obj->bounds.y +  perlinNoise(obj->shake.noiseTime + 100.0f) * obj->shake.shakeIntensity; // Offset for Y-axis
+    if (obj->shake.isShaking) {
+        if (obj->shake.shakeDuration > 0.0f) {
+            // Use Perlin noise to generate offsets
+            obj->bounds.x = obj->bounds.x +  perlinNoise(obj->shake.noiseTime) * obj->shake.shakeIntensity;
+            obj->bounds.y = obj->bounds.y +  perlinNoise(obj->shake.noiseTime + 100.0f) * obj->shake.shakeIntensity; // Offset for Y-axis
 
-        // Increment noiseTime to get new noise values each frame
-        obj->shake.noiseTime += 0.1f;
+            // Increment noiseTime to get new noise values each frame
+            obj->shake.noiseTime += 0.1f;
 
-        // Reduce the shake duration over time
-        obj->shake.shakeDuration -= 0.016f; // Assuming a frame time of ~16ms
-    }
-    else {
-        printf("DONE SHAKING.\n");
-        // Reset offsets when shake is done
-        obj->shake.isShaking = false;
-        // obj->bounds.x = (GetScreenWidth() - obj->bounds.width) / 2;
-        // obj->bounds.y = (GetScreenHeight() - obj->bounds.height) / 2;
+            // Reduce the shake duration over time
+            obj->shake.shakeDuration -= 0.016f; // Assuming a frame time of ~16ms
+        }
+        else {
+            printf("DONE SHAKING.\n");
+            // Reset offsets when shake is done
+            obj->shake.isShaking = false;
+            // obj->bounds.x = (GetScreenWidth() - obj->bounds.width) / 2;
+            // obj->bounds.y = (GetScreenHeight() - obj->bounds.height) / 2;
+        }
     }
 }
 void HandleInput(GameObject *mo, Vector2 mouse) {
@@ -184,7 +186,7 @@ float GetPerlin(float time) {
 
     return np;
 }
-void PerlinMo(GameObject *mo) {
+void PerlinMo(GameObject *obj) {
     float currentTime = GetTime();
 
     float x = GetPerlin(currentTime);
@@ -192,30 +194,30 @@ void PerlinMo(GameObject *mo) {
 
     // Multiply by size
     // pos.x = np * GetScreenWidth();
-    mo->bounds.x = x * GetScreenWidth();
-    mo->bounds.y = y * GetScreenHeight();
+    obj->bounds.x = x * GetScreenWidth();
+    obj->bounds.y = y * GetScreenHeight();
     // printf("result %.2f\n", x);
 }
-void TweenMo(GameObject *mo) {
-    if (mo->tween.state == TWEENING) {
-        mo->tween.frameCounter++;
+void TweenMo(GameObject *obj) {
+    if (obj->tween.state == TWEENING) {
+        obj->tween.frameCounter++;
 
         // Tween
-        mo->bounds.x  = EaseElasticOut(
-            (float) mo->tween.frameCounter,
-            mo->tween.currentPosition.x,
-            mo->tween.targetPosition.x - mo->tween.currentPosition.x,
-            mo->tween.duration
+        obj->bounds.x  = EaseElasticOut(
+            (float) obj->tween.frameCounter,
+            obj->tween.currentPosition.x,
+            obj->tween.targetPosition.x - obj->tween.currentPosition.x,
+            obj->tween.duration
         );
 
         // Tween complete
-        if (mo->tween.frameCounter >= mo->tween.duration) {
-            mo->tween.frameCounter = 0;
-            mo->tween.state = IDLE;
+        if (obj->tween.frameCounter >= obj->tween.duration) {
+            obj->tween.frameCounter = 0;
+            obj->tween.state = IDLE;
 
 
             // Set final position
-            mo->bounds.x = mo->tween.currentPosition.x;
+            obj->bounds.x = obj->tween.currentPosition.x;
         }
     }
 }
@@ -251,9 +253,7 @@ void InputMo(GameObject *mo, Vector2 mouse) {
 }
 void UpdateMo(GameObject *mo) {
     PerlinMo(mo);
-    if (mo->shake.isShaking) {
-        ShakeMo(mo);
-    }
+    ShakeMo(mo);
     // TweenMo(mo);
 }
 void DrawMo(GameObject mo) {
@@ -333,7 +333,7 @@ int main() {
             // float size = 15;
             // DrawCircle(pos.x, pos.y, size, BLACK);
             DrawMo(mo);
-            drawCursor(mouse, cursorTexture, cursorPressedTexture);
+            DrawCursor(mouse, cursorTexture, cursorPressedTexture);
             DrawFPS(SCREEN_WIDTH - MeasureText("FPS: 60", 20) - 20, 20);
 
         EndDrawing();
