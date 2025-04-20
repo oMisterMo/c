@@ -97,8 +97,8 @@ int main() {
         // ATTEMPT 1 - Only run after elapsed interval time
         double currentTime = GetTime();
         if (currentTime - timeLastSpawn > spawnInterval) {
-            int len = (sizeof(colors) / sizeof(colors[0])) - 1;
-            index = GetRandomValue(0, len);
+            int len = sizeof(colors) / sizeof(colors[0]);
+            index = GetRandomValue(0, len - 1);
             // Reset last spawn
             timeLastSpawn = GetTime();
         }
