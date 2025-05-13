@@ -1,3 +1,16 @@
+/**
+ * The typedef is a keyword that is used to provide existing data types with a new name.
+ *
+ *
+ * examples...
+ *
+ * typedef <existing_type> <new_type>
+ *
+ * typedef int Integear
+ * typedef "struct Point {}" Point
+ *
+ */
+
 #include <stdio.h>
 
 struct Vector2 {
@@ -32,12 +45,6 @@ typedef struct Vector5 {
 typedef int Integer;
 typedef long long ll;
 
-/**
- * The typedef is a keyword that is used to provide existing data types with a new name.
- *
- * typedef <existing_type> <new_type>
- *
- */
 int main() {
 
 
