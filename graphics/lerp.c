@@ -11,8 +11,8 @@ int main(void) {
     // Init variables
     Vector2 pos = { WIDTH/2, HEIGHT/2 };
     Texture2D img = LoadTexture("resources/sprites/114.png");
-    float scale = 2;
-    float t = 0;    // 0 -> 1
+    float scale = 2.0f;
+    float t = 0.0f;    // 0 -> 1
 
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
