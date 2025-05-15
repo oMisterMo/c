@@ -4,9 +4,10 @@
 
 #define WIDTH 800
 #define HEIGHT 800
+#define STRENGTH 5.0f   // 1 = Weak, 3+ = Strong
 
 int main(void) {
-    InitWindow(WIDTH, HEIGHT, "TEST");
+    InitWindow(WIDTH, HEIGHT, "Lerp");
 
     // Init variables
     Vector2 pos = { WIDTH/2, HEIGHT/2 };
@@ -16,25 +17,28 @@ int main(void) {
 
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
+        // float dt = GetFrameTime();
+        // printf("dt: %.2f\n", dt);
 
         //input
         float mouseX = (float)GetMouseX() / WIDTH;
-        printf("%f\n", mouseX);
+        // printf("%f\n", mouseX);
         // printf("%d\n", GetMouseX());
+
         //update
         // t += 0.001;
+
         //draw
         BeginDrawing();
-            ClearBackground(WHITE);
-            // Vector2 atOrigin = Vector2Subtract(pos, (Vector2) {(img.width)/2, (img.height)/2});
-
+            ClearBackground((Color) {213,240,234,1});
+            // Game
             float scale = Lerp(1, 10, mouseX);
-
             Vector2 atOriginScaled = Vector2Subtract(pos, (Vector2) {(img.width*scale)/2, (img.height*scale)/2});
-            DrawTextureEx(img, atOriginScaled, 0, scale, ColorLerp(BLACK, WHITE, mouseX));
+            DrawTextureEx(img, atOriginScaled, 0, scale, ColorLerp(BLACK, WHITE, mouseX / STRENGTH));
             DrawCircleV(pos, 10, ColorAlpha(RED, 0.1f));
+            // UI
+            DrawText(TextFormat("%.2f", mouseX), 20, 20, 30, BLACK);
         EndDrawing();
-
     }
 
     UnloadTexture(img);
