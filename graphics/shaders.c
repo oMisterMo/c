@@ -89,7 +89,7 @@ int main(void) {
 
     // ==== SET UNIFORM VALUE ====
 
-    // Variable that is passed to shader
+    // Variable that are passed into the shader
     Vector2 resolution = { GetScreenWidth(), GetScreenHeight() };
     float seconds = 2.0f;
     Vector2 mouse = { 0 };
@@ -167,6 +167,9 @@ int main(void) {
 
     UnloadTexture(texture);
     UnloadShader(shader_0);
+    UnloadShader(shader_1);
+    UnloadShader(shader_2);
+    UnloadShader(shader_3);
     UnloadRenderTexture(target);
     CloseWindow();
 
