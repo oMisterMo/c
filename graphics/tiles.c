@@ -3,22 +3,21 @@
 #include <math.h>
 #include "raylib.h"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define WORLD_WIDTH 1280
+#define WORLD_HEIGHT 720
 
-#define WORLD_WIDTH 480
-#define WORLD_HEIGHT 270
-
-
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 270
 
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
-#define NO_OF_TILES_X SCREEN_WIDTH / TILE_WIDTH 
-#define NO_OF_TILES_Y SCREEN_HEIGHT / TILE_HEIGHT
+
+#define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH 
+#define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT
 
 int main(void) {
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tiles");
+    InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
 
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
@@ -40,23 +39,23 @@ int main(void) {
     }
 
     // Player
-    Rectangle player = { WORLD_WIDTH/2, WORLD_HEIGHT/2, 20, 20};
+    Rectangle player = { SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20};
 
     // Camera
     Camera2D camera = { 0 };
-    camera.offset = (Vector2){ SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
+    camera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
     // camera.offset = (Vector2){ 0, 0 };
     camera.target = (Vector2){ player.x, player.y };
     camera.rotation = 0.0f;
-    camera.zoom = 1.8f;
+    camera.zoom = 1.0f;
 
-    Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
+    Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 
     // Test
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, camera);
-    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, camera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, camera);
 
     printf("==========================\n");
     printf("Moo\n");
@@ -105,12 +104,12 @@ int main(void) {
 
         // if (camera.target.x < 0) camera.target.x = 0;
         // if (camera.target.y < 0) camera.target.y = 0;
-        // if (camera.target.x > SCREEN_WIDTH) camera.target.x = SCREEN_WIDTH;
-        // if (camera.target.y > SCREEN_HEIGHT) camera.target.y = SCREEN_HEIGHT;
+        // if (camera.target.x > WORLD_WIDTH) camera.target.x = WORLD_WIDTH;
+        // if (camera.target.y > WORLD_HEIGHT) camera.target.y = WORLD_HEIGHT;
 
         // draw
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, camera);
-        Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, camera);
+        Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, camera);
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode2D(camera);
@@ -159,8 +158,8 @@ int main(void) {
             
             
             int i = 0;
-            for (int y = 0; y < (int) (SCREEN_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-                for (int x = 0; x < (int) (SCREEN_WIDTH / TILE_WIDTH) + 1; ++x) {
+            for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
+                for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
                     // DrawRectangleRec(tiles[i], RED);
                     // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
                     DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
@@ -170,8 +169,8 @@ int main(void) {
                     ++i;
                 }
             }
-            DrawRectangleLinesEx(screenBounds, 8, YELLOW);
-            DrawRectangleLinesEx(worldBounds, 8, BLUE);
+            DrawRectangleLinesEx(worldBounds, 8, YELLOW);
+            DrawRectangleLinesEx(screenBounds, 8, BLUE);
 
             DrawRectangleRec(player, ORANGE);
             
