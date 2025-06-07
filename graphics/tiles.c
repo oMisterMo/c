@@ -19,6 +19,30 @@ int main(void) {
 
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
 
+    // Checkard background
+    Color *pixels = (Color *)malloc(WORLD_WIDTH*WORLD_HEIGHT*sizeof(Color));
+
+    for (int y = 0; y < WORLD_HEIGHT; y++)
+    {
+        for (int x = 0; x < WORLD_WIDTH; x++)
+        {
+            if (((x/32+y/32)/1)%2 == 0) pixels[y*WORLD_WIDTH + x] = ColorAlpha(ORANGE, 0.1f);
+            else pixels[y*WORLD_WIDTH + x] = ColorAlpha(GOLD, 0.1f);
+        }
+    }
+
+    // Load pixels data into an image structure and create texture
+    Image checkedIm = {
+        .data = pixels,             // We can assign pixels directly to data
+        .width = WORLD_WIDTH,
+        .height = WORLD_HEIGHT,
+        .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
+        .mipmaps = 1
+    };
+
+    Texture2D checked = LoadTextureFromImage(checkedIm);
+    UnloadImage(checkedIm);     // free img.data aka pixels
+
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
     Rectangle tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
@@ -113,6 +137,8 @@ int main(void) {
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode2D(camera);
+
+            DrawTexture(checked, 0, 0, WHITE);
 
             // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
             // printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
