@@ -166,11 +166,11 @@ void Update(int cameraType, Camera2D *worldCamera, Camera2D *screenCamera, Recta
         if (screenBounds->x + screenBounds->width > worldBounds.width) screenBounds->x = worldBounds.width - screenBounds->width;
         if (screenBounds->y < worldBounds.y) screenBounds->y = worldBounds.y;
         if (screenBounds->y + screenBounds->height > worldBounds.height) screenBounds->y = worldBounds.height - screenBounds->height;
-        // Bound blue window to game world
+        // Bound screen camera to game world
         if (screenCamera->target.x < WORLD_WIDTH / 4) screenCamera->target.x = WORLD_WIDTH / 4;
-        // if (screenCamera->target.x + SCREEN_WIDTH > worldBounds.width) screenCamera->target.x = worldBounds.width - SCREEN_WIDTH;
+        if (screenCamera->target.x + WORLD_WIDTH / 4 > worldBounds.width) screenCamera->target.x = worldBounds.width - WORLD_WIDTH / 4;
         if (screenCamera->target.y < WORLD_HEIGHT / 4) screenCamera->target.y = WORLD_HEIGHT / 4;
-        // if (screenCamera->target.y + SCREEN_HEIGHT > worldBounds.height) screenCamera->target.y = worldBounds.height - SCREEN_HEIGHT;
+        if (screenCamera->target.y + WORLD_HEIGHT / 4 > worldBounds.height) screenCamera->target.y = worldBounds.height - WORLD_HEIGHT / 4;
     }
 
     // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
