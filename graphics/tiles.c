@@ -15,6 +15,81 @@
 #define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH 
 #define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT
 
+enum CameraType {
+    CAMERA_WORLD,
+    CAMERA_SCREEN
+};
+
+void DrawCameraWorld(Camera2D worldCamera, Texture checked, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
+    BeginMode2D(worldCamera);
+    DrawTexture(checked, 0, 0, WHITE);
+
+    // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
+    // printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
+    // Draw every tile
+    // int i = 0;
+    // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
+    //         // DrawRectangleRec(tiles[i], RED);
+    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, RED);
+    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
+    //         ++i;
+    //     }
+    // }
+
+    // Draw only visible tiles
+    // int i = 0;
+    // int startX = (int) windowStart.x / TILE_WIDTH;
+    // int endX = (int) (windowEnd.x / TILE_WIDTH) + 1;
+    // int startY = (int) windowStart.y / TILE_HEIGHT;
+    // int endY = (int) (windowEnd.y / TILE_HEIGHT) + 1;
+
+    // for (int y = startY; y < endY     ; ++y) {
+    //     for (int x = startX; x < endX ; ++x) {
+    //         // DrawRectangleRec(tiles[i], RED);
+    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+    //         // if (startX <= 0) startX = 0;
+    //         // if (startY <= 0) startY = 0;
+    //         // if (endX < NO_OF_TILES_X) endX = NO_OF_TILES_X;
+    //         // if (endY < NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
+    //         // if (endX > NO_OF_TILES_X) endX = NO_OF_TILES_X;
+    //         // if (endY > NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
+
+    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, RED);
+    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
+    //         ++i;
+    //     }
+    // }
+
+    int i = 0;
+    for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
+        for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
+            // DrawRectangleRec(tiles[i], RED);
+            // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+            DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT, RED);
+            DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT, WHITE);
+            ++i;
+        }
+    }
+    DrawRectangleLinesEx(worldBounds, 8, YELLOW);
+    DrawRectangleLinesEx(screenBounds, 8, BLUE);
+
+    DrawRectangleRec(player, ORANGE);
+    EndMode2D();
+}
+
+void DrawCameraScreen() {
+
+}
+
+
 int main(void) {
 
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
@@ -66,20 +141,28 @@ int main(void) {
     Rectangle player = { SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20};
 
     // Camera
-    Camera2D camera = { 0 };
-    camera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    // camera.offset = (Vector2){ 0, 0 };
-    camera.target = (Vector2){ player.x, player.y };
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    Camera2D worldCamera = { 0 };
+    worldCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
+    // worldCamera.offset = (Vector2){ 0, 0 };
+    worldCamera.target = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
+    worldCamera.rotation = 0.0f;
+    worldCamera.zoom = 1.0f;
+
+    Camera2D screenCamera = { 0 };
+    screenCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
+    // screenCamera.offset = (Vector2){ 0, 0 };
+    screenCamera.target = (Vector2){ player.x, player.y };
+    screenCamera.rotation = 0.0f;
+    screenCamera.zoom = 2.0f;
 
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
     Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
+    int cameraType = CAMERA_WORLD;
 
     // Test
-    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, camera);
-    Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, camera);
+    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
 
     printf("==========================\n");
     printf("Moo\n");
@@ -94,114 +177,68 @@ int main(void) {
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
         // input
+        if (IsKeyPressed(KEY_SPACE)) {
+            if (cameraType == CAMERA_WORLD) {
+                cameraType = CAMERA_SCREEN;
+            } else {
+                cameraType = CAMERA_WORLD;
+            }
+        }
         if (IsKeyPressed(KEY_ONE)) {
             lineThick += 1;
         }
+
         // update
-        float speed = 800 * GetFrameTime();
-        if (IsKeyDown(KEY_UP)) {
-            camera.target.y -= speed;
-        }
-        if (IsKeyDown(KEY_DOWN)) {
-            camera.target.y += speed;
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            camera.target.x -= speed;
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            camera.target.x += speed;
+        if (cameraType == CAMERA_WORLD) {
+            float speed = 800 * GetFrameTime();
+            if (IsKeyDown(KEY_UP)) {
+                worldCamera.target.y -= speed;
+            }
+            if (IsKeyDown(KEY_DOWN)) {
+                worldCamera.target.y += speed;
+            }
+            if (IsKeyDown(KEY_LEFT)) {
+                worldCamera.target.x -= speed;
+            }
+            if (IsKeyDown(KEY_RIGHT)) {
+                worldCamera.target.x += speed;
+            }
         }
 
-        // WORLD CAMERA
-        // if (IsKeyDown(KEY_UP)) {
-        //     camera.target.y -= speed;
-        // }
-        // if (IsKeyDown(KEY_DOWN)) {
-        //     camera.target.y += speed;
-        // }
-        // if (IsKeyDown(KEY_LEFT)) {
-        //     camera.target.x -= speed;
-        // }
-        // if (IsKeyDown(KEY_RIGHT)) {
-        //     camera.target.x += speed;
-        // }
+        if (cameraType == CAMERA_SCREEN) {
+            float speed = 800 * GetFrameTime();
+            if (IsKeyDown(KEY_UP)) {
+                worldCamera.target.y -= speed;
+            }
+            if (IsKeyDown(KEY_DOWN)) {
+                worldCamera.target.y += speed;
+            }
+            if (IsKeyDown(KEY_LEFT)) {
+                worldCamera.target.x -= speed;
+            }
+            if (IsKeyDown(KEY_RIGHT)) {
+                worldCamera.target.x += speed;
+            }
+        }
 
-        // if (camera.target.x < 0) camera.target.x = 0;
-        // if (camera.target.y < 0) camera.target.y = 0;
-        // if (camera.target.x > WORLD_WIDTH) camera.target.x = WORLD_WIDTH;
-        // if (camera.target.y > WORLD_HEIGHT) camera.target.y = WORLD_HEIGHT;
+        // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
+        // if (worldCamera.target.y < 0) worldCamera.target.y = 0;
+        // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
+        // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
 
         // draw
-        Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, camera);
-        Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, camera);
+        Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
+        Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
         BeginDrawing();
             ClearBackground(BLACK);
-            BeginMode2D(camera);
 
-            DrawTexture(checked, 0, 0, WHITE);
-
-            // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
-            // printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
-            // Draw every tile
-            // int i = 0;
-            // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
-            //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            //         // DrawRectangleRec(tiles[i], RED);
-            //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-            //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-            //             TILE_WIDTH, TILE_HEIGHT, RED);
-            //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-            //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-            //         ++i;
-            //     }
-            // }
-
-            // Draw only visible tiles
-            // int i = 0;
-            // int startX = (int) windowStart.x / TILE_WIDTH;
-            // int endX = (int) (windowEnd.x / TILE_WIDTH) + 1;
-            // int startY = (int) windowStart.y / TILE_HEIGHT;
-            // int endY = (int) (windowEnd.y / TILE_HEIGHT) + 1;
-
-            // for (int y = startY; y < endY     ; ++y) {
-            //     for (int x = startX; x < endX ; ++x) {
-            //         // DrawRectangleRec(tiles[i], RED);
-            //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-            //         // if (startX <= 0) startX = 0;
-            //         // if (startY <= 0) startY = 0;
-            //         // if (endX < NO_OF_TILES_X) endX = NO_OF_TILES_X;
-            //         // if (endY < NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
-            //         // if (endX > NO_OF_TILES_X) endX = NO_OF_TILES_X;
-            //         // if (endY > NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
-
-            //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-            //             TILE_WIDTH, TILE_HEIGHT, RED);
-            //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-            //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-            //         ++i;
-            //     }
-            // }
-            
-            
-            int i = 0;
-            for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-                for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
-                    // DrawRectangleRec(tiles[i], RED);
-                    // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-                    DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-                        TILE_WIDTH, TILE_HEIGHT, RED);
-                    DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-                        TILE_WIDTH, TILE_HEIGHT, WHITE);
-                    ++i;
-                }
+            if (cameraType == CAMERA_WORLD) {
+                DrawCameraWorld(worldCamera, checked, worldBounds, screenBounds, player);
+                DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
+            } else if (cameraType == CAMERA_SCREEN) {
+                DrawCameraScreen();
+                DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
             }
-            DrawRectangleLinesEx(worldBounds, 8, YELLOW);
-            DrawRectangleLinesEx(screenBounds, 8, BLUE);
-
-            DrawRectangleRec(player, ORANGE);
-            
-            
-            EndMode2D();
 
             DrawText(TextFormat("x (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 60, 20, WHITE);
             DrawText(TextFormat("y (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 100, 20, WHITE);
