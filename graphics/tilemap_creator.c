@@ -123,10 +123,8 @@ void DrawCameraWorld(Game *game) {
     int i = 0;
     for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
         for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
-            // DrawRectangleRec(tiles[i], RED);
-            // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
             DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, RED);
+                TILE_WIDTH, TILE_HEIGHT, GRAY);
             DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT, WHITE);
             ++i;
@@ -134,23 +132,14 @@ void DrawCameraWorld(Game *game) {
     }
 
     // Texture tiles
-    i = 0;
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            // y * NO_OF_TILES_Y + x
-            // printf("%d - %d\n", i, y * NO_OF_TILES_Y + x);
-            Rectangle src = game->tiles[i].srcRect;
-            Rectangle dest = game->tiles[i].destRect;
+            // y * NO_OF_TILES_X + x
+            Rectangle src = game->tiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->tiles[y * NO_OF_TILES_X + x].destRect;
             DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
-            // DrawRectangleRec(game->tiles[i].destRect, GREEN);
-
-            ++i;
         }
     }
-
-    // Rectangle src = {game->tileSelected.x*TILE_WIDTH,game->tileSelected.y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
-    // Rectangle dest = {0,0,TILE_WIDTH,TILE_HEIGHT};
-    // DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
 
     if (game->boolFlags.showWindowBorder) {
         DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
@@ -168,16 +157,26 @@ void DrawCameraScreen(Game *game) {
     BeginMode2D(game->screenCamera);
     DrawAxis();
 
-    int i = 0;
-    for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-        for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
-            // DrawRectangleRec(tiles[i], RED);
-            // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-            DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, RED);
-            DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, WHITE);
-            ++i;
+    // int i = 0;
+    // for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
+    //     for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
+    //         // DrawRectangleRec(tiles[i], RED);
+    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, RED);
+    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
+    //         ++i;
+    //     }
+    // }
+
+    // Texture tiles
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            // y * NO_OF_TILES_X + x
+            Rectangle src = game->tiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->tiles[y * NO_OF_TILES_X + x].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
         }
     }
 
