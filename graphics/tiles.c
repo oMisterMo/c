@@ -143,14 +143,12 @@ int main(void) {
     // Camera
     Camera2D worldCamera = { 0 };
     worldCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    // worldCamera.offset = (Vector2){ 0, 0 };
     worldCamera.target = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
     worldCamera.rotation = 0.0f;
     worldCamera.zoom = 1.0f;
 
     Camera2D screenCamera = { 0 };
     screenCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    // screenCamera.offset = (Vector2){ 0, 0 };
     screenCamera.target = (Vector2){ player.x, player.y };
     screenCamera.rotation = 0.0f;
     screenCamera.zoom = 2.0f;
@@ -189,8 +187,8 @@ int main(void) {
         }
 
         // update
+        float speed = 400 * GetFrameTime();
         if (cameraType == CAMERA_WORLD) {
-            float speed = 800 * GetFrameTime();
             if (IsKeyDown(KEY_UP)) {
                 worldCamera.target.y -= speed;
             }
@@ -206,19 +204,23 @@ int main(void) {
         }
 
         if (cameraType == CAMERA_SCREEN) {
-            float speed = 800 * GetFrameTime();
             if (IsKeyDown(KEY_UP)) {
-                worldCamera.target.y -= speed;
+                player.y -= speed;
             }
             if (IsKeyDown(KEY_DOWN)) {
-                worldCamera.target.y += speed;
+                player.y += speed;
             }
             if (IsKeyDown(KEY_LEFT)) {
-                worldCamera.target.x -= speed;
+                player.x -= speed;
             }
             if (IsKeyDown(KEY_RIGHT)) {
-                worldCamera.target.x += speed;
+                player.x += speed;
             }
+
+            screenCamera.target.x = player.x;
+            screenCamera.target.y = player.y;
+            screenBounds.x = player.x - SCREEN_WIDTH / 2;
+            screenBounds.y = player.y - SCREEN_HEIGHT / 2;
         }
 
         // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
@@ -237,6 +239,7 @@ int main(void) {
                 DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
             } else if (cameraType == CAMERA_SCREEN) {
                 DrawCameraScreen();
+                DrawCameraWorld(screenCamera, checked, worldBounds, screenBounds, player);
                 DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
             }
 
