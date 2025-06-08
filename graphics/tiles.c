@@ -94,7 +94,6 @@ void DrawGUI(Game *game) {
 
 void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
-    DrawTexture(game->checkered, 0, 0, WHITE);
     DrawAxis();
 
     // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
@@ -160,7 +159,6 @@ void DrawCameraWorld(Game *game) {
 
 void DrawCameraScreen(Game *game) {
     BeginMode2D(game->screenCamera);
-    DrawTexture(game->checkered, 0, 0, WHITE);
     DrawAxis();
 
     int i = 0;
@@ -263,6 +261,8 @@ void Update(Game *game) {
 void Draw(Game *game) {
     BeginDrawing();
         ClearBackground(BLACK);
+
+        DrawTexture(game->checkered, 0, 0, WHITE);
 
         if (game->cameraType == CAMERA_WORLD) {
             DrawCameraWorld(game);
