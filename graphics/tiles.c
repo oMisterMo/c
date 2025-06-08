@@ -245,6 +245,11 @@ int main(void) {
             screenCamera.target.y = player.y;
             screenBounds.x = player.x - SCREEN_WIDTH / 2;
             screenBounds.y = player.y - SCREEN_HEIGHT / 2;
+
+            if (screenBounds.x < worldBounds.x) screenBounds.x = worldBounds.x;
+            if (screenBounds.x + screenBounds.width > worldBounds.width) screenBounds.x = worldBounds.width - screenBounds.width;
+            if (screenBounds.y < worldBounds.y) screenBounds.y = worldBounds.y;
+            if (screenBounds.y + screenBounds.height > worldBounds.height) screenBounds.y = worldBounds.height - screenBounds.height;
         }
 
         // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
