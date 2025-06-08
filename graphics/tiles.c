@@ -20,9 +20,17 @@ enum CameraType {
     CAMERA_SCREEN
 };
 
+void DrawAxis() {
+    // DrawLine(-1000, 0, 1000, 0, WHITE);
+    // DrawLine(0, -1000, 0, 1000, WHITE);
+    DrawLineEx((Vector2){-5000,0}, (Vector2){5000,0}, 4, WHITE);
+    DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, WHITE);
+}
+
 void DrawCameraWorld(Camera2D worldCamera, Texture checked, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
     BeginMode2D(worldCamera);
     DrawTexture(checked, 0, 0, WHITE);
+    DrawAxis();
 
     // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
     // printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
@@ -233,6 +241,7 @@ int main(void) {
         Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
         BeginDrawing();
             ClearBackground(BLACK);
+
 
             if (cameraType == CAMERA_WORLD) {
                 DrawCameraWorld(worldCamera, checked, worldBounds, screenBounds, player);
