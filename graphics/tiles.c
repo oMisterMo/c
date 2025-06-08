@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
 #include "raylib.h"
 
 #define WORLD_WIDTH 1280
@@ -20,6 +21,11 @@ enum CameraType {
     CAMERA_SCREEN
 };
 
+typedef struct BoolFlags {
+    bool showGUI;
+    bool showGUIwindow;
+} BoolFlags;
+
 void DrawAxis() {
     // DrawLine(-1000, 0, 1000, 0, WHITE);
     // DrawLine(0, -1000, 0, 1000, WHITE);
@@ -27,12 +33,18 @@ void DrawAxis() {
     DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, WHITE);
 }
 
-void DrawGUI(Rectangle guiWindow, float guiAlpha, int cameraType, Vector2 windowStart, Vector2 windowEnd, Camera2D screenCamera) {
-    DrawRectangleRec(guiWindow, ColorAlpha(BLUE, guiAlpha));
-    DrawText(cameraType == CAMERA_WORLD ? "Camera World" : "Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
-    DrawText(TextFormat("x (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 60, 20, WHITE);
-    DrawText(TextFormat("y (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 100, 20, WHITE);
-    DrawText(TextFormat("screen (%d,%d)", (int) screenCamera.target.x, (int)(screenCamera.target.y)), 20, 160, 20, WHITE);
+void DrawGUI(Rectangle guiWindow, int cameraType, Vector2 windowStart, Vector2 windowEnd, Camera2D screenCamera, Camera2D worldCamera, Rectangle player, BoolFlags boolFlags) {
+    if (boolFlags.showGUI) {
+        if (boolFlags.showGUIwindow) {
+            DrawRectangleRec(guiWindow, ColorAlpha(GRAY, 0.8f));
+        }
+        DrawText(cameraType == CAMERA_WORLD ? "Camera World" : "Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
+        DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
+        DrawText(TextFormat("y (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
+        DrawText(TextFormat("player (%d,%d)", (int) player.x, (int)(player.y)), 20, 160, 20, WHITE);
+        DrawText(TextFormat("screen (%d,%d)", (int) screenCamera.target.x, (int)(screenCamera.target.y)), 20, 200, 20, WHITE);
+        DrawText(TextFormat("world  (%d,%d)", (int) worldCamera.target.x, (int)(worldCamera.target.y)), 20, 240, 20, WHITE);
+    }
 }
 
 void DrawCameraWorld(Camera2D worldCamera, Texture checked, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
@@ -105,7 +117,7 @@ void DrawCameraScreen() {
 
 }
 
-void Input(int *cameraType, int *lineThick, Rectangle guiWindow, float *guiAlpha) {
+void Input(int *cameraType, int *lineThick, Rectangle guiWindow, BoolFlags *boolFlags) {
     if (IsKeyPressed(KEY_SPACE)) {
         if (*cameraType == CAMERA_WORLD) {
             *cameraType = CAMERA_SCREEN;
@@ -113,14 +125,17 @@ void Input(int *cameraType, int *lineThick, Rectangle guiWindow, float *guiAlpha
             *cameraType = CAMERA_WORLD;
         }
     }
-    if (IsKeyPressed(KEY_ONE)) {
+    if (IsKeyPressed(KEY_EQUAL)) {
         *lineThick += 1;
     }
-
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        if (CheckCollisionPointRec(GetMousePosition(), guiWindow)) {
-            *guiAlpha =  1 - *guiAlpha;
-        }
+    if (IsKeyPressed(KEY_ONE)) {
+        boolFlags->showGUI = !boolFlags->showGUI;
+    }
+    if (IsKeyPressed(KEY_TWO)) {
+        boolFlags->showGUIwindow = !boolFlags->showGUIwindow;
+    }
+    if (IsKeyPressed(KEY_THREE)) {
+        // nothing yet
     }
 }
 
@@ -248,8 +263,12 @@ int main(void) {
 
     int cameraType = CAMERA_WORLD;
 
-    float guiAlpha = 0.0f;  // Click on left size of world to show
-    Rectangle guiWindow = { 0, 0, 190, WORLD_HEIGHT };
+    // GUI
+    Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
+    BoolFlags boolFlags = {
+        .showGUI = false,
+        .showGUIwindow = true
+    };
 
     // Test
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
@@ -268,14 +287,14 @@ int main(void) {
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
         // input
-        Input(&cameraType, &lineThick, guiWindow, &guiAlpha);
+        Input(&cameraType, &lineThick, guiWindow, &boolFlags);
 
         // update
         Update(cameraType, &worldCamera, &screenCamera, &player, &screenBounds, worldBounds);
 
         // draw
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
-        Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
+        Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
         BeginDrawing();
             ClearBackground(BLACK);
 
@@ -286,7 +305,7 @@ int main(void) {
                 DrawCameraWorld(screenCamera, checked, worldBounds, screenBounds, player);
             }
             
-            DrawGUI(guiWindow, guiAlpha, cameraType, windowStart, windowEnd, screenCamera);
+            DrawGUI(guiWindow, cameraType, windowStart, windowEnd, screenCamera, worldCamera, player, boolFlags);
 
             DrawFPS(20, 20);
         EndDrawing();
