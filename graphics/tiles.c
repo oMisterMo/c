@@ -27,6 +27,13 @@ void DrawAxis() {
     DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, WHITE);
 }
 
+void DrawGUI(Rectangle guiWindow, float guiAlpha, int cameraType, Vector2 windowStart, Vector2 windowEnd) {
+    DrawRectangleRec(guiWindow, ColorAlpha(BLUE, guiAlpha));
+    DrawText(cameraType == CAMERA_WORLD ? "Camera World" : "Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
+    DrawText(TextFormat("x (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 60, 20, WHITE);
+    DrawText(TextFormat("y (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 100, 20, WHITE);
+}
+
 void DrawCameraWorld(Camera2D worldCamera, Texture checked, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
     BeginMode2D(worldCamera);
     DrawTexture(checked, 0, 0, WHITE);
@@ -166,6 +173,9 @@ int main(void) {
 
     int cameraType = CAMERA_WORLD;
 
+    float guiAlpha = 0.0f;  // Click on left size of world to show
+    Rectangle guiWindow = { 0, 0, 170, WORLD_HEIGHT };
+
     // Test
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
     Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
@@ -194,34 +204,40 @@ int main(void) {
             lineThick += 1;
         }
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointRec(GetMousePosition(), guiWindow)) {
+                guiAlpha =  1 - guiAlpha;
+            }
+        }
+
         // update
         float speed = 400 * GetFrameTime();
         if (cameraType == CAMERA_WORLD) {
-            if (IsKeyDown(KEY_UP)) {
+            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
                 worldCamera.target.y -= speed;
             }
-            if (IsKeyDown(KEY_DOWN)) {
+            if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
                 worldCamera.target.y += speed;
             }
-            if (IsKeyDown(KEY_LEFT)) {
+            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
                 worldCamera.target.x -= speed;
             }
-            if (IsKeyDown(KEY_RIGHT)) {
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
                 worldCamera.target.x += speed;
             }
         }
 
         if (cameraType == CAMERA_SCREEN) {
-            if (IsKeyDown(KEY_UP)) {
+            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
                 player.y -= speed;
             }
-            if (IsKeyDown(KEY_DOWN)) {
+            if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
                 player.y += speed;
             }
-            if (IsKeyDown(KEY_LEFT)) {
+            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
                 player.x -= speed;
             }
-            if (IsKeyDown(KEY_RIGHT)) {
+            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
                 player.x += speed;
             }
 
@@ -245,16 +261,13 @@ int main(void) {
 
             if (cameraType == CAMERA_WORLD) {
                 DrawCameraWorld(worldCamera, checked, worldBounds, screenBounds, player);
-                DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
             } else if (cameraType == CAMERA_SCREEN) {
                 DrawCameraScreen();
                 DrawCameraWorld(screenCamera, checked, worldBounds, screenBounds, player);
-                DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
             }
-
-            DrawText(TextFormat("x (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 60, 20, WHITE);
-            DrawText(TextFormat("y (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 100, 20, WHITE);
             
+            DrawGUI(guiWindow, guiAlpha, cameraType, windowStart, windowEnd);
+
             DrawFPS(20, 20);
         EndDrawing();
     }
