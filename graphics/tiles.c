@@ -222,6 +222,23 @@ void Update(int cameraType, Camera2D *worldCamera, Camera2D *screenCamera, Recta
 
 }
 
+void Draw(int cameraType, Camera2D worldCamera, Camera2D screenCamera, Texture2D checkered, Rectangle worldBounds, Rectangle screenBounds, Rectangle player, BoolFlags boolFlags, Vector2 windowStart, Vector2 windowEnd, Rectangle guiWindow) {
+    BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (cameraType == CAMERA_WORLD) {
+            DrawCameraWorld(worldCamera, checkered, worldBounds, screenBounds, player);
+        } else if (cameraType == CAMERA_SCREEN) {
+            DrawCameraScreen(); // Not used yet...
+            DrawCameraWorld(screenCamera, checkered, worldBounds, screenBounds, player);
+        }
+
+        DrawGUI(guiWindow, cameraType, windowStart, windowEnd, screenCamera, worldCamera, player, boolFlags);
+
+        DrawFPS(20, 20);
+    EndDrawing();
+}
+
 int main(void) {
 
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
@@ -277,7 +294,7 @@ int main(void) {
 
     // Test
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
-    Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
 
     printf("==========================\n");
     printf("Moo\n");
@@ -300,20 +317,7 @@ int main(void) {
         // draw
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
         Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
-        BeginDrawing();
-            ClearBackground(BLACK);
-
-            if (cameraType == CAMERA_WORLD) {
-                DrawCameraWorld(worldCamera, checkered, worldBounds, screenBounds, player);
-            } else if (cameraType == CAMERA_SCREEN) {
-                DrawCameraScreen(); // Not used yet...
-                DrawCameraWorld(screenCamera, checkered, worldBounds, screenBounds, player);
-            }
-            
-            DrawGUI(guiWindow, cameraType, windowStart, windowEnd, screenCamera, worldCamera, player, boolFlags);
-
-            DrawFPS(20, 20);
-        EndDrawing();
+        Draw(cameraType, worldCamera, screenCamera, checkered, worldBounds, screenBounds, player, boolFlags, windowStart, windowEnd, guiWindow);
     }
 
     // free(tiles);
