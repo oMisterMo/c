@@ -29,6 +29,12 @@ typedef struct BoolFlags {
     bool showScreenBorder;
 } BoolFlags;
 
+typedef struct Tile {
+    int id;
+    Rectangle srcRect;
+    Rectangle destRect;
+} Tile;
+
 typedef struct Game {
     Rectangle player;
     Rectangle worldBounds;
@@ -48,6 +54,7 @@ typedef struct Game {
     Texture2D tileset;
 
     Vector2 tileSelected;
+    Tile *tiles;
 } Game;
 
 Texture2D CreateCheckeredBackground() {
@@ -112,6 +119,7 @@ void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
     DrawAxis();
 
+    // Red tiles
     int i = 0;
     for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
         for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
@@ -125,9 +133,24 @@ void DrawCameraWorld(Game *game) {
         }
     }
 
-    Rectangle src = {game->tileSelected.x*TILE_WIDTH,game->tileSelected.y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
-    Rectangle dest = {0,0,TILE_WIDTH,TILE_HEIGHT};
-    DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+    // Texture tiles
+    i = 0;
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            // y * NO_OF_TILES_Y + x
+            // printf("%d - %d\n", i, y * NO_OF_TILES_Y + x);
+            Rectangle src = game->tiles[i].srcRect;
+            Rectangle dest = game->tiles[i].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+            // DrawRectangleRec(game->tiles[i].destRect, GREEN);
+
+            ++i;
+        }
+    }
+
+    // Rectangle src = {game->tileSelected.x*TILE_WIDTH,game->tileSelected.y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+    // Rectangle dest = {0,0,TILE_WIDTH,TILE_HEIGHT};
+    // DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
 
     if (game->boolFlags.showWindowBorder) {
         DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
@@ -309,19 +332,22 @@ int main(void) {
 
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
-    Rectangle tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
+    Tile tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
     Rectangle tile = { 0, 0, TILE_WIDTH, TILE_HEIGHT };
     int lineThick = 1;
 
     int i = 0;
+    int blankTile = 3 * TILE_WIDTH;  // Blank tile at index 3, could use any random number
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
             // y * NO_OF_TILES_Y + x
             // printf("%d - %d\n", i, y * NO_OF_TILES_Y + x);
-            tiles[i] = (Rectangle) {
+            tiles[i].destRect = (Rectangle) {
                 x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT
-            };
+                TILE_WIDTH, TILE_HEIGHT};
+
+            tiles[i].srcRect = (Rectangle) {blankTile,blankTile,TILE_WIDTH,TILE_HEIGHT};
+
             ++i;
         }
     }
@@ -375,6 +401,7 @@ int main(void) {
     game.checkered = checkered;
     game.tileset = tileset;
     game.tileSelected = (Vector2) { 0, 0};
+    game.tiles = tiles;
 
     // Log some stuff
     printf("==========================\n");
