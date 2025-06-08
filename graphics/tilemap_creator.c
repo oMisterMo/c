@@ -25,6 +25,8 @@ enum CameraType {
 typedef struct BoolFlags {
     bool showGUI;
     bool showGUIwindow;
+    bool showWindowBorder;
+    bool showScreenBorder;
 } BoolFlags;
 
 typedef struct Game {
@@ -164,8 +166,12 @@ void DrawCameraWorld(Game *game) {
             ++i;
         }
     }
-    DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
-    DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+    if (game->boolFlags.showWindowBorder) {
+        DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
+    }
+    if (game->boolFlags.showScreenBorder) {
+        DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+    }
 
     DrawRectangleRec(game->player, ORANGE);
     EndMode2D();
@@ -188,8 +194,12 @@ void DrawCameraScreen(Game *game) {
             ++i;
         }
     }
-    DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
-    DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+    if (game->boolFlags.showWindowBorder) {
+        DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
+    }
+    if (game->boolFlags.showScreenBorder) {
+        DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+    }
 
     DrawRectangleRec(game->player, ORANGE);
     EndMode2D();
@@ -212,13 +222,21 @@ void Input(Game *game) {
     }
     if (IsKeyPressed(KEY_TWO)) {
         game->cameraType = CAMERA_WORLD;
+        // game->boolFlags.showScreenBorder = false;
         // game->boolFlags.showGUIwindow = !game->boolFlags.showGUIwindow;
     }
     if (IsKeyPressed(KEY_THREE)) {
         game->cameraType = CAMERA_SCREEN;
+        // game->boolFlags.showScreenBorder = true;
     }
     if (IsKeyPressed(KEY_ZERO)) {
         game->boolFlags.showGUI = !game->boolFlags.showGUI;
+    }
+    if (IsKeyPressed(KEY_EIGHT)) {
+        game->boolFlags.showWindowBorder = !game->boolFlags.showWindowBorder;
+    }
+    if (IsKeyPressed(KEY_NINE)) {
+        game->boolFlags.showScreenBorder = !game->boolFlags.showScreenBorder;
     }
 
     switch (game->cameraType) {
@@ -366,7 +384,9 @@ int main(void) {
     Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
     BoolFlags boolFlags = {
         .showGUI = false,
-        .showGUIwindow = true
+        .showGUIwindow = true,
+        .showWindowBorder = true,
+        .showScreenBorder = true
     };
 
     // Test
