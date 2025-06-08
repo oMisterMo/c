@@ -112,48 +112,6 @@ void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
     DrawAxis();
 
-    // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
-    // printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
-    // Draw every tile
-    // int i = 0;
-    // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
-    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
-    //         // DrawRectangleRec(tiles[i], RED);
-    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, RED);
-    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-    //         ++i;
-    //     }
-    // }
-
-    // Draw only visible tiles
-    // int i = 0;
-    // int startX = (int) windowStart.x / TILE_WIDTH;
-    // int endX = (int) (windowEnd.x / TILE_WIDTH) + 1;
-    // int startY = (int) windowStart.y / TILE_HEIGHT;
-    // int endY = (int) (windowEnd.y / TILE_HEIGHT) + 1;
-
-    // for (int y = startY; y < endY     ; ++y) {
-    //     for (int x = startX; x < endX ; ++x) {
-    //         // DrawRectangleRec(tiles[i], RED);
-    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-    //         // if (startX <= 0) startX = 0;
-    //         // if (startY <= 0) startY = 0;
-    //         // if (endX < NO_OF_TILES_X) endX = NO_OF_TILES_X;
-    //         // if (endY < NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
-    //         // if (endX > NO_OF_TILES_X) endX = NO_OF_TILES_X;
-    //         // if (endY > NO_OF_TILES_Y) endY = NO_OF_TILES_Y;
-
-    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, RED);
-    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-    //         ++i;
-    //     }
-    // }
-
     int i = 0;
     for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
         for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
@@ -166,6 +124,11 @@ void DrawCameraWorld(Game *game) {
             ++i;
         }
     }
+
+    Rectangle src = {game->tileSelected.x*TILE_WIDTH,game->tileSelected.y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+    Rectangle dest = {0,0,TILE_WIDTH,TILE_HEIGHT};
+    DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+
     if (game->boolFlags.showWindowBorder) {
         DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
     }
@@ -194,6 +157,7 @@ void DrawCameraScreen(Game *game) {
             ++i;
         }
     }
+
     if (game->boolFlags.showWindowBorder) {
         DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
     }
@@ -248,6 +212,9 @@ void Input(Game *game) {
             }
             break;
         case CAMERA_WORLD:
+            // if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
+            //     printf("down\n");
+            // }
             break;
         case CAMERA_SCREEN:
             break;
@@ -385,8 +352,8 @@ int main(void) {
     BoolFlags boolFlags = {
         .showGUI = false,
         .showGUIwindow = true,
-        .showWindowBorder = true,
-        .showScreenBorder = true
+        .showWindowBorder = false,
+        .showScreenBorder = false
     };
 
     // Test
