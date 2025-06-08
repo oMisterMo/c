@@ -41,7 +41,8 @@ typedef struct Game {
     Camera2D worldCamera;
     Camera2D screenCamera;
 
-    Texture checkered;
+    Texture2D checkered;
+    Texture2D tileset;
 } Game;
 
 Texture2D CreateCheckeredBackground() {
@@ -158,6 +159,7 @@ void DrawCameraWorld(Game *game) {
 }
 
 void DrawCameraScreen(Game *game) {
+    // TODO: this method is exactly identical to DrawCamerWorld except for the line below (at this moment).
     BeginMode2D(game->screenCamera);
     DrawAxis();
 
@@ -263,6 +265,7 @@ void Draw(Game *game) {
         ClearBackground(BLACK);
 
         DrawTexture(game->checkered, 0, 0, WHITE);
+        DrawTexture(game->tileset, 0, 0, WHITE);
 
         if (game->cameraType == CAMERA_WORLD) {
             DrawCameraWorld(game);
@@ -281,6 +284,7 @@ int main(void) {
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
 
     Texture2D checkered = CreateCheckeredBackground();
+    Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png");
 
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
@@ -346,6 +350,7 @@ int main(void) {
     game.worldCamera = worldCamera;
     game.screenCamera =screenCamera;
     game.checkered = checkered;
+    game.tileset = tileset;
 
     // Log some stuff
     printf("==========================\n");
@@ -371,6 +376,8 @@ int main(void) {
     }
 
     // free(tiles);
+    UnloadTexture(game.checkered);
+    UnloadTexture(game.tileset);
     CloseWindow();
 
     return 0;
