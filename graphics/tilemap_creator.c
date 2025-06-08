@@ -10,8 +10,8 @@
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 270
 
-#define TILE_WIDTH 64
-#define TILE_HEIGHT 64
+#define TILE_WIDTH 32
+#define TILE_HEIGHT 32
 
 #define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH 
 #define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT
@@ -44,6 +44,8 @@ typedef struct Game {
 
     Texture2D checkered;
     Texture2D tileset;
+
+    Vector2 tileSelected;
 } Game;
 
 Texture2D CreateCheckeredBackground() {
@@ -87,14 +89,14 @@ void DrawGUI(Game *game) {
         }
         switch (game->cameraType) {
             case CAMERA_TILESET:
-            DrawText("Camera Tileset", 20, WORLD_HEIGHT - 40, 20, WHITE);
-            break;
+                DrawText("Camera Tileset", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                break;
             case CAMERA_WORLD:
-            DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
-            break;
+                DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                break;
             case CAMERA_SCREEN:
-            DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
-            break;
+                DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                break;
         }
         DrawText(TextFormat("x (%d,%d)", (int) game->windowStart.x / TILE_WIDTH, (int)(game->windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
         DrawText(TextFormat("y (%d,%d)", (int) game->windowStart.y / TILE_HEIGHT, (int)(game->windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
@@ -218,6 +220,20 @@ void Input(Game *game) {
     if (IsKeyPressed(KEY_ZERO)) {
         game->boolFlags.showGUI = !game->boolFlags.showGUI;
     }
+
+    switch (game->cameraType) {
+        case CAMERA_TILESET:
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                printf("%d, %d\n", GetMouseX() / TILE_WIDTH, GetMouseY() / TILE_HEIGHT);
+                game->tileSelected.x = GetMouseX() / TILE_WIDTH;
+                game->tileSelected.y = GetMouseY() / TILE_WIDTH;
+            }
+            break;
+        case CAMERA_WORLD:
+            break;
+        case CAMERA_SCREEN:
+            break;
+    }
 }
 
 void Update(Game *game) {
@@ -284,6 +300,7 @@ void Draw(Game *game) {
 
         if (game->cameraType == CAMERA_TILESET) {
             DrawTexture(game->tileset, 0, 0, WHITE);
+            DrawRectangleLines(game->tileSelected.x * TILE_WIDTH, game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, ColorAlpha(RED, 1.0f));
         } else if (game->cameraType == CAMERA_WORLD) {
             DrawCameraWorld(game);
         } else if (game->cameraType == CAMERA_SCREEN) {
@@ -301,7 +318,9 @@ int main(void) {
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
 
     Texture2D checkered = CreateCheckeredBackground();
-    Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png");
+    Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png"); // 16 x 16 tileset
+    tileset.width *= 2;
+    tileset.height *= 2;
 
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
@@ -368,6 +387,7 @@ int main(void) {
     game.screenCamera =screenCamera;
     game.checkered = checkered;
     game.tileset = tileset;
+    game.tileSelected = (Vector2) { 0, 0};
 
     // Log some stuff
     printf("==========================\n");
