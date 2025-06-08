@@ -238,6 +238,17 @@ void Input(Game *game) {
             // if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
             //     printf("down\n");
             // }
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                Vector2 pos = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
+                int x = (int) (pos.x / TILE_WIDTH);
+                int y = (int) (pos.y / TILE_HEIGHT);
+                if (x < 0 || x > NO_OF_TILES_X) return;
+                if (y < 0 || y > NO_OF_TILES_Y) return;
+                printf("%d,%d\n", x, y);
+
+                // Set tile here...
+
+            }
             break;
         case CAMERA_SCREEN:
             break;
