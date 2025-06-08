@@ -367,8 +367,6 @@ int main(void) {
         Update(&game);
 
         // draw
-        Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
-        Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
         Draw(&game);
     }
 
