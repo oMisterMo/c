@@ -360,7 +360,7 @@ int main(void) {
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
     Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-    int cameraType = CAMERA_WORLD;
+    int cameraType = CAMERA_TILESET;
 
     // GUI
     Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
