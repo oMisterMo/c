@@ -26,6 +26,24 @@ typedef struct BoolFlags {
     bool showGUIwindow;
 } BoolFlags;
 
+typedef struct Game {
+    Rectangle player;
+    Rectangle worldBounds;
+    Rectangle screenBounds;
+    Rectangle guiWindow;
+
+    Vector2 windowStart;
+    Vector2 windowEnd ;
+
+    BoolFlags boolFlags;
+
+    int cameraType;
+    Camera2D worldCamera;
+    Camera2D screenCamera;
+
+    Texture checkered;
+} Game;
+
 Texture2D CreateCheckeredBackground() {
     // Checkered background
     Color *pixels = (Color *)malloc(WORLD_WIDTH*WORLD_HEIGHT*sizeof(Color));
@@ -60,23 +78,23 @@ void DrawAxis() {
     DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, WHITE);
 }
 
-void DrawGUI(Rectangle guiWindow, int cameraType, Vector2 windowStart, Vector2 windowEnd, Camera2D screenCamera, Camera2D worldCamera, Rectangle player, BoolFlags boolFlags) {
-    if (boolFlags.showGUI) {
-        if (boolFlags.showGUIwindow) {
-            DrawRectangleRec(guiWindow, ColorAlpha(GRAY, 0.8f));
+void DrawGUI(Game *game) {
+    if (game->boolFlags.showGUI) {
+        if (game->boolFlags.showGUIwindow) {
+            DrawRectangleRec(game->guiWindow, ColorAlpha(GRAY, 0.8f));
         }
-        DrawText(cameraType == CAMERA_WORLD ? "Camera World" : "Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
-        DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
-        DrawText(TextFormat("y (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
-        DrawText(TextFormat("player (%d,%d)", (int) player.x, (int)(player.y)), 20, 160, 20, WHITE);
-        DrawText(TextFormat("screen (%d,%d)", (int) screenCamera.target.x, (int)(screenCamera.target.y)), 20, 200, 20, WHITE);
-        DrawText(TextFormat("world  (%d,%d)", (int) worldCamera.target.x, (int)(worldCamera.target.y)), 20, 240, 20, WHITE);
+        DrawText(game->cameraType == CAMERA_WORLD ? "Camera World" : "Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
+        DrawText(TextFormat("x (%d,%d)", (int) game->windowStart.x / TILE_WIDTH, (int)(game->windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
+        DrawText(TextFormat("y (%d,%d)", (int) game->windowStart.y / TILE_HEIGHT, (int)(game->windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
+        DrawText(TextFormat("player (%d,%d)", (int) game->player.x, (int)(game->player.y)), 20, 160, 20, WHITE);
+        DrawText(TextFormat("screen (%d,%d)", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y)), 20, 200, 20, WHITE);
+        DrawText(TextFormat("world  (%d,%d)", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y)), 20, 240, 20, WHITE);
     }
 }
 
-void DrawCameraWorld(Camera2D worldCamera, Texture checkered, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
-    BeginMode2D(worldCamera);
-    DrawTexture(checkered, 0, 0, WHITE);
+void DrawCameraWorld(Game *game) {
+    BeginMode2D(game->worldCamera);
+    DrawTexture(game->checkered, 0, 0, WHITE);
     DrawAxis();
 
     // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
@@ -133,86 +151,106 @@ void DrawCameraWorld(Camera2D worldCamera, Texture checkered, Rectangle worldBou
             ++i;
         }
     }
-    DrawRectangleLinesEx(worldBounds, 8, YELLOW);
-    DrawRectangleLinesEx(screenBounds, 8, BLUE);
+    DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
+    DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
 
-    DrawRectangleRec(player, ORANGE);
+    DrawRectangleRec(game->player, ORANGE);
     EndMode2D();
 }
 
-void DrawCameraScreen() {
+void DrawCameraScreen(Game *game) {
+    BeginMode2D(game->screenCamera);
+    DrawTexture(game->checkered, 0, 0, WHITE);
+    DrawAxis();
 
+    int i = 0;
+    for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
+        for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
+            // DrawRectangleRec(tiles[i], RED);
+            // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+            DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT, RED);
+            DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT, WHITE);
+            ++i;
+        }
+    }
+    DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
+    DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+
+    DrawRectangleRec(game->player, ORANGE);
+    EndMode2D();
 }
 
-void Input(int *cameraType, int *lineThick, Rectangle guiWindow, BoolFlags *boolFlags) {
+void Input(Game *game) {
     if (IsKeyPressed(KEY_SPACE)) {
-        if (*cameraType == CAMERA_WORLD) {
-            *cameraType = CAMERA_SCREEN;
+        if (game->cameraType == CAMERA_WORLD) {
+            game->cameraType = CAMERA_SCREEN;
         } else {
-            *cameraType = CAMERA_WORLD;
+            game->cameraType = CAMERA_WORLD;
         }
     }
     if (IsKeyPressed(KEY_EQUAL)) {
-        *lineThick += 1;
+        // *lineThick += 1;
     }
     if (IsKeyPressed(KEY_ONE)) {
-        boolFlags->showGUI = !boolFlags->showGUI;
+        game->boolFlags.showGUI = !game->boolFlags.showGUI;
     }
     if (IsKeyPressed(KEY_TWO)) {
-        boolFlags->showGUIwindow = !boolFlags->showGUIwindow;
+        game->boolFlags.showGUIwindow = !game->boolFlags.showGUIwindow;
     }
     if (IsKeyPressed(KEY_THREE)) {
         // nothing yet
     }
 }
 
-void Update(int cameraType, Camera2D *worldCamera, Camera2D *screenCamera, Rectangle *player, Rectangle *screenBounds, Rectangle worldBounds) {
-    if (cameraType == CAMERA_WORLD) {
+void Update(Game *game) {
+    if (game->cameraType == CAMERA_WORLD) {
         float speed = 800 * GetFrameTime();
         if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-            worldCamera->target.y -= speed;
+            game->worldCamera.target.y -= speed;
         }
         if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-            worldCamera->target.y += speed;
+            game->worldCamera.target.y += speed;
         }
         if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-            worldCamera->target.x -= speed;
+            game->worldCamera.target.x -= speed;
         }
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-            worldCamera->target.x += speed;
+            game->worldCamera.target.x += speed;
         }
     }
 
-    if (cameraType == CAMERA_SCREEN) {
+    if (game->cameraType == CAMERA_SCREEN) {
         float speed = 300 * GetFrameTime();
         if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-            player->y -= speed;
+            game->player.y -= speed;
         }
         if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-            player->y += speed;
+            game->player.y += speed;
         }
         if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-            player->x -= speed;
+            game->player.x -= speed;
         }
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-            player->x += speed;
+            game->player.x += speed;
         }
 
-        screenCamera->target.x = player->x;
-        screenCamera->target.y = player->y;
-        screenBounds->x = player->x - SCREEN_WIDTH / 2;
-        screenBounds->y = player->y - SCREEN_HEIGHT / 2;
+        game->screenCamera.target.x = game->player.x;
+        game->screenCamera.target.y = game->player.y;
+        game->screenBounds.x = game->player.x - SCREEN_WIDTH / 2;
+        game->screenBounds.y = game->player.y - SCREEN_HEIGHT / 2;
 
         // Bound blue window to game world
-        if (screenBounds->x < worldBounds.x) screenBounds->x = worldBounds.x;
-        if (screenBounds->x + screenBounds->width > worldBounds.width) screenBounds->x = worldBounds.width - screenBounds->width;
-        if (screenBounds->y < worldBounds.y) screenBounds->y = worldBounds.y;
-        if (screenBounds->y + screenBounds->height > worldBounds.height) screenBounds->y = worldBounds.height - screenBounds->height;
+        if (game->screenBounds.x < game->worldBounds.x) game->screenBounds.x = game->worldBounds.x;
+        if (game->screenBounds.x + game->screenBounds.width > game->worldBounds.width) game->screenBounds.x = game->worldBounds.width - game->screenBounds.width;
+        if (game->screenBounds.y < game->worldBounds.y) game->screenBounds.y = game->worldBounds.y;
+        if (game->screenBounds.y + game->screenBounds.height > game->worldBounds.height) game->screenBounds.y = game->worldBounds.height - game->screenBounds.height;
         // Bound screen camera to game world
-        if (screenCamera->target.x < WORLD_WIDTH / 4) screenCamera->target.x = WORLD_WIDTH / 4;
-        if (screenCamera->target.x + WORLD_WIDTH / 4 > worldBounds.width) screenCamera->target.x = worldBounds.width - WORLD_WIDTH / 4;
-        if (screenCamera->target.y < WORLD_HEIGHT / 4) screenCamera->target.y = WORLD_HEIGHT / 4;
-        if (screenCamera->target.y + WORLD_HEIGHT / 4 > worldBounds.height) screenCamera->target.y = worldBounds.height - WORLD_HEIGHT / 4;
+        if (game->screenCamera.target.x < WORLD_WIDTH / 4) game->screenCamera.target.x = WORLD_WIDTH / 4;
+        if (game->screenCamera.target.x + WORLD_WIDTH / 4 > game->worldBounds.width) game->screenCamera.target.x = game->worldBounds.width - WORLD_WIDTH / 4;
+        if (game->screenCamera.target.y < WORLD_HEIGHT / 4) game->screenCamera.target.y = WORLD_HEIGHT / 4;
+        if (game->screenCamera.target.y + WORLD_HEIGHT / 4 > game->worldBounds.height) game->screenCamera.target.y = game->worldBounds.height - WORLD_HEIGHT / 4;
     }
 
     // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
@@ -222,18 +260,17 @@ void Update(int cameraType, Camera2D *worldCamera, Camera2D *screenCamera, Recta
 
 }
 
-void Draw(int cameraType, Camera2D worldCamera, Camera2D screenCamera, Texture2D checkered, Rectangle worldBounds, Rectangle screenBounds, Rectangle player, BoolFlags boolFlags, Vector2 windowStart, Vector2 windowEnd, Rectangle guiWindow) {
+void Draw(Game *game) {
     BeginDrawing();
         ClearBackground(BLACK);
 
-        if (cameraType == CAMERA_WORLD) {
-            DrawCameraWorld(worldCamera, checkered, worldBounds, screenBounds, player);
-        } else if (cameraType == CAMERA_SCREEN) {
-            DrawCameraScreen(); // Not used yet...
-            DrawCameraWorld(screenCamera, checkered, worldBounds, screenBounds, player);
+        if (game->cameraType == CAMERA_WORLD) {
+            DrawCameraWorld(game);
+        } else if (game->cameraType == CAMERA_SCREEN) {
+            DrawCameraScreen(game);
         }
 
-        DrawGUI(guiWindow, cameraType, windowStart, windowEnd, screenCamera, worldCamera, player, boolFlags);
+        DrawGUI(game);
 
         DrawFPS(20, 20);
     EndDrawing();
@@ -296,6 +333,21 @@ int main(void) {
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
     Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
 
+    // Game
+    Game game = { 0 };
+    game.player = player;
+    game.worldBounds = worldBounds;
+    game.screenBounds = screenBounds;
+    game.guiWindow = guiWindow;
+    game.windowStart = windowStart;
+    game.windowEnd = windowEnd;
+    game.boolFlags = boolFlags;
+    game.cameraType = cameraType;
+    game.worldCamera = worldCamera;
+    game.screenCamera =screenCamera;
+    game.checkered = checkered;
+
+    // Log some stuff
     printf("==========================\n");
     printf("Moo\n");
     printf("==========================\n");
@@ -309,15 +361,15 @@ int main(void) {
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
         // input
-        Input(&cameraType, &lineThick, guiWindow, &boolFlags);
+        Input(&game);
 
         // update
-        Update(cameraType, &worldCamera, &screenCamera, &player, &screenBounds, worldBounds);
+        Update(&game);
 
         // draw
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
         Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
-        Draw(cameraType, worldCamera, screenCamera, checkered, worldBounds, screenBounds, player, boolFlags, windowStart, windowEnd, guiWindow);
+        Draw(&game);
     }
 
     // free(tiles);
