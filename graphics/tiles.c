@@ -104,6 +104,73 @@ void DrawCameraScreen() {
 
 }
 
+void Input(int *cameraType, int *lineThick, Rectangle guiWindow, float *guiAlpha) {
+    if (IsKeyPressed(KEY_SPACE)) {
+        if (*cameraType == CAMERA_WORLD) {
+            *cameraType = CAMERA_SCREEN;
+        } else {
+            *cameraType = CAMERA_WORLD;
+        }
+    }
+    if (IsKeyPressed(KEY_ONE)) {
+        *lineThick += 1;
+    }
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), guiWindow)) {
+            *guiAlpha =  1 - *guiAlpha;
+        }
+    }
+}
+
+void Update(int cameraType, Camera2D *worldCamera, Camera2D *screenCamera, Rectangle *player, Rectangle *screenBounds, Rectangle worldBounds) {
+    float speed = 400 * GetFrameTime();
+    if (cameraType == CAMERA_WORLD) {
+        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
+            worldCamera->target.y -= speed;
+        }
+        if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
+            worldCamera->target.y += speed;
+        }
+        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+            worldCamera->target.x -= speed;
+        }
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+            worldCamera->target.x += speed;
+        }
+    }
+
+    if (cameraType == CAMERA_SCREEN) {
+        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
+            player->y -= speed;
+        }
+        if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
+            player->y += speed;
+        }
+        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+            player->x -= speed;
+        }
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+            player->x += speed;
+        }
+
+        screenCamera->target.x = player->x;
+        screenCamera->target.y = player->y;
+        screenBounds->x = player->x - SCREEN_WIDTH / 2;
+        screenBounds->y = player->y - SCREEN_HEIGHT / 2;
+
+        if (screenBounds->x < worldBounds.x) screenBounds->x = worldBounds.x;
+        if (screenBounds->x + screenBounds->width > worldBounds.width) screenBounds->x = worldBounds.width - screenBounds->width;
+        if (screenBounds->y < worldBounds.y) screenBounds->y = worldBounds.y;
+        if (screenBounds->y + screenBounds->height > worldBounds.height) screenBounds->y = worldBounds.height - screenBounds->height;
+    }
+
+    // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
+    // if (worldCamera.target.y < 0) worldCamera.target.y = 0;
+    // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
+    // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
+
+}
 
 int main(void) {
 
@@ -174,7 +241,7 @@ int main(void) {
     int cameraType = CAMERA_WORLD;
 
     float guiAlpha = 0.0f;  // Click on left size of world to show
-    Rectangle guiWindow = { 0, 0, 170, WORLD_HEIGHT };
+    Rectangle guiWindow = { 0, 0, 190, WORLD_HEIGHT };
 
     // Test
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
@@ -193,76 +260,16 @@ int main(void) {
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
         // input
-        if (IsKeyPressed(KEY_SPACE)) {
-            if (cameraType == CAMERA_WORLD) {
-                cameraType = CAMERA_SCREEN;
-            } else {
-                cameraType = CAMERA_WORLD;
-            }
-        }
-        if (IsKeyPressed(KEY_ONE)) {
-            lineThick += 1;
-        }
-
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (CheckCollisionPointRec(GetMousePosition(), guiWindow)) {
-                guiAlpha =  1 - guiAlpha;
-            }
-        }
+        Input(&cameraType, &lineThick, guiWindow, &guiAlpha);
 
         // update
-        float speed = 400 * GetFrameTime();
-        if (cameraType == CAMERA_WORLD) {
-            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-                worldCamera.target.y -= speed;
-            }
-            if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-                worldCamera.target.y += speed;
-            }
-            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-                worldCamera.target.x -= speed;
-            }
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-                worldCamera.target.x += speed;
-            }
-        }
-
-        if (cameraType == CAMERA_SCREEN) {
-            if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-                player.y -= speed;
-            }
-            if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-                player.y += speed;
-            }
-            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-                player.x -= speed;
-            }
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-                player.x += speed;
-            }
-
-            screenCamera.target.x = player.x;
-            screenCamera.target.y = player.y;
-            screenBounds.x = player.x - SCREEN_WIDTH / 2;
-            screenBounds.y = player.y - SCREEN_HEIGHT / 2;
-
-            if (screenBounds.x < worldBounds.x) screenBounds.x = worldBounds.x;
-            if (screenBounds.x + screenBounds.width > worldBounds.width) screenBounds.x = worldBounds.width - screenBounds.width;
-            if (screenBounds.y < worldBounds.y) screenBounds.y = worldBounds.y;
-            if (screenBounds.y + screenBounds.height > worldBounds.height) screenBounds.y = worldBounds.height - screenBounds.height;
-        }
-
-        // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
-        // if (worldCamera.target.y < 0) worldCamera.target.y = 0;
-        // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
-        // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
+        Update(cameraType, &worldCamera, &screenCamera, &player, &screenBounds, worldBounds);
 
         // draw
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
         Vector2 windowEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, worldCamera);
         BeginDrawing();
             ClearBackground(BLACK);
-
 
             if (cameraType == CAMERA_WORLD) {
                 DrawCameraWorld(worldCamera, checked, worldBounds, screenBounds, player);
