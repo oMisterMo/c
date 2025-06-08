@@ -238,7 +238,7 @@ void Input(Game *game) {
             // if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
             //     printf("down\n");
             // }
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
                 Vector2 pos = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
                 int x = (int) (pos.x / TILE_WIDTH);
                 int y = (int) (pos.y / TILE_HEIGHT);
@@ -246,8 +246,25 @@ void Input(Game *game) {
                 if (y < 0 || y > NO_OF_TILES_Y) return;
                 printf("%d,%d\n", x, y);
 
-                // Set tile here...
+                // Store the source rect pointer
+                Rectangle *rect = &game->tiles[y * NO_OF_TILES_X + x].srcRect;
+                // Set the selected tile
+                rect->x = game->tileSelected.x * TILE_WIDTH;
+                rect->y = game->tileSelected.y * TILE_HEIGHT;
+            }
+            if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+                Vector2 pos = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
+                int x = (int) (pos.x / TILE_WIDTH);
+                int y = (int) (pos.y / TILE_HEIGHT);
+                if (x < 0 || x > NO_OF_TILES_X) return;
+                if (y < 0 || y > NO_OF_TILES_Y) return;
+                printf("%d,%d\n", x, y);
 
+                // Store the source rect pointer
+                Rectangle *rect = &game->tiles[y * NO_OF_TILES_X + x].srcRect;
+                // Set the empty tile
+                rect->x = 3 * TILE_WIDTH;
+                rect->y = 3 * TILE_HEIGHT;
             }
             break;
         case CAMERA_SCREEN:
