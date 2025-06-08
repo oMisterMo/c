@@ -26,8 +26,8 @@ typedef struct BoolFlags {
     bool showGUIwindow;
 } BoolFlags;
 
-Texture2D CreateCheckardBackground() {
-    // Checkard background
+Texture2D CreateCheckeredBackground() {
+    // Checkered background
     Color *pixels = (Color *)malloc(WORLD_WIDTH*WORLD_HEIGHT*sizeof(Color));
 
     for (int y = 0; y < WORLD_HEIGHT; y++)
@@ -48,9 +48,9 @@ Texture2D CreateCheckardBackground() {
         .mipmaps = 1
     };
 
-    Texture2D checked = LoadTextureFromImage(checkedIm);
+    Texture2D checkered = LoadTextureFromImage(checkedIm);
     UnloadImage(checkedIm);     // free img.data aka pixels
-    return checked;
+    return checkered;
 }
 
 void DrawAxis() {
@@ -74,9 +74,9 @@ void DrawGUI(Rectangle guiWindow, int cameraType, Vector2 windowStart, Vector2 w
     }
 }
 
-void DrawCameraWorld(Camera2D worldCamera, Texture checked, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
+void DrawCameraWorld(Camera2D worldCamera, Texture checkered, Rectangle worldBounds, Rectangle screenBounds, Rectangle player) {
     BeginMode2D(worldCamera);
-    DrawTexture(checked, 0, 0, WHITE);
+    DrawTexture(checkered, 0, 0, WHITE);
     DrawAxis();
 
     // printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
@@ -226,7 +226,7 @@ int main(void) {
 
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
 
-    Texture2D checked = CreateCheckardBackground();
+    Texture2D checkered = CreateCheckeredBackground();
 
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
@@ -304,10 +304,10 @@ int main(void) {
             ClearBackground(BLACK);
 
             if (cameraType == CAMERA_WORLD) {
-                DrawCameraWorld(worldCamera, checked, worldBounds, screenBounds, player);
+                DrawCameraWorld(worldCamera, checkered, worldBounds, screenBounds, player);
             } else if (cameraType == CAMERA_SCREEN) {
                 DrawCameraScreen(); // Not used yet...
-                DrawCameraWorld(screenCamera, checked, worldBounds, screenBounds, player);
+                DrawCameraWorld(screenCamera, checkered, worldBounds, screenBounds, player);
             }
             
             DrawGUI(guiWindow, cameraType, windowStart, windowEnd, screenCamera, worldCamera, player, boolFlags);
