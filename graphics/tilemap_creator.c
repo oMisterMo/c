@@ -244,6 +244,118 @@ int TileIndexToId(int x, int y) {
     return id;
 }
 
+Vector2 IdToTileIndex(char id) {
+    Vector2 index = {blankTile, blankTile};
+
+    // Wall
+    if (id == TILE_GRASS_TOP) {
+        index.x = 0;
+        index.y = 0;
+    }
+    if (id == TILE_GRASS_MIDDLE) {
+        index.x = 0;
+        index.y = 1;
+    }
+    if (id == TILE_GRASS_QUESTION) {
+        index.x = 0;
+        index.y = 2;
+    }
+    if (id == TILE_GRASS_BRICK) {
+        index.x = 1;
+        index.y = 0;
+    }
+    if (id == TILE_GRASS_BRICK_BROKEN) {
+        index.x = 1;
+        index.y = 1;
+    }
+    if (id == TILE_GRASS_EXCLAMATION) {
+        index.x = 1;
+        index.y = 2;
+    }
+
+    // Others
+    if (id == TILE_BOX) {
+        index.x = 7;
+        index.y = 3;
+    }
+    if (id == TILE_SIGN) {
+        index.x = 8;
+        index.y = 3;
+    }
+    if (id == TILE_LADDER) {
+        index.x = 9;
+        index.y = 3;
+    }
+    return index;
+}
+
+void SaveMap(Game *game) {
+    // Calculate size required
+    // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
+    // I'll do it later
+    // Just using random number thats high enough for now
+    // Save map to text
+    char data[8192 * 2] = "";
+    size_t offset = 0;
+    // Store the {x,y} texture location
+    // for (int y = 0; y < NO_OF_TILES_Y; ++y){
+    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
+    //         int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
+    //         int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+    //         offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+    //     }
+    //     offset += snprintf(data + offset, sizeof(data) - offset, "\n");
+    // }
+    // Store the index
+    for (int y = 0; y < NO_OF_TILES_Y; ++y){
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
+            int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+            offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
+        }
+        offset += snprintf(data + offset, sizeof(data) - offset, "\n");
+    }
+    SaveFileText("map.txt", data);
+}
+
+void LoadMap(Game *game) {
+    // ATTEMPT 2
+    FILE *file = fopen("map.txt", "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    int ch;
+    int i = 0;
+    while (fscanf(file, "%d", &ch) == 1) {
+        Vector2 index = IdToTileIndex(ch);
+        game->tiles[i].id = ch;
+        game->tiles[i].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+        // putchar(ch);
+        // printf("%d", ch);
+        ++i;
+    }
+
+    fclose(file);
+
+
+    // ATTEMPT 1
+    // char *map = LoadFileText("map.txt");
+    // // printf("%s", map);
+    // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
+    //         char id = map[y * NO_OF_TILES_X + x];
+    //         Vector2 index = IdToTileIndex(id - '0');
+    //         game->tiles[y * NO_OF_TILES_X + x].id = id;
+    //         game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+    //         printf("%c", id);
+
+    //     }
+    // }
+    // UnloadFileText(map);
+}
+
 void Input(Game *game) {
     if (IsKeyPressed(KEY_SPACE)) {
         if (game->cameraType == CAMERA_WORLD) {
@@ -286,33 +398,11 @@ void Input(Game *game) {
             }
         }
     }
+    if (IsKeyPressed(KEY_L)) {
+        LoadMap(game);
+    }
     if (IsKeyPressed(KEY_ENTER)) {
-        // Calculate size required
-        // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
-        // I'll do it later
-        // Just using random number thats high enough for now
-        // Save map to text
-        char data[8192 * 2] = "";
-        size_t offset = 0;
-        // Store the {x,y} texture location
-        // for (int y = 0; y < NO_OF_TILES_Y; ++y){
-        //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
-        //         int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
-        //         int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
-        //         offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
-        //     }
-        //     offset += snprintf(data + offset, sizeof(data) - offset, "\n");
-        // }
-        // Store the index
-        for (int y = 0; y < NO_OF_TILES_Y; ++y){
-            for (int x = 0; x < NO_OF_TILES_X; ++x) {
-                int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
-                int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
-                offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
-            }
-            offset += snprintf(data + offset, sizeof(data) - offset, "\n");
-        }
-        SaveFileText("map.txt", data);
+        SaveMap(game);
     }
 
     switch (game->cameraType) {
