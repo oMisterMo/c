@@ -455,6 +455,15 @@ void Input(Game *game) {
         printf("Save map...\n");
         SaveMap(game);
     }
+    if (IsKeyPressed(KEY_H)) {
+        game->fillMode = FILL_HORIZONTAL;
+    }
+    if (IsKeyPressed(KEY_V)) {
+        game->fillMode = FILL_VERTICAL;
+    }
+    if (IsKeyPressed(KEY_O)) {
+        game->fillMode = FILL_OFF;
+    }
 
     switch (game->cameraType) {
         case CAMERA_TILESET:
