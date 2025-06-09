@@ -8,8 +8,8 @@
  *  - Select multiple tiles
  *  - Draw multiple tiles
  *  - Add RayGUI
- *      - Fill horizonal tiles
- *      - Fill vertical tiles
+ *      - Fill horizonal tiles ✔️
+ *      - Fill vertical tiles ✔️
  *      - Fill all tiles
  *      - Save multiple files
  *      - Load multiple files
@@ -122,6 +122,7 @@ typedef struct Game {
     Vector2 tileSelected;
     Tile *tiles;
     int fillMode;
+    bool overwriteTiles;
 } Game;
 
 Texture2D CreateCheckeredBackground() {
@@ -485,7 +486,9 @@ void Input(Game *game) {
                 if (y < 0 || y > NO_OF_TILES_Y) return;
                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
                 // printf("Touching tile id %d\n", tile->id);
-                if (tile->id != TILE_EMPTY) return;
+                if (!game->overwriteTiles) {
+                    if (tile->id != TILE_EMPTY) return;
+                }
                 printf("draw %d,%d\n", x, y);
 
                 switch (game->fillMode) {
@@ -546,7 +549,9 @@ void Input(Game *game) {
 
                 // Store the source rect pointer
                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-                if (tile->id == TILE_EMPTY) return;
+                if (!game->overwriteTiles) {
+                    if (tile->id != TILE_EMPTY) return;
+                }
                 printf("erase %d,%d\n", x, y);
 
                 // Set the empty tile
@@ -785,6 +790,7 @@ int main(void) {
     game.tileSelected = (Vector2) { 0, 0};
     game.tiles = tiles;
     game.fillMode = fillMode;
+    game.overwriteTiles = false;
 
     // Log some stuff
     printf("==========================\n");
