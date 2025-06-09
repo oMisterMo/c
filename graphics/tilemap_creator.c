@@ -13,8 +13,10 @@
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 32
 
-#define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH 
-#define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT
+#define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH      // 40
+#define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT    // 22.5
+
+int blankTile = 3;  // Blank tile at index 3, could use any random number
 
 enum CameraType {
     CAMERA_TILESET,
@@ -30,9 +32,9 @@ typedef struct BoolFlags {
 } BoolFlags;
 
 typedef struct Tile {
-    int id;
-    Rectangle srcRect;
-    Rectangle destRect;
+    int id; // what tile (grass, water)
+    Rectangle srcRect;  // spritesheet index
+    Rectangle destRect; // position
 } Tile;
 
 typedef struct Game {
@@ -224,6 +226,24 @@ void Input(Game *game) {
     if (IsKeyPressed(KEY_NINE)) {
         game->boolFlags.showScreenBorder = !game->boolFlags.showScreenBorder;
     }
+    if (IsKeyPressed(KEY_ENTER)) {
+        // Calculate size required
+        // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
+        // I'll do it later
+        // Just using random number thats high enough for now
+        // Save map to text
+        char data[8192 * 2] = "";
+        size_t offset = 0;
+        for (int y = 0; y < NO_OF_TILES_Y; ++y){
+            for (int x = 0; x < NO_OF_TILES_X; ++x) {
+                int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
+                int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+                offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+            }
+            offset += snprintf(data + offset, sizeof(data) - offset, "\n");
+        }
+        SaveFileText("map.txt", data);
+    }
 
     switch (game->cameraType) {
         case CAMERA_TILESET:
@@ -262,8 +282,8 @@ void Input(Game *game) {
                 // Store the source rect pointer
                 Rectangle *rect = &game->tiles[y * NO_OF_TILES_X + x].srcRect;
                 // Set the empty tile
-                rect->x = 3 * TILE_WIDTH;
-                rect->y = 3 * TILE_HEIGHT;
+                rect->x = blankTile * TILE_WIDTH;
+                rect->y = blankTile * TILE_HEIGHT;
             }
             break;
         case CAMERA_SCREEN:
@@ -364,7 +384,6 @@ int main(void) {
     int lineThick = 1;
 
     int i = 0;
-    int blankTile = 3 * TILE_WIDTH;  // Blank tile at index 3, could use any random number
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
             // y * NO_OF_TILES_Y + x
@@ -373,7 +392,7 @@ int main(void) {
                 x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT};
 
-            tiles[i].srcRect = (Rectangle) {blankTile,blankTile,TILE_WIDTH,TILE_HEIGHT};
+            tiles[i].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
 
             ++i;
         }
