@@ -1,3 +1,44 @@
+/**
+ * Functional Requirements:
+ *  - Background tiles
+ *  - Show toast when user saves/loads/resets file
+ *  - Player spawn location (ID = 'p')
+ *  - Middle click to drag
+ *  - Scroll to zoom
+ *  - Select multiple tiles
+ *  - Draw multiple tiles
+ *  - Add RayGUI
+ *      - Fill horizonal tiles
+ *      - Fill vertical tiles
+ *      - Fill all tiles
+ *      - Save multiple files
+ *      - Load multiple files
+ *          - Dropdown list of all maps in resources
+ *          - Click to load
+ *      - Set custom tiles x/y
+ *      - Set custom tile size width/height
+ *      - Add export button
+ *
+ *
+ *
+ * Non-Functional Requirements:
+ *  - Rain animation
+ *  - Snow animation
+ *  - Particles
+ *  - Screen shake
+ *  - Add more usable tiles
+ *  - Better way to load texture atlas (using ray texture packer)
+ *  - Player physics/collisions
+ *
+ *
+ * Number of character idsL
+ * A-Z
+ * a-z
+ * 0-9
+ *
+ * Total = 62 unique
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -165,7 +206,7 @@ void DrawCameraWorld(Game *game) {
         DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
     }
 
-    DrawRectangleRec(game->player, ORANGE);
+    DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
     EndMode2D();
 }
 
@@ -204,7 +245,7 @@ void DrawCameraScreen(Game *game) {
         DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
     }
 
-    DrawRectangleRec(game->player, ORANGE);
+    DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
     EndMode2D();
 }
 
@@ -294,33 +335,31 @@ void SaveMap(Game *game) {
     // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
     // I'll do it later
     // Just using random number thats high enough for now
+
+
     // Save map to text
     char data[8192 * 2] = "";
     size_t offset = 0;
-    // Store the {x,y} texture location
-    // for (int y = 0; y < NO_OF_TILES_Y; ++y){
-    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
-    //         int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
-    //         int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
-    //         offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
-    //     }
-    //     offset += snprintf(data + offset, sizeof(data) - offset, "\n");
-    // }
-    // Store the index
+
     for (int y = 0; y < NO_OF_TILES_Y; ++y){
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
             int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
             int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+
+            // Store the {x,y} texture location
+            // offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+
+            // Store the ID
             offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
         }
         offset += snprintf(data + offset, sizeof(data) - offset, "\n");
     }
-    SaveFileText("map.txt", data);
+    SaveFileText("./resources/maps/map.txt", data);
 }
 
 void LoadMap(Game *game) {
     // ATTEMPT 2
-    FILE *file = fopen("map.txt", "r");
+    FILE *file = fopen("./resources/maps/map.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
         return;
@@ -359,7 +398,7 @@ void LoadMap(Game *game) {
 void Input(Game *game) {
     if (IsKeyPressed(KEY_SPACE)) {
         if (game->cameraType == CAMERA_WORLD) {
-            game->cameraType = CAMERA_SCREEN;
+            game->cameraType = CAMERA_TILESET;
         } else {
             game->cameraType = CAMERA_WORLD;
         }
@@ -391,6 +430,7 @@ void Input(Game *game) {
     }
     // Reset
     if (IsKeyPressed(KEY_R)) {
+        printf("Reset tiles...\n");
         for (int y = 0; y < NO_OF_TILES_Y; ++y) {
             for (int x = 0; x < NO_OF_TILES_X; ++x) {
                 game->tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
@@ -399,9 +439,11 @@ void Input(Game *game) {
         }
     }
     if (IsKeyPressed(KEY_L)) {
+        printf("Load map...\n");
         LoadMap(game);
     }
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_PERIOD)) {
+        printf("Save map...\n");
         SaveMap(game);
     }
 
@@ -418,9 +460,9 @@ void Input(Game *game) {
             //     printf("down\n");
             // }
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                Vector2 pos = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
-                int x = (int) (pos.x / TILE_WIDTH);
-                int y = (int) (pos.y / TILE_HEIGHT);
+                Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
+                int x = (int) (mouse.x / TILE_WIDTH);
+                int y = (int) (mouse.y / TILE_HEIGHT);
                 if (x < 0 || x > NO_OF_TILES_X) return;
                 if (y < 0 || y > NO_OF_TILES_Y) return;
                 printf("%d,%d\n", x, y);
@@ -432,9 +474,9 @@ void Input(Game *game) {
                 rect->y = game->tileSelected.y * TILE_HEIGHT;
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-                Vector2 pos = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
-                int x = (int) (pos.x / TILE_WIDTH);
-                int y = (int) (pos.y / TILE_HEIGHT);
+                Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
+                int x = (int) (mouse.x / TILE_WIDTH);
+                int y = (int) (mouse.y / TILE_HEIGHT);
                 if (x < 0 || x > NO_OF_TILES_X) return;
                 if (y < 0 || y > NO_OF_TILES_Y) return;
                 printf("%d,%d\n", x, y);
@@ -515,7 +557,7 @@ void Draw(Game *game) {
 
         if (game->cameraType == CAMERA_TILESET) {
             DrawTexture(game->tileset, 0, 0, WHITE);
-            DrawRectangleLines(game->tileSelected.x * TILE_WIDTH, game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, ColorAlpha(RED, 1.0f));
+            DrawRectangleLinesEx((Rectangle) {game->tileSelected.x * TILE_WIDTH, game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT}, 4 ,ColorAlpha(RED, 1.0f));
         } else if (game->cameraType == CAMERA_WORLD) {
             DrawCameraWorld(game);
         } else if (game->cameraType == CAMERA_SCREEN) {
@@ -530,7 +572,7 @@ void Draw(Game *game) {
 
 int main(void) {
 
-    InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tiles");
+    InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tile Map Editor");
 
     Texture2D checkered = CreateCheckeredBackground();
     Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png"); // 16 x 16 tileset
