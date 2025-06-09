@@ -24,6 +24,21 @@ enum CameraType {
     CAMERA_SCREEN
 };
 
+enum TileType {
+    TILE_EMPTY,
+
+    TILE_GRASS_TOP,
+    TILE_GRASS_MIDDLE,
+    TILE_GRASS_QUESTION,
+    TILE_GRASS_BRICK,
+    TILE_GRASS_BRICK_BROKEN,
+    TILE_GRASS_EXCLAMATION,
+
+    TILE_BOX,
+    TILE_SIGN,
+    TILE_LADDER,
+};
+
 typedef struct BoolFlags {
     bool showGUI;
     bool showGUIwindow;
@@ -193,6 +208,42 @@ void DrawCameraScreen(Game *game) {
     EndMode2D();
 }
 
+int TileIndexToId(int x, int y) {
+    int id = TILE_EMPTY;
+
+    // Wall
+    if (x == 0 && y == 0) {
+        id = TILE_GRASS_TOP;
+    }
+    if (x == 0 && y == 1) {
+        id = TILE_GRASS_MIDDLE;
+    }
+    if (x == 0 && y == 2) {
+        id = TILE_GRASS_QUESTION;
+    }
+    if (x == 1 && y == 0) {
+        id = TILE_GRASS_BRICK;
+    }
+    if (x == 1 && y == 1) {
+        id = TILE_GRASS_BRICK_BROKEN;
+    }
+    if (x == 1 && y == 2) {
+        id = TILE_GRASS_EXCLAMATION;
+    }
+
+    // Others
+    if (x == 7 && y == 3) {
+        id = TILE_BOX;
+    }
+    if (x == 8 && y == 3) {
+        id = TILE_SIGN;
+    }
+    if (x == 9 && y == 3) {
+        id = TILE_LADDER;
+    }
+    return id;
+}
+
 void Input(Game *game) {
     if (IsKeyPressed(KEY_SPACE)) {
         if (game->cameraType == CAMERA_WORLD) {
@@ -226,6 +277,15 @@ void Input(Game *game) {
     if (IsKeyPressed(KEY_NINE)) {
         game->boolFlags.showScreenBorder = !game->boolFlags.showScreenBorder;
     }
+    // Reset
+    if (IsKeyPressed(KEY_R)) {
+        for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+            for (int x = 0; x < NO_OF_TILES_X; ++x) {
+                game->tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
+                game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+            }
+        }
+    }
     if (IsKeyPressed(KEY_ENTER)) {
         // Calculate size required
         // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
@@ -234,11 +294,21 @@ void Input(Game *game) {
         // Save map to text
         char data[8192 * 2] = "";
         size_t offset = 0;
+        // Store the {x,y} texture location
+        // for (int y = 0; y < NO_OF_TILES_Y; ++y){
+        //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
+        //         int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
+        //         int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+        //         offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+        //     }
+        //     offset += snprintf(data + offset, sizeof(data) - offset, "\n");
+        // }
+        // Store the index
         for (int y = 0; y < NO_OF_TILES_Y; ++y){
             for (int x = 0; x < NO_OF_TILES_X; ++x) {
                 int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
                 int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
-                offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+                offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
             }
             offset += snprintf(data + offset, sizeof(data) - offset, "\n");
         }
