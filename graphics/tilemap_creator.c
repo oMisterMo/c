@@ -1,6 +1,7 @@
 /**
  * Functional Requirements:
- *  - Background tiles
+ *  - Set background tiles in UI
+ *  - Render background tiles
  *  - Show toast when user saves/loads/resets file
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
@@ -37,6 +38,16 @@
  * 0-9
  *
  * Total = 62 unique
+ *
+ *
+ * ======================
+ *
+ * Mario Maker
+ *
+ * 27 or 13 Tiles          (y-axis)
+ * 270 or 240 Tiles        (x-axis)
+ *
+ * TILE_WIDTH * NO_OF_TILES_X = TOTAL PIXELS
  *
  */
 #include <stdio.h>
@@ -175,11 +186,24 @@ void DrawGUI(Game *game) {
                 DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
                 break;
         }
+
+        Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
+        Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
+        Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
+        Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
+
         DrawText(TextFormat("x (%d,%d)", (int) game->windowStart.x / TILE_WIDTH, (int)(game->windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
         DrawText(TextFormat("y (%d,%d)", (int) game->windowStart.y / TILE_HEIGHT, (int)(game->windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
         DrawText(TextFormat("player (%d,%d)", (int) game->player.x, (int)(game->player.y)), 20, 160, 20, WHITE);
-        DrawText(TextFormat("screen (%d,%d)", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y)), 20, 200, 20, WHITE);
-        DrawText(TextFormat("world  (%d,%d)", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y)), 20, 240, 20, WHITE);
+        DrawText(TextFormat("world  (%d,%d) x%.2f", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y), game->worldCamera.zoom), 20, 200, 20, WHITE);
+        DrawText(TextFormat("screen (%d,%d) x%.2f", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y), game->screenCamera.zoom), 20, 240, 20, WHITE);
+
+
+        DrawRectangle(20, 265, 240, 10, ColorAlpha(BLACK, 0.5f));
+        DrawText(TextFormat("w start (%d,%d)", (int) windowStart.x , (int)(windowStart.y)), 20, 280, 20, WHITE);
+        DrawText(TextFormat("w end (%d,%d)", (int) windowEnd.x , (int)(windowEnd.y)), 20, 320, 20, WHITE);
+        DrawText(TextFormat("s start (%d,%d)", (int) screenStart.x , (int)(screenStart.y)), 20, 360, 20, WHITE);
+        DrawText(TextFormat("s end (%d,%d)", (int) screenEnd.x , (int)(screenEnd.y)), 20, 400, 20, WHITE);
     }
 }
 
@@ -189,8 +213,8 @@ void DrawCameraWorld(Game *game) {
 
     // Red tiles
     int i = 0;
-    for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-        for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
             DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT, GRAY);
             DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
@@ -241,7 +265,6 @@ void DrawCameraScreen(Game *game) {
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            // y * NO_OF_TILES_X + x
             Rectangle src = game->tiles[y * NO_OF_TILES_X + x].srcRect;
             Rectangle dest = game->tiles[y * NO_OF_TILES_X + x].destRect;
             DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
@@ -513,7 +536,7 @@ void Input(Game *game) {
                         }
                         for (int i = x; i >= 0; --i) {
                             Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
-                            if (tile->id > 0) break;
+                            if (tile->id > TILE_EMPTY) break;
                             tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                             tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
                             tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
@@ -523,7 +546,6 @@ void Input(Game *game) {
                         // Should it stop when it finds a non empty tile?
                         for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
                             Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-                            // Rectangle *rect = &game->tiles[i * NO_OF_TILES_X + x].srcRect;
                             if (tile->id > TILE_EMPTY) break;
                             tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                             tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
@@ -531,7 +553,6 @@ void Input(Game *game) {
                         }
                         for (int i = y; i >= 0; --i) {
                             Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-                            // Rectangle *rect = &game->tiles[i * NO_OF_TILES_X + x].srcRect;
                             if (tile->id > TILE_EMPTY) break;
                             tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                             tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
@@ -549,9 +570,7 @@ void Input(Game *game) {
 
                 // Store the source rect pointer
                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-                if (!game->overwriteTiles) {
-                    if (tile->id != TILE_EMPTY) return;
-                }
+                if (tile->id == TILE_EMPTY) return;
                 printf("erase %d,%d\n", x, y);
 
                 // Set the empty tile
@@ -661,21 +680,25 @@ void Update(Game *game) {
             game->player.x += speed;
         }
 
+        // Camera follow player
         game->screenCamera.target.x = game->player.x;
         game->screenCamera.target.y = game->player.y;
+
+        // Center blue bounds around player
         game->screenBounds.x = game->player.x - SCREEN_WIDTH / 2;
         game->screenBounds.y = game->player.y - SCREEN_HEIGHT / 2;
-
-        // Bound blue window to game world
         if (game->screenBounds.x < game->worldBounds.x) game->screenBounds.x = game->worldBounds.x;
         if (game->screenBounds.x + game->screenBounds.width > game->worldBounds.width) game->screenBounds.x = game->worldBounds.width - game->screenBounds.width;
         if (game->screenBounds.y < game->worldBounds.y) game->screenBounds.y = game->worldBounds.y;
         if (game->screenBounds.y + game->screenBounds.height > game->worldBounds.height) game->screenBounds.y = game->worldBounds.height - game->screenBounds.height;
+
         // Bound screen camera to game world
-        if (game->screenCamera.target.x < WORLD_WIDTH / 4) game->screenCamera.target.x = WORLD_WIDTH / 4;
-        if (game->screenCamera.target.x + WORLD_WIDTH / 4 > game->worldBounds.width) game->screenCamera.target.x = game->worldBounds.width - WORLD_WIDTH / 4;
-        if (game->screenCamera.target.y < WORLD_HEIGHT / 4) game->screenCamera.target.y = WORLD_HEIGHT / 4;
-        if (game->screenCamera.target.y + WORLD_HEIGHT / 4 > game->worldBounds.height) game->screenCamera.target.y = game->worldBounds.height - WORLD_HEIGHT / 4;
+        float camX = game->screenCamera.offset.x / game->screenCamera.zoom;
+        float camY = game->screenCamera.offset.y / game->screenCamera.zoom;
+        if (game->screenCamera.target.x < camX ) game->screenCamera.target.x = camX;
+        if (game->screenCamera.target.y < camY ) game->screenCamera.target.y = camY;
+        if (game->screenCamera.target.x > WORLD_WIDTH - camX) game->screenCamera.target.x = WORLD_WIDTH - camX;
+        if (game->screenCamera.target.y > WORLD_HEIGHT - camY) game->screenCamera.target.y = WORLD_HEIGHT - camY;
     }
 
     // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
@@ -748,9 +771,9 @@ int main(void) {
 
     Camera2D screenCamera = { 0 };
     screenCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    screenCamera.target = (Vector2){ player.x, player.y };
+    // screenCamera.target = (Vector2){ player.x, player.y };
     screenCamera.rotation = 0.0f;
-    screenCamera.zoom = 2.0f;
+    screenCamera.zoom = 1.5f;
 
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
     Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -763,9 +786,9 @@ int main(void) {
     // GUI
     Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
     BoolFlags boolFlags = {
-        .showGUI = false,
+        .showGUI = true,
         .showGUIwindow = true,
-        .showWindowBorder = false,
+        .showWindowBorder = true,
         .showScreenBorder = false
     };
 
@@ -784,7 +807,7 @@ int main(void) {
     game.boolFlags = boolFlags;
     game.cameraType = cameraType;
     game.worldCamera = worldCamera;
-    game.screenCamera =screenCamera;
+    game.screenCamera = screenCamera;
     game.checkered = checkered;
     game.tileset = tileset;
     game.tileSelected = (Vector2) { 0, 0};
