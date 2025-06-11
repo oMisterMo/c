@@ -56,6 +56,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include "raylib.h"
+#include "raymath.h"
 
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
@@ -204,6 +205,9 @@ void DrawGUI(Game *game) {
             case CAMERA_SCREEN:
                 DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
                 break;
+            case CAMERA_SCREEN_SHAKE:
+                DrawText("Camera Shake", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                break;
         }
 
         Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
@@ -269,6 +273,44 @@ void DrawCameraWorld(Game *game) {
 void DrawCameraScreen(Game *game) {
     // TODO: this method is exactly identical to DrawCamerWorld except for the line below (at this moment).
     BeginMode2D(game->screenCamera);
+    DrawAxis();
+
+    // int i = 0;
+    // for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
+    //     for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
+    //         // DrawRectangleRec(tiles[i], RED);
+    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
+    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, RED);
+    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
+    //         ++i;
+    //     }
+    // }
+
+    // Texture tiles
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            Rectangle src = game->tiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->tiles[y * NO_OF_TILES_X + x].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+        }
+    }
+
+    if (game->boolFlags.showWindowBorder) {
+        DrawRectangleLinesEx(game->worldBounds, 8, YELLOW);
+    }
+    if (game->boolFlags.showScreenBorder) {
+        DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
+    }
+
+    DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
+    EndMode2D();
+}
+
+void DrawCameraScreenShake(Game *game) {
+    // TODO: this method is exactly identical to DrawCamerWorld except for the line below (at this moment).
+    BeginMode2D(game->shakyCamera);
     DrawAxis();
 
     // int i = 0;
@@ -476,10 +518,12 @@ void Input(Game *game) {
     }
     // Screen shake
     if (IsKeyPressed(KEY_FOUR)) {
-        // TODO...
         printf("Shake...\n");
         game->cameraType = CAMERA_SCREEN_SHAKE;
-        game->screenShake.shake = 0.7f;
+
+        // TODO method to add shake so that I can limit in one place
+        game->screenShake.shake += 0.3f;
+        if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
     }
 
 
@@ -699,7 +743,7 @@ void Update(Game *game) {
         }
     }
 
-    if (game->cameraType == CAMERA_SCREEN) {
+    if (game->cameraType == CAMERA_SCREEN || game->cameraType == CAMERA_SCREEN_SHAKE) {
         float speed = 300 * GetFrameTime();
         if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
             game->player.y -= speed;
@@ -738,7 +782,25 @@ void Update(Game *game) {
         if (game->screenCamera.target.y > WORLD_HEIGHT - camY) game->screenCamera.target.y = WORLD_HEIGHT - camY;
     }
 
-    if (game->cameraType == CAMERA_SCREEN_SHAKE) {}
+    if (game->cameraType == CAMERA_SCREEN_SHAKE) {
+
+        if (game->screenShake.shake > 0) {
+            game->screenShake.shake -= 0.01;
+
+            // Update shake
+            game->screenShake.angle = game->screenShake.shake * GetRandomValueFloat(-1, 1);
+            game->screenShake.offsetX = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
+            game->screenShake.offsetY = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
+
+            // Apply shake
+            game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
+            game->shakyCamera.target =  Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
+
+        } else {
+            game->screenShake.shake = 0;
+            game->cameraType = CAMERA_SCREEN;
+        }
+    }
 
     // Bound world camera
     // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
@@ -763,7 +825,7 @@ void Draw(Game *game) {
             DrawCameraScreen(game);
         } else if (game->cameraType == CAMERA_SCREEN_SHAKE) {
             // DrawCameraScreen(game);
-            // DrawCameraScreenShake(game);
+            DrawCameraScreenShake(game);
         }
 
         DrawGUI(game);
@@ -830,8 +892,8 @@ int main(void) {
 
     ScreenShake screenShake = {
         .shake = 0.0f,
-        .maxAngle = 20.0f,
-        .maxOffset = 20.0f,
+        .maxAngle = 10.0f,
+        .maxOffset = 10.0f,
         // Not sure this works, might have to do it after
         // .angle = screenShake.shake * GetRandomValueFloat(-1, 1),
         // .offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1),
