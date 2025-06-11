@@ -254,7 +254,7 @@ void DrawCameraWorld(Game *game) {
             // DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
             //     TILE_WIDTH, TILE_HEIGHT, GRAY);
             DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, WHITE);
+                TILE_WIDTH, TILE_HEIGHT, ColorAlpha(WHITE, 0.3f));
             ++i;
         }
     }
@@ -276,7 +276,7 @@ void DrawCameraWorld(Game *game) {
         DrawRectangleLinesEx(game->screenBounds, 8, BLUE);
     }
 
-    DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
+    // DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
     EndMode2D();
 }
 
