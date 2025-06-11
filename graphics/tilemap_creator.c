@@ -715,8 +715,11 @@ void Update(Game *game) {
         }
 
         // Camera follow player
-        game->screenCamera.target.x = game->player.x;
-        game->screenCamera.target.y = game->player.y;
+        // game->screenCamera.target.x = game->player.x;
+        // game->screenCamera.target.y = game->player.y;
+        // Camera follow player (smooth)
+        game->screenCamera.target.x += (game->player.x - game->screenCamera.target.x) * .1;
+        game->screenCamera.target.y += (game->player.y - game->screenCamera.target.y) * .1;
 
         // Center blue bounds around player
         game->screenBounds.x = game->player.x - SCREEN_WIDTH / 2;
