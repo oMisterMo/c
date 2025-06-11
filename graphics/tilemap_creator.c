@@ -844,13 +844,16 @@ void Update(Game *game) {
             game->screenShake.offsetX = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
             game->screenShake.offsetY = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
 
-            // Apply shake
+            // Just rotation
+            // game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
+            // game->shakyCamera.target = game->screenCamera.target;
 
-            // TODO: ROTATION NOT WORKING
-            // game->screenCamera.offset
-            printf("angle %.2f\n", game->screenShake.angle);
+            // Just translation
+            // game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
+
+            // Apply rotation and translation
             game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
-            game->shakyCamera.target =  Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
+            game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
 
         } else {
             game->screenShake.shake = 0;
