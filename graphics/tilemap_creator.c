@@ -885,9 +885,9 @@ int main(void) {
     // GUI
     Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
     BoolFlags boolFlags = {
-        .showGUI = true,
+        .showGUI = false,
         .showGUIwindow = true,
-        .showWindowBorder = true,
+        .showWindowBorder = false,
         .showScreenBorder = false
     };
 
