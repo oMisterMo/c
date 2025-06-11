@@ -97,9 +97,9 @@ enum TileType {
 };
 
 enum FillMode {
-    FILL_OFF = 0,
-    FILL_EMPTY,
-    FILL_ALL,
+    FILL_OFF = 0,   // TODO: Rename to FILL_STAMP
+    FILL_EMPTY,     // TODO: Remove
+    FILL_ALL,       // TODO: Use BFS/Dijkstra algorithm
     FILL_HORIZONTAL,
     FILL_VERTICAL
 };
@@ -266,6 +266,75 @@ void DrawCameraWorld(Game *game) {
             Rectangle src = game->tiles[y * NO_OF_TILES_X + x].srcRect;
             Rectangle dest = game->tiles[y * NO_OF_TILES_X + x].destRect;
             DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+        }
+    }
+
+    // Draw Preview tiles
+    Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
+    int x = (int) (mouse.x / TILE_WIDTH);
+    int y = (int) (mouse.y / TILE_HEIGHT);
+    // When the mouse is hovering on the tile map
+    if (x >= 0 && x < NO_OF_TILES_X && y >= 0 && y < NO_OF_TILES_Y && !IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+        printf("%d,%d\n", x , y);
+        switch (game->fillMode) {
+            case FILL_OFF:
+                    DrawTexturePro(game->tileset,
+                        (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Rectangle){x * TILE_WIDTH , y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                break;
+            case FILL_HORIZONTAL:
+                // For all tiles
+                // for (int i = 0; i < NO_OF_TILES_X; i++) {
+                //     DrawTexturePro(game->tileset,
+                //         (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                //         (Rectangle){i * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                //         (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                // }
+                // Break on found tile
+                for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
+                    Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
+                    if (tile->id > TILE_EMPTY) break;
+                        DrawTexturePro(game->tileset,
+                        (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Rectangle){i * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                }
+                for (int i = x; i >= 0; --i) {
+                    Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
+                    if (tile->id > TILE_EMPTY) break;
+                        DrawTexturePro(game->tileset,
+                        (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Rectangle){i * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                }
+                break;
+            case FILL_VERTICAL:
+                // For all tiles
+                // for (int i = 0; i < NO_OF_TILES_Y; i++) {
+                    // DrawTexturePro(game->tileset,
+                    //     (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                    //     (Rectangle){x * TILE_WIDTH , i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                    //     (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                // }
+                // Break on found tile
+                for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
+                    Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
+                    if (tile->id > TILE_EMPTY) break;
+                         DrawTexturePro(game->tileset,
+                        (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Rectangle){x * TILE_WIDTH , i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                }
+                for (int i = y; i >= 0; --i) {
+                    Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
+                    if (tile->id > TILE_EMPTY) break;
+                        DrawTexturePro(game->tileset,
+                        (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Rectangle){x * TILE_WIDTH , i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
+                        (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
+                }
+                break;
         }
     }
 
@@ -766,6 +835,7 @@ void Update(Game *game) {
     if (game->cameraType == CAMERA_SCREEN_SHAKE) {
 
         if (game->screenShake.shake > 0) {
+            // TODO: FRAME RATE INDEPENDENT
             game->screenShake.shake -= 0.01;
 
             // Update shake
@@ -774,6 +844,10 @@ void Update(Game *game) {
             game->screenShake.offsetY = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
 
             // Apply shake
+
+            // TODO: ROTATION NOT WORKING
+            // game->screenCamera.offset
+            printf("angle %.2f\n", game->screenShake.angle);
             game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
             game->shakyCamera.target =  Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
 
