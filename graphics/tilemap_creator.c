@@ -271,22 +271,9 @@ void DrawCameraWorld(Game *game) {
 }
 
 void DrawCameraScreen(Game *game) {
-    // TODO: this method is exactly identical to DrawCamerWorld except for the line below (at this moment).
+    // TODO: this method is identical to DrawCamerWorld except for the line below, and the drawing of empty tiles.
     BeginMode2D(game->screenCamera);
     DrawAxis();
-
-    // int i = 0;
-    // for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-    //     for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
-    //         // DrawRectangleRec(tiles[i], RED);
-    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, RED);
-    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-    //         ++i;
-    //     }
-    // }
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
@@ -309,22 +296,9 @@ void DrawCameraScreen(Game *game) {
 }
 
 void DrawCameraScreenShake(Game *game) {
-    // TODO: this method is exactly identical to DrawCamerWorld except for the line below (at this moment).
+    // TODO: this method is exactly identical to DrawCamerScreen except for the line below (at this moment).
     BeginMode2D(game->shakyCamera);
     DrawAxis();
-
-    // int i = 0;
-    // for (int y = 0; y < (int) (WORLD_HEIGHT / TILE_HEIGHT) + 1; ++y) {
-    //     for (int x = 0; x < (int) (WORLD_WIDTH / TILE_WIDTH) + 1; ++x) {
-    //         // DrawRectangleRec(tiles[i], RED);
-    //         // DrawRectangleLinesEx(tiles[i], lineThick % 4, WHITE);
-    //         DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, RED);
-    //         DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-    //             TILE_WIDTH, TILE_HEIGHT, WHITE);
-    //         ++i;
-    //     }
-    // }
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
