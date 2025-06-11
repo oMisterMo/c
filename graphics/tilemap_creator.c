@@ -570,7 +570,7 @@ void Input(Game *game) {
 
                 // Store the source rect pointer
                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-                if (tile->id == TILE_EMPTY) return;
+                // if (tile->id == TILE_EMPTY) return;
                 printf("erase %d,%d\n", x, y);
 
                 // Set the empty tile
