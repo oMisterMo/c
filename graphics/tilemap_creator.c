@@ -2,10 +2,12 @@
  * Functional Requirements:
  *  - Set background tiles in UI
  *  - Render background tiles
+ *  - Show ghost tile (preview)
  *  - Show toast when user saves/loads/resets file
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
  *  - Scroll to zoom
+ *  - Fullscreen
  *  - Select multiple tiles
  *  - Draw multiple tiles
  *  - Add RayGUI
@@ -26,7 +28,7 @@
  *  - Rain animation
  *  - Snow animation
  *  - Particles
- *  - Screen shake
+ *  - Screen shake ✔️
  *  - Add more usable tiles
  *  - Better way to load texture atlas (using ray texture packer)
  *  - Player physics/collisions
@@ -235,14 +237,15 @@ void DrawGUI(Game *game) {
 
 void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
-    DrawAxis();
+
+    // DrawAxis();
 
     // Red tiles
     int i = 0;
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, GRAY);
+            // DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+            //     TILE_WIDTH, TILE_HEIGHT, GRAY);
             DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT, WHITE);
             ++i;
@@ -273,7 +276,8 @@ void DrawCameraWorld(Game *game) {
 void DrawCameraScreen(Game *game) {
     // TODO: this method is identical to DrawCamerWorld except for the line below, and the drawing of empty tiles.
     BeginMode2D(game->screenCamera);
-    DrawAxis();
+
+    // DrawAxis();
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
@@ -298,7 +302,8 @@ void DrawCameraScreen(Game *game) {
 void DrawCameraScreenShake(Game *game) {
     // TODO: this method is exactly identical to DrawCamerScreen except for the line below (at this moment).
     BeginMode2D(game->shakyCamera);
-    DrawAxis();
+
+    // DrawAxis();
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
@@ -857,9 +862,9 @@ int main(void) {
     screenCamera.zoom = 1.5f;
 
     Camera2D shakyCamera = { 0 };
-    shakyCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    shakyCamera.rotation = 0.0f;
-    shakyCamera.zoom = 1.5f;
+    shakyCamera.offset = screenCamera.offset;
+    shakyCamera.rotation = screenCamera.rotation;
+    shakyCamera.zoom = screenCamera.zoom;
 
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
     Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
