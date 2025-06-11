@@ -2,7 +2,7 @@
  * Functional Requirements:
  *  - Set background tiles in UI
  *  - Render background tiles
- *  - Show ghost tile (preview)
+ *  - Show ghost tile (preview) ✔️
  *  - Show toast when user saves/loads/resets file
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
@@ -13,6 +13,7 @@
  *  - Add RayGUI
  *      - Fill horizonal tiles ✔️
  *      - Fill vertical tiles ✔️
+ *      - Select layer to add tiles
  *      - Fill all tiles
  *      - Save multiple files
  *      - Load multiple files
@@ -275,7 +276,7 @@ void DrawCameraWorld(Game *game) {
     int y = (int) (mouse.y / TILE_HEIGHT);
     // When the mouse is hovering on the tile map
     if (x >= 0 && x < NO_OF_TILES_X && y >= 0 && y < NO_OF_TILES_Y && !IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-        printf("%d,%d\n", x , y);
+        // printf("%d,%d\n", x , y);
         switch (game->fillMode) {
             case FILL_OFF:
                     DrawTexturePro(game->tileset,
