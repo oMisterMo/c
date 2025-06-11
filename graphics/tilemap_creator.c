@@ -158,6 +158,13 @@ float GetRandomValueFloat(float min, float max) {
     return (((float)rand()/(float)(RAND_MAX)) * 2) - 1;
 }
 
+void ApplyShake(Game *game, float trauma) {
+    printf("Shake...\n");
+    game->cameraType = CAMERA_SCREEN_SHAKE;
+    game->screenShake.shake += trauma;
+    if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
+}
+
 Texture2D CreateCheckeredBackground() {
     // Checkered background
     Color *pixels = (Color *)malloc(WORLD_WIDTH*WORLD_HEIGHT*sizeof(Color));
@@ -497,12 +504,7 @@ void Input(Game *game) {
     }
     // Screen shake
     if (IsKeyPressed(KEY_FOUR)) {
-        printf("Shake...\n");
-        game->cameraType = CAMERA_SCREEN_SHAKE;
-
-        // TODO method to add shake so that I can limit in one place
-        game->screenShake.shake += 0.3f;
-        if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
+        ApplyShake(game, 0.3f);
     }
 
 
