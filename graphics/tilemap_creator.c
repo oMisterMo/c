@@ -52,6 +52,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <math.h>
 #include <stdbool.h>
 #include "raylib.h"
@@ -73,7 +74,8 @@ int blankTile = 3;  // Blank tile at index 3, could use any random number
 enum CameraType {
     CAMERA_TILESET = 0,
     CAMERA_WORLD,
-    CAMERA_SCREEN
+    CAMERA_SCREEN,
+    CAMERA_SCREEN_SHAKE,
 };
 
 enum TileType {
@@ -106,6 +108,15 @@ typedef struct BoolFlags {
     bool showScreenBorder;
 } BoolFlags;
 
+typedef struct ScreenShake {
+    float shake;
+    float maxAngle;
+    float maxOffset;
+    float angle;
+    float offsetX;
+    float offsetY;
+} ScreenShake;
+
 typedef struct Tile {
     int id; // what tile (grass, water)
     Rectangle srcRect;  // spritesheet index
@@ -126,6 +137,8 @@ typedef struct Game {
     int cameraType;
     Camera2D worldCamera;
     Camera2D screenCamera;
+    Camera2D shakyCamera;
+    ScreenShake screenShake;
 
     Texture2D checkered;
     Texture2D tileset;
@@ -135,6 +148,12 @@ typedef struct Game {
     int fillMode;
     bool overwriteTiles;
 } Game;
+
+float GetRandomValueFloat(float min, float max) {
+    // Use perlin noise, not random values
+    // https://www.youtube.com/watch?v=tu-Qe66AvtY
+    return (((float)rand()/(float)(RAND_MAX)) * 2) - 1;
+}
 
 Texture2D CreateCheckeredBackground() {
     // Checkered background
@@ -204,6 +223,9 @@ void DrawGUI(Game *game) {
         DrawText(TextFormat("w end (%d,%d)", (int) windowEnd.x , (int)(windowEnd.y)), 20, 320, 20, WHITE);
         DrawText(TextFormat("s start (%d,%d)", (int) screenStart.x , (int)(screenStart.y)), 20, 360, 20, WHITE);
         DrawText(TextFormat("s end (%d,%d)", (int) screenEnd.x , (int)(screenEnd.y)), 20, 400, 20, WHITE);
+
+
+        DrawText(TextFormat("shake (%.2f)",  game->screenShake.shake), 20, 440, 20, WHITE);
     }
 }
 
@@ -452,14 +474,23 @@ void Input(Game *game) {
         game->cameraType = CAMERA_SCREEN;
         // game->boolFlags.showScreenBorder = true;
     }
-    if (IsKeyPressed(KEY_ZERO)) {
-        game->boolFlags.showGUI = !game->boolFlags.showGUI;
+    // Screen shake
+    if (IsKeyPressed(KEY_FOUR)) {
+        // TODO...
+        printf("Shake...\n");
+        game->cameraType = CAMERA_SCREEN_SHAKE;
+        game->screenShake.shake = 0.7f;
     }
+
+
     if (IsKeyPressed(KEY_EIGHT)) {
         game->boolFlags.showWindowBorder = !game->boolFlags.showWindowBorder;
     }
     if (IsKeyPressed(KEY_NINE)) {
         game->boolFlags.showScreenBorder = !game->boolFlags.showScreenBorder;
+    }
+    if (IsKeyPressed(KEY_ZERO)) {
+        game->boolFlags.showGUI = !game->boolFlags.showGUI;
     }
     // Reset
     if (IsKeyPressed(KEY_R)) {
@@ -471,14 +502,17 @@ void Input(Game *game) {
             }
         }
     }
+    // Load map
     if (IsKeyPressed(KEY_L)) {
         printf("Load map...\n");
         LoadMap(game);
     }
+    // Save map
     if (IsKeyPressed(KEY_PERIOD)) {
         printf("Save map...\n");
         SaveMap(game);
     }
+    // Set tile modes
     if (IsKeyPressed(KEY_H)) {
         game->fillMode = FILL_HORIZONTAL;
     }
@@ -701,6 +735,9 @@ void Update(Game *game) {
         if (game->screenCamera.target.y > WORLD_HEIGHT - camY) game->screenCamera.target.y = WORLD_HEIGHT - camY;
     }
 
+    if (game->cameraType == CAMERA_SCREEN_SHAKE) {}
+
+    // Bound world camera
     // if (worldCamera.target.x < 0) worldCamera.target.x = 0;
     // if (worldCamera.target.y < 0) worldCamera.target.y = 0;
     // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
@@ -721,6 +758,9 @@ void Draw(Game *game) {
             DrawCameraWorld(game);
         } else if (game->cameraType == CAMERA_SCREEN) {
             DrawCameraScreen(game);
+        } else if (game->cameraType == CAMERA_SCREEN_SHAKE) {
+            // DrawCameraScreen(game);
+            // DrawCameraScreenShake(game);
         }
 
         DrawGUI(game);
@@ -730,6 +770,8 @@ void Draw(Game *game) {
 }
 
 int main(void) {
+
+    srand((unsigned int)time(NULL));
 
     InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tile Map Editor");
 
@@ -775,10 +817,28 @@ int main(void) {
     screenCamera.rotation = 0.0f;
     screenCamera.zoom = 1.5f;
 
+    Camera2D shakyCamera = { 0 };
+    shakyCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
+    shakyCamera.rotation = 0.0f;
+    shakyCamera.zoom = 1.5f;
+
     Rectangle worldBounds = { 0, 0, WORLD_WIDTH, WORLD_HEIGHT };
     Rectangle screenBounds = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-    int cameraType = CAMERA_TILESET;
+    ScreenShake screenShake = {
+        .shake = 0.0f,
+        .maxAngle = 20.0f,
+        .maxOffset = 20.0f,
+        // Not sure this works, might have to do it after
+        // .angle = screenShake.shake * GetRandomValueFloat(-1, 1),
+        // .offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1),
+        // .offsetY = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1),
+    };
+    screenShake.angle = screenShake.shake * GetRandomValueFloat(-1, 1);
+    screenShake.offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
+    screenShake.offsetY = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
+
+    int cameraType = CAMERA_SCREEN;
     int fillMode = FILL_OFF;
     // int fillMode = FILL_HORIZONTAL;
     // int fillMode = FILL_VERTICAL;
@@ -808,12 +868,16 @@ int main(void) {
     game.cameraType = cameraType;
     game.worldCamera = worldCamera;
     game.screenCamera = screenCamera;
+    game.shakyCamera = shakyCamera;
     game.checkered = checkered;
     game.tileset = tileset;
     game.tileSelected = (Vector2) { 0, 0};
     game.tiles = tiles;
     game.fillMode = fillMode;
     game.overwriteTiles = false;
+    game.screenShake = screenShake;
+
+    LoadMap(&game);
 
     // Log some stuff
     printf("==========================\n");
