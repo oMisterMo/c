@@ -7,7 +7,7 @@
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
  *  - Scroll to zoom
- *  - Fullscreen ✔️❌☝️
+ *  - Fullscreen ✔️
  *  - Select multiple tiles
  *  - Draw multiple tiles
  *  - Add RayGUI
@@ -26,9 +26,9 @@
  *
  *
  * Non-Functional Requirements:
- *  - Rain animation
- *  - Snow animation
  *  - Particles
+ *      - Rain animation
+ *      - Snow animation
  *  - Screen shake ✔️
  *  - Add more usable tiles
  *  - Better way to load texture atlas (using ray texture packer)
@@ -150,6 +150,22 @@ typedef struct Game {
     int fillMode;
     bool overwriteTiles;
 } Game;
+
+int GetWidth() {
+    if (IsWindowFullscreen()) {
+        // printf("%d\n", WINDOW_WIDTH);
+        return WINDOW_WIDTH;
+    }
+    // printf("%d\n", WORLD_WIDTH);
+    return WORLD_WIDTH;
+}
+
+int GetHeight() {
+    if (IsWindowFullscreen()) {
+        return WINDOW_HEIGHT;
+    }
+    return WORLD_HEIGHT;
+}
 
 float GetRandomValueFloat(float min, float max) {
     // Use perlin noise, not random values
@@ -626,10 +642,16 @@ void Input(Game *game) {
             printf("Fullscreen\n");
             WINDOW_WIDTH = GetMonitorWidth(2);
             WINDOW_HEIGHT = GetMonitorHeight(2);
+
+            game->screenCamera.offset.x = WINDOW_WIDTH / 2;
+            game->screenCamera.offset.y = WINDOW_HEIGHT / 2;
         } else {
             printf("Windowed\n");
             WINDOW_WIDTH = WORLD_WIDTH;
             WINDOW_HEIGHT = WORLD_HEIGHT;
+
+            game->screenCamera.offset.x = WORLD_WIDTH / 2;
+            game->screenCamera.offset.y = WORLD_HEIGHT / 2;
         }
     }
 
@@ -904,7 +926,7 @@ void Draw(Game *game) {
 
         DrawGUI(game);
 
-        DrawFPS(WORLD_WIDTH - MeasureText("60 FPS", 20) - 20, 20);
+        DrawFPS(GetWidth() - MeasureText("60 FPS", 20) - 20, 20);
     EndDrawing();
 }
 
