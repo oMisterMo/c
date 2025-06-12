@@ -949,14 +949,10 @@ int main(void) {
         .shake = 0.0f,
         .maxAngle = 10.0f,
         .maxOffset = 10.0f,
-        // Not sure this works, might have to do it after
-        // .angle = screenShake.shake * GetRandomValueFloat(-1, 1),
-        // .offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1),
-        // .offsetY = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1),
+        .angle   = 0.0f,
+        .offsetX = 0.0f,
+        .offsetY = 0.0f,
     };
-    screenShake.angle = screenShake.shake * GetRandomValueFloat(-1, 1);
-    screenShake.offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
-    screenShake.offsetY = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
 
     int cameraType = CAMERA_SCREEN;
     int fillMode = FILL_OFF;
