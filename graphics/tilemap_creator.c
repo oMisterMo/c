@@ -55,9 +55,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <stdbool.h>
+#include <time.h>           // Required for: time()
 #include "raylib.h"
 #include "raymath.h"
 
@@ -132,9 +130,6 @@ typedef struct Game {
     Rectangle worldBounds;
     Rectangle screenBounds;
     Rectangle guiWindow;
-
-    Vector2 windowStart;
-    Vector2 windowEnd ;
 
     BoolFlags boolFlags;
 
@@ -225,8 +220,8 @@ void DrawGUI(Game *game) {
         Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
         Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
 
-        DrawText(TextFormat("x (%d,%d)", (int) game->windowStart.x / TILE_WIDTH, (int)(game->windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
-        DrawText(TextFormat("y (%d,%d)", (int) game->windowStart.y / TILE_HEIGHT, (int)(game->windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
+        DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
+        DrawText(TextFormat("y (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
         DrawText(TextFormat("player (%d,%d)", (int) game->player.x, (int)(game->player.y)), 20, 160, 20, WHITE);
         DrawText(TextFormat("world  (%d,%d) x%.2f", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y), game->worldCamera.zoom), 20, 200, 20, WHITE);
         DrawText(TextFormat("screen (%d,%d) x%.2f", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y), game->screenCamera.zoom), 20, 240, 20, WHITE);
@@ -937,12 +932,13 @@ int main(void) {
 
     Camera2D screenCamera = { 0 };
     screenCamera.offset = (Vector2){ WORLD_WIDTH/2.0f, WORLD_HEIGHT/2.0f };
-    // screenCamera.target = (Vector2){ player.x, player.y };
+    screenCamera.target = (Vector2){ player.x, player.y };
     screenCamera.rotation = 0.0f;
-    screenCamera.zoom = 1.5f;
+    screenCamera.zoom = 2.0f;   // 2.8f is good zoom
 
     Camera2D shakyCamera = { 0 };
     shakyCamera.offset = screenCamera.offset;
+    shakyCamera.target = (Vector2){ player.x, player.y };
     shakyCamera.rotation = screenCamera.rotation;
     shakyCamera.zoom = screenCamera.zoom;
 
@@ -976,18 +972,12 @@ int main(void) {
         .showScreenBorder = false
     };
 
-    // Test
-    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, worldCamera);
-    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, worldCamera);
-
     // Game
     Game game = { 0 };
     game.player = player;
     game.worldBounds = worldBounds;
     game.screenBounds = screenBounds;
     game.guiWindow = guiWindow;
-    game.windowStart = windowStart;
-    game.windowEnd = windowEnd;
     game.boolFlags = boolFlags;
     game.cameraType = cameraType;
     game.worldCamera = worldCamera;
@@ -1007,12 +997,23 @@ int main(void) {
     printf("==========================\n");
     printf("Moo\n");
     printf("==========================\n");
+    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game.worldCamera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game.worldCamera);
+    Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game.screenCamera);
+    Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game.screenCamera);
     int TOTAL_TILES_X = (int) (windowEnd.x / TILE_WIDTH) + 1;
     int TOTAL_TILES_Y = (int) (windowEnd.y / TILE_HEIGHT) + 1;
+    // The position takes into account the offset, target and zoom levels.
     printf("windowStart %d, %d\n", (int) windowStart.x, (int) windowStart.y);
     printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
+    printf("screenStart %d, %d\n", (int) screenStart.x, (int) screenStart.y);
+    printf("screenEnd %d, %d\n", (int) screenEnd.x, (int) screenEnd.y);
+    printf("---------------------\n");
     printf("Total x tiles: %d\n", TOTAL_TILES_X);
     printf("Total y tiles: %d\n", TOTAL_TILES_Y);
+    printf("---------------------\n");
+    printf("Total (visible) x tiles: %d\n", (int) SCREEN_WIDTH / TILE_WIDTH);
+    printf("Total (visible) y tiles: %d\n", (int) SCREEN_HEIGHT / TILE_HEIGHT);
 
     SetTargetFPS(60);
     while(!WindowShouldClose()) {
