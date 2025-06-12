@@ -7,7 +7,7 @@
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
  *  - Scroll to zoom
- *  - Fullscreen
+ *  - Fullscreen ✔️❌☝️
  *  - Select multiple tiles
  *  - Draw multiple tiles
  *  - Add RayGUI
@@ -70,6 +70,9 @@
 
 #define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH      // 40
 #define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT    // 22.5
+
+int WINDOW_WIDTH  = WORLD_WIDTH;
+int WINDOW_HEIGHT  = WORLD_HEIGHT;
 
 int blankTile = 3;  // Blank tile at index 3, could use any random number
 
@@ -163,22 +166,25 @@ void ApplyShake(Game *game, float trauma) {
 
 Texture2D CreateCheckeredBackground() {
     // Checkered background
-    Color *pixels = (Color *)malloc(WORLD_WIDTH*WORLD_HEIGHT*sizeof(Color));
+    int w = GetMonitorWidth(2);
+    int h = GetMonitorHeight(2);
+    printf("w %d\n", w);
+    Color *pixels = (Color *)malloc(w*h*sizeof(Color));
 
-    for (int y = 0; y < WORLD_HEIGHT; y++)
+    for (int y = 0; y < h; y++)
     {
-        for (int x = 0; x < WORLD_WIDTH; x++)
+        for (int x = 0; x < w; x++)
         {
-            if (((x/32+y/32)/1)%2 == 0) pixels[y*WORLD_WIDTH + x] = ColorAlpha(ORANGE, 0.1f);
-            else pixels[y*WORLD_WIDTH + x] = ColorAlpha(GOLD, 0.1f);
+            if (((x/32+y/32)/1)%2 == 0) pixels[y*w + x] = ColorAlpha(ORANGE, 0.1f);
+            else pixels[y*w + x] = ColorAlpha(GOLD, 0.1f);
         }
     }
 
     // Load pixels data into an image structure and create texture
     Image checkedIm = {
         .data = pixels,             // We can assign pixels directly to data
-        .width = WORLD_WIDTH,
-        .height = WORLD_HEIGHT,
+        .width = w,
+        .height = h,
         .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
         .mipmaps = 1
     };
@@ -613,6 +619,20 @@ void Input(Game *game) {
         game->fillMode = FILL_OFF;
     }
 
+    if (IsKeyPressed(KEY_F)) {
+        ToggleFullscreen();
+
+        if (IsWindowFullscreen()) {
+            printf("Fullscreen\n");
+            WINDOW_WIDTH = GetMonitorWidth(2);
+            WINDOW_HEIGHT = GetMonitorHeight(2);
+        } else {
+            printf("Windowed\n");
+            WINDOW_WIDTH = WORLD_WIDTH;
+            WINDOW_HEIGHT = WORLD_HEIGHT;
+        }
+    }
+
     switch (game->cameraType) {
         case CAMERA_TILESET:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -892,7 +912,7 @@ int main(void) {
 
     srand((unsigned int)time(NULL));
 
-    InitWindow(WORLD_WIDTH, WORLD_HEIGHT, "Tile Map Editor");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tile Map Editor");
 
     Texture2D checkered = CreateCheckeredBackground();
     Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png"); // 16 x 16 tileset
