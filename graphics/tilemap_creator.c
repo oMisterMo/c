@@ -643,15 +643,23 @@ void Input(Game *game) {
             WINDOW_WIDTH = GetMonitorWidth(2);
             WINDOW_HEIGHT = GetMonitorHeight(2);
 
+            // Update screen camera
             game->screenCamera.offset.x = WINDOW_WIDTH / 2;
             game->screenCamera.offset.y = WINDOW_HEIGHT / 2;
+            // Update shaky camera
+            game->shakyCamera.offset.x = game->screenCamera.offset.x;
+            game->shakyCamera.offset.y = game->screenCamera.offset.y;
         } else {
             printf("Windowed\n");
             WINDOW_WIDTH = WORLD_WIDTH;
             WINDOW_HEIGHT = WORLD_HEIGHT;
 
+            // Update screen camera
             game->screenCamera.offset.x = WORLD_WIDTH / 2;
             game->screenCamera.offset.y = WORLD_HEIGHT / 2;
+            // Update shaky camera
+            game->shakyCamera.offset.x = game->screenCamera.offset.x;
+            game->shakyCamera.offset.y = game->screenCamera.offset.y;
         }
     }
 
