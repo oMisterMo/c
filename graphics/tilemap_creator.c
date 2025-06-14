@@ -3,7 +3,7 @@
  *  - Set background tiles in UI
  *  - Render background tiles
  *  - Show ghost tile (preview) ✔️
- *  - Show toast when user saves/loads/resets file
+ *  - Show toast when user saves/loads/resets file ✔️
  *  - Player spawn location (ID = 'p')
  *  - Middle click to drag
  *  - Scroll to zoom
@@ -58,6 +58,7 @@
 #include <time.h>           // Required for: time()
 #include "raylib.h"
 #include "raymath.h"
+#include "reasings.h"
 
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
@@ -106,6 +107,19 @@ enum FillMode {
     FILL_VERTICAL
 };
 
+typedef enum {
+    IDLE = 0,
+    TWEENING
+} TweenState;
+
+typedef struct Tween {
+    int state;                  // IDLE | TWEENING
+    int frameCounter;           // Current time in tween
+    Vector2 currentPosition;    // Tween start
+    Vector2 targetPosition;     // Tween end [could be consts]
+    int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
+} Tween;
+
 typedef struct BoolFlags {
     bool showGUI;
     bool showGUIwindow;
@@ -128,6 +142,13 @@ typedef struct Tile {
     Rectangle destRect; // position
 } Tile;
 
+typedef struct Toast {
+    char *message;
+    Rectangle bounds;
+    Vector2 position;
+    Tween tween;
+} Toast;
+
 typedef struct Game {
     Rectangle player;
     Rectangle worldBounds;
@@ -149,6 +170,8 @@ typedef struct Game {
     Tile *tiles;
     int fillMode;
     bool overwriteTiles;
+
+    Toast toast;
 } Game;
 
 int GetWidth() {
@@ -178,6 +201,43 @@ void ApplyShake(Game *game, float trauma) {
     game->cameraType = CAMERA_SCREEN_SHAKE;
     game->screenShake.shake += trauma;
     if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
+}
+
+void TweenToast(Toast *toast) {
+    if (toast->tween.state == TWEENING) {
+        printf("twwenz %d\n", toast->tween.frameCounter);
+        toast->tween.frameCounter++;
+
+        // Tween
+        toast->position.y  = EaseQuadOut(
+            (float) toast->tween.frameCounter,
+            toast->tween.currentPosition.y,
+            toast->tween.targetPosition.y - toast->tween.currentPosition.y,
+            toast->tween.duration
+        );
+
+        // Tween complete
+        if (toast->tween.frameCounter >= toast->tween.duration) {
+            printf("complete\n");
+            toast->tween.frameCounter = 0;
+            toast->tween.state = IDLE;
+
+            // Set final position
+            toast->position.y = toast->tween.currentPosition.y;
+        }
+    }
+}
+
+void PlayToastTween(Toast *toast, char *message) {
+    toast->message = message;
+    toast->tween.currentPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->tween.currentPosition.y = GetHeight() + 50;
+    toast->tween.targetPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->tween.targetPosition.y = GetHeight() - 50;
+    toast->position.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->position.y = GetHeight() + 50;
+    toast->tween.state = TWEENING;
+    toast->tween.frameCounter = 0;
 }
 
 Texture2D CreateCheckeredBackground() {
@@ -258,6 +318,11 @@ void DrawGUI(Game *game) {
 
         DrawText(TextFormat("shake (%.2f)",  game->screenShake.shake), 20, 440, 20, WHITE);
     }
+    int pad = 20;
+    int h = 40;
+    DrawRectangleRounded((Rectangle) {game->toast.position.x - pad, game->toast.position.y - h / 4, MeasureText(game->toast.message, 20) + pad * 2, h}, 10, 4, ColorAlpha(BLACK, 1.0f));
+    DrawText(TextFormat("%s",  game->toast.message), game->toast.position.x, game->toast.position.y, 20, WHITE);
+
 }
 
 void DrawCameraWorld(Game *game) {
@@ -613,26 +678,34 @@ void Input(Game *game) {
                 game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
             }
         }
+
+        PlayToastTween(&game->toast, "Reset");
     }
     // Load map
     if (IsKeyPressed(KEY_L)) {
         printf("Load map...\n");
         LoadMap(game);
+
+        PlayToastTween(&game->toast, "Load");
     }
     // Save map
     if (IsKeyPressed(KEY_PERIOD)) {
         printf("Save map...\n");
         SaveMap(game);
+        PlayToastTween(&game->toast, "Save");
     }
     // Set tile modes
     if (IsKeyPressed(KEY_H)) {
         game->fillMode = FILL_HORIZONTAL;
+        PlayToastTween(&game->toast, "Horizontal Fill");
     }
     if (IsKeyPressed(KEY_V)) {
         game->fillMode = FILL_VERTICAL;
+        PlayToastTween(&game->toast, "Vertical Fill");
     }
     if (IsKeyPressed(KEY_O)) {
         game->fillMode = FILL_OFF;
+        PlayToastTween(&game->toast, "Stamp");
     }
 
     if (IsKeyPressed(KEY_F)) {
@@ -661,6 +734,7 @@ void Input(Game *game) {
             game->shakyCamera.offset.x = game->screenCamera.offset.x;
             game->shakyCamera.offset.y = game->screenCamera.offset.y;
         }
+        PlayToastTween(&game->toast, "Toggle Fullscreen");
     }
 
     switch (game->cameraType) {
@@ -837,6 +911,7 @@ void Update(Game *game) {
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
             game->worldCamera.target.x += speed;
         }
+        TweenToast(&game->toast);
     }
 
     if (game->cameraType == CAMERA_SCREEN || game->cameraType == CAMERA_SCREEN_SHAKE) {
@@ -1017,7 +1092,18 @@ int main(void) {
         .showWindowBorder = false,
         .showScreenBorder = false
     };
-
+    Toast toast = {
+        .message = "Hello there whats goign one ok?",
+        // .bounds = (Rectangle) { 200, 200, MeasureText(toast.message, 20), 100 },
+        .position = (Vector2) { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() + 50 },
+        .tween = (Tween) {
+            .currentPosition = { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() + 50 },
+            .targetPosition = { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() - 50 },
+            .duration = 140,
+            .frameCounter = 0,
+            .state = IDLE
+         }
+    };
     // Game
     Game game = { 0 };
     game.player = player;
@@ -1036,6 +1122,7 @@ int main(void) {
     game.fillMode = fillMode;
     game.overwriteTiles = false;
     game.screenShake = screenShake;
+    game.toast = toast;
 
     LoadMap(&game);
 
