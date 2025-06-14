@@ -1094,11 +1094,10 @@ int main(void) {
     };
     Toast toast = {
         .message = "Hello there whats goign one ok?",
-        // .bounds = (Rectangle) { 200, 200, MeasureText(toast.message, 20), 100 },
         .position = (Vector2) { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() + 50 },
         .tween = (Tween) {
-            .currentPosition = { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() + 50 },
-            .targetPosition = { (GetWidth() - MeasureText(toast.message, 20)) / 2, GetHeight() - 50 },
+            .currentPosition = { toast.position.x, toast.position.y },
+            .targetPosition = { toast.position.x, GetHeight() - 50 },
             .duration = 140,
             .frameCounter = 0,
             .state = IDLE
