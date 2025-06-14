@@ -107,10 +107,10 @@ enum FillMode {
     FILL_VERTICAL
 };
 
-typedef enum {
+enum TweenState {
     IDLE = 0,
     TWEENING
-} TweenState;
+};
 
 typedef struct Tween {
     int state;                  // IDLE | TWEENING
@@ -719,6 +719,9 @@ void Input(Game *game) {
             // Update screen camera
             game->screenCamera.offset.x = WINDOW_WIDTH / 2;
             game->screenCamera.offset.y = WINDOW_HEIGHT / 2;
+            // Update world camera
+            game->worldCamera.offset.x = WINDOW_WIDTH / 2;
+            game->worldCamera.offset.y = WINDOW_HEIGHT / 2;
             // Update shaky camera
             game->shakyCamera.offset.x = game->screenCamera.offset.x;
             game->shakyCamera.offset.y = game->screenCamera.offset.y;
@@ -730,6 +733,9 @@ void Input(Game *game) {
             // Update screen camera
             game->screenCamera.offset.x = WORLD_WIDTH / 2;
             game->screenCamera.offset.y = WORLD_HEIGHT / 2;
+            // Update world camera
+            game->worldCamera.offset.x = WORLD_WIDTH / 2;
+            game->worldCamera.offset.y = WORLD_HEIGHT / 2;
             // Update shaky camera
             game->shakyCamera.offset.x = game->screenCamera.offset.x;
             game->shakyCamera.offset.y = game->screenCamera.offset.y;
