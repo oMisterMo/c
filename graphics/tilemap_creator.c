@@ -59,6 +59,8 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "reasings.h"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
@@ -76,6 +78,9 @@ int WINDOW_WIDTH  = WORLD_WIDTH;
 int WINDOW_HEIGHT  = WORLD_HEIGHT;
 
 int blankTile = 3;  // Blank tile at index 3, could use any random number
+int guiX = 260; // 300 - 40
+int guiY = 40;  // 40
+int guiWidth = 300;
 
 enum CameraType {
     CAMERA_TILESET = 0,
@@ -153,7 +158,6 @@ typedef struct Game {
     Rectangle player;
     Rectangle worldBounds;
     Rectangle screenBounds;
-    Rectangle guiWindow;
 
     BoolFlags boolFlags;
 
@@ -280,20 +284,22 @@ void DrawAxis() {
 void DrawGUI(Game *game) {
     if (game->boolFlags.showGUI) {
         if (game->boolFlags.showGUIwindow) {
-            DrawRectangleRec(game->guiWindow, ColorAlpha(GRAY, 0.8f));
+            // Draw window
+            DrawRectangleRec((Rectangle) { 0, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
+            DrawRectangleRec((Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
         }
         switch (game->cameraType) {
             case CAMERA_TILESET:
-                DrawText("Camera Tileset", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                DrawText("Camera Tileset", 20, GetHeight() - 40, 20, WHITE);
                 break;
             case CAMERA_WORLD:
-                DrawText("Camera World", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                DrawText("Camera World", 20, GetHeight() - 40, 20, WHITE);
                 break;
             case CAMERA_SCREEN:
-                DrawText("Camera Screen", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                DrawText("Camera Screen", 20, GetHeight() - 40, 20, WHITE);
                 break;
             case CAMERA_SCREEN_SHAKE:
-                DrawText("Camera Shake", 20, WORLD_HEIGHT - 40, 20, WHITE);
+                DrawText("Camera Shake", 20, GetHeight() - 40, 20, WHITE);
                 break;
         }
 
@@ -302,12 +308,12 @@ void DrawGUI(Game *game) {
         Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
         Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
 
+        // Draw elements on left window
         DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
         DrawText(TextFormat("y (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
         DrawText(TextFormat("player (%d,%d)", (int) game->player.x, (int)(game->player.y)), 20, 160, 20, WHITE);
         DrawText(TextFormat("world  (%d,%d) x%.2f", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y), game->worldCamera.zoom), 20, 200, 20, WHITE);
         DrawText(TextFormat("screen (%d,%d) x%.2f", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y), game->screenCamera.zoom), 20, 240, 20, WHITE);
-
 
         DrawRectangle(20, 265, 240, 10, ColorAlpha(BLACK, 0.5f));
         DrawText(TextFormat("w start (%d,%d)", (int) windowStart.x , (int)(windowStart.y)), 20, 280, 20, WHITE);
@@ -315,8 +321,13 @@ void DrawGUI(Game *game) {
         DrawText(TextFormat("s start (%d,%d)", (int) screenStart.x , (int)(screenStart.y)), 20, 360, 20, WHITE);
         DrawText(TextFormat("s end (%d,%d)", (int) screenEnd.x , (int)(screenEnd.y)), 20, 400, 20, WHITE);
 
-
         DrawText(TextFormat("shake (%.2f)",  game->screenShake.shake), 20, 440, 20, WHITE);
+
+        // Draw elements on right window
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY, 20, 20 }, "Close", &game->boolFlags.showGUI);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
     }
     int pad = 20;
     int h = 40;
@@ -1091,7 +1102,6 @@ int main(void) {
     // int fillMode = FILL_VERTICAL;
 
     // GUI
-    Rectangle guiWindow = { 0, 0, 300, WORLD_HEIGHT };
     BoolFlags boolFlags = {
         .showGUI = false,
         .showGUIwindow = true,
@@ -1109,12 +1119,19 @@ int main(void) {
             .state = IDLE
          }
     };
+
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 10);
+    GuiSetStyle(DEFAULT, TEXT_SPACING, 3);
+    GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 25);
+    GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xFFFFFFFF);
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
+    GuiSetStyle(CHECKBOX, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
+
     // Game
     Game game = { 0 };
     game.player = player;
     game.worldBounds = worldBounds;
     game.screenBounds = screenBounds;
-    game.guiWindow = guiWindow;
     game.boolFlags = boolFlags;
     game.cameraType = cameraType;
     game.worldCamera = worldCamera;
