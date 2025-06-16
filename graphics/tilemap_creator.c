@@ -82,14 +82,14 @@ int guiX = 260; // 300 - 40
 int guiY = 40;  // 40
 int guiWidth = 300;
 
-enum CameraType {
+typedef enum CameraType {
     CAMERA_TILESET = 0,
     CAMERA_WORLD,
     CAMERA_SCREEN,
     CAMERA_SCREEN_SHAKE,
-};
+} CameraType;
 
-enum TileType {
+typedef enum TileType {
     TILE_EMPTY = 0,
 
     TILE_GRASS_TOP,
@@ -102,20 +102,20 @@ enum TileType {
     TILE_BOX,
     TILE_SIGN,
     TILE_LADDER,
-};
+} TileType;
 
-enum FillMode {
+typedef enum FillMode {
     FILL_OFF = 0,   // TODO: Rename to FILL_STAMP
     FILL_EMPTY,     // TODO: Remove
     FILL_ALL,       // TODO: Use BFS/Dijkstra algorithm
     FILL_HORIZONTAL,
     FILL_VERTICAL
-};
+} FillMode;
 
-enum TweenState {
+typedef enum TweenState {
     IDLE = 0,
     TWEENING
-};
+} TweenState;
 
 typedef struct Tween {
     int state;                  // IDLE | TWEENING
@@ -161,7 +161,7 @@ typedef struct Game {
 
     BoolFlags boolFlags;
 
-    int cameraType;
+    CameraType cameraType;
     Camera2D worldCamera;
     Camera2D screenCamera;
     Camera2D shakyCamera;
@@ -172,7 +172,7 @@ typedef struct Game {
 
     Vector2 tileSelected;
     Tile *tiles;
-    int fillMode;
+    FillMode fillMode;
     bool overwriteTiles;
 
     Toast toast;
@@ -1096,8 +1096,8 @@ int main(void) {
         .offsetY = 0.0f,
     };
 
-    int cameraType = CAMERA_SCREEN;
-    int fillMode = FILL_OFF;
+    CameraType cameraType = CAMERA_SCREEN;
+    FillMode fillMode = FILL_OFF;
     // int fillMode = FILL_HORIZONTAL;
     // int fillMode = FILL_VERTICAL;
 
