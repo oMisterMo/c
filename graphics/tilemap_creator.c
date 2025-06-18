@@ -282,9 +282,15 @@ void DrawAxis() {
 }
 
 void DrawGUI(Game *game) {
+    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
+    Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
+    Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
+
     // Screenshake bar
     DrawRectangle(20, 20, game->screenShake.shake * 400, 25, ColorAlpha(GREEN, 0.6f));
     DrawRectangleLines(20, 20,400,25, ColorAlpha(BLACK, 0.2f));
+
     // UI
     if (game->boolFlags.showGUI) {
         if (game->boolFlags.showGUIwindow) {
@@ -307,27 +313,33 @@ void DrawGUI(Game *game) {
                 break;
         }
 
-        Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
-        Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
-        Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
-        Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
+        // LEFT
 
-        // Draw elements on left window
+        // Tiles on screen
         DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
         DrawText(TextFormat("y (%d,%d)", (int) windowStart.y / TILE_HEIGHT, (int)(windowEnd.y / TILE_HEIGHT) + 1), 20, 100, 20, WHITE);
+
+        // Camera position
         DrawText(TextFormat("player (%d,%d)", (int) game->player.x, (int)(game->player.y)), 20, 160, 20, WHITE);
         DrawText(TextFormat("world  (%d,%d) x%.2f", (int) game->worldCamera.target.x, (int)(game->worldCamera.target.y), game->worldCamera.zoom), 20, 200, 20, WHITE);
         DrawText(TextFormat("screen (%d,%d) x%.2f", (int) game->screenCamera.target.x, (int)(game->screenCamera.target.y), game->screenCamera.zoom), 20, 240, 20, WHITE);
 
         DrawRectangle(20, 265, 240, 10, ColorAlpha(BLACK, 0.5f));
-        DrawText(TextFormat("w start (%d,%d)", (int) windowStart.x , (int)(windowStart.y)), 20, 280, 20, WHITE);
-        DrawText(TextFormat("w end (%d,%d)", (int) windowEnd.x , (int)(windowEnd.y)), 20, 320, 20, WHITE);
-        DrawText(TextFormat("s start (%d,%d)", (int) screenStart.x , (int)(screenStart.y)), 20, 360, 20, WHITE);
-        DrawText(TextFormat("s end (%d,%d)", (int) screenEnd.x , (int)(screenEnd.y)), 20, 400, 20, WHITE);
 
+        // ScreenToWorld2D
+        // DrawText(TextFormat("w start (%d,%d)", (int) windowStart.x , (int)(windowStart.y)), 20, 280, 20, WHITE);
+        // DrawText(TextFormat("w end (%d,%d)", (int) windowEnd.x , (int)(windowEnd.y)), 20, 320, 20, WHITE);
+        // DrawText(TextFormat("s start (%d,%d)", (int) screenStart.x , (int)(screenStart.y)), 20, 360, 20, WHITE);
+        // DrawText(TextFormat("s end (%d,%d)", (int) screenEnd.x , (int)(screenEnd.y)), 20, 400, 20, WHITE);
+
+        // Screenshake
         DrawText(TextFormat("shake (%.2f)",  game->screenShake.shake), 20, 440, 20, WHITE);
 
-        // Draw elements on right window
+        // Tile info
+        DrawText(TextFormat("No x tiles %d", NO_OF_TILES_X), 20, 480, 20, WHITE);
+        DrawText(TextFormat("No y tiles %d", NO_OF_TILES_Y), 20, 520, 20, WHITE);
+
+        // RIGHT
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY, 20, 20 }, "Close", &game->boolFlags.showGUI);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
