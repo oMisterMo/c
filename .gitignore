@@ -4,6 +4,7 @@ temp.c
 *.txt
 
 graphics/settings
+raylib-games/
 
 out/
 .vscode/
