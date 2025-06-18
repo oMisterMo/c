@@ -282,6 +282,10 @@ void DrawAxis() {
 }
 
 void DrawGUI(Game *game) {
+    // Screenshake bar
+    DrawRectangle(20, 20, game->screenShake.shake * 400, 25, ColorAlpha(GREEN, 0.6f));
+    DrawRectangleLines(20, 20,400,25, ColorAlpha(BLACK, 0.2f));
+    // UI
     if (game->boolFlags.showGUI) {
         if (game->boolFlags.showGUIwindow) {
             // Draw window
