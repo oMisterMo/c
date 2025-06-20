@@ -242,7 +242,7 @@ void ApplyShake(Game *game, float trauma) {
 
 void TweenToast(Toast *toast) {
     if (toast->tween.state == TWEENING) {
-        printf("twwenz %d\n", toast->tween.frameCounter);
+        // printf("twwenz %d\n", toast->tween.frameCounter);
         toast->tween.frameCounter++;
 
         // Tween
@@ -381,10 +381,10 @@ void DrawParticles(Game *game) {
         if (p.age <= 0) {
             return;
         }
+
+
         DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
         // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
-
-
         // printf("%.2f,%.2f\n", p.position.x, p.position.y);
     }
 }
@@ -1208,6 +1208,7 @@ int main(void) {
 
     Texture2D checkered = CreateCheckeredBackground();
     Texture2D tileset = LoadTexture("resources/tilesets/world_tileset.png"); // 16 x 16 tileset
+    // Texture2D tileset = LoadTexture("resources/tilesets/jungle.png"); // 16 x 16 tileset
     tileset.width *= 2;
     tileset.height *= 2;
 
