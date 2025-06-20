@@ -601,6 +601,7 @@ void DrawCameraWorld(Game *game) {
     }
 
     // DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
+    DrawParticles(game);
     EndMode2D();
 }
 
@@ -1091,7 +1092,6 @@ void Update(Game *game) {
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
             game->worldCamera.target.x += speed;
         }
-        TweenToast(&game->toast);
     }
 
     if (game->cameraType == CAMERA_SCREEN || game->cameraType == CAMERA_SCREEN_SHAKE) {
@@ -1167,7 +1167,7 @@ void Update(Game *game) {
     // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
     // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
 
-
+    TweenToast(&game->toast);
     UpdateParticles(game->particles);
 }
 
