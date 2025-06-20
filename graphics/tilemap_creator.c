@@ -62,6 +62,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#define NO_OF_PARTICLES 1024 / 8
+// #define NO_OF_PARTICLES 1
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
 
@@ -125,6 +127,34 @@ typedef struct Tween {
     int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
 } Tween;
 
+typedef struct Particle {
+    Vector2 position;
+    Vector2 velocity;
+    Vector2 acceleration;
+
+    float size;
+
+    float scale;
+    float scaleStart;
+    float scaleEnd;
+    float scaleVelocity;
+    // float rotation;
+
+    float alpha;
+    float alphaStart;
+    float alphaEnd;
+    float alphaVelocity;
+
+    Color color;
+    Color colorStart;
+    Color colorEnd;
+
+    bool dead;
+    float age;
+    float ageStart;
+    // Texture2D img;
+} Particle;
+
 typedef struct BoolFlags {
     bool showGUI;
     bool showGUIwindow;
@@ -169,6 +199,7 @@ typedef struct Game {
 
     Texture2D checkered;
     Texture2D tileset;
+    Texture2D img;
 
     Vector2 tileSelected;
     Tile *tiles;
@@ -176,6 +207,7 @@ typedef struct Game {
     bool overwriteTiles;
 
     Toast toast;
+    Particle *particles;
 } Game;
 
 int GetWidth() {
@@ -197,7 +229,8 @@ int GetHeight() {
 float GetRandomValueFloat(float min, float max) {
     // Use perlin noise, not random values
     // https://www.youtube.com/watch?v=tu-Qe66AvtY
-    return (((float)rand()/(float)(RAND_MAX)) * 2) - 1;
+    return (((float)rand()/(float)(RAND_MAX)) * abs(max - min)) + min;
+    // return (((float)rand()/(float)(RAND_MAX)) * 2) - 1; // between -1 and 1
 }
 
 void ApplyShake(Game *game, float trauma) {
@@ -242,6 +275,118 @@ void PlayToastTween(Toast *toast, char *message) {
     toast->position.y = GetHeight() + 50;
     toast->tween.state = TWEENING;
     toast->tween.frameCounter = 0;
+}
+
+void SetPaticleFall(Particle *p) {
+    float speed = 50;
+
+    // position
+    p->position.x = GetRandomValue(0, GetWidth());
+    p->position.y = GetRandomValue(0, GetHeight());
+    p->velocity.x = GetRandomValueFloat(-100, 100);
+    p->velocity.y = GetRandomValueFloat(50, speed);
+    p->acceleration.x = 0;
+    p->acceleration.y = 0;
+
+    p->size = 3;
+    p->size = 3;
+
+    // p->velocity.x = GetRandomValueFloat(50, speed);
+    // p->velocity.y = GetRandomValueFloat(50, speed);
+
+    // scale
+    p->scaleStart = 1.0f;
+    p->scaleEnd = 0.0f;
+    p->scale = p->scaleStart;
+    p->scaleVelocity = GetRandomValueFloat(-0.1, -1);
+
+    // printf("scale %f\n", p->scale);
+    // printf("scale vel %f\n", p->scaleVelocity);
+
+    // alpha
+    p->alphaStart = 1.0f;
+    p->alphaEnd = 0.0f;
+    p->alpha = p->alphaStart;
+    p->alphaVelocity = GetRandomValueFloat(-0.1, -1);
+
+    // color
+    p->colorStart = WHITE;
+    p->colorEnd = BROWN;
+    p->color = p->colorStart;
+
+
+    p->dead = false;
+    p->age = GetRandomValueFloat(1, 15);
+    p->ageStart = p->age;
+}
+
+void CreateSimpleParticleEffect(Particle *particles) {
+    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+        Particle *p = &particles[i];
+        SetPaticleFall(p);
+    }
+}
+
+void UpdateParticles(Particle *particles) {
+    float dt = GetFrameTime();
+    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+        Particle *p = &particles[i];
+        p->age -= dt;
+        if (p->age <= 0) {
+            // printf("Age is over...\n");
+            p->dead = true;
+            p->age = 0;
+            SetPaticleFall(p);
+            return;
+        }
+        if (p->scale <= 0) {
+            // printf("Scale is over...\n");
+            SetPaticleFall(p);
+            return;
+        }
+        if (p->alpha <= 0) {
+            // printf("Alpha is over...\n");
+            SetPaticleFall(p);
+            return;
+        }
+        // Update position
+        p->velocity.x += p->acceleration.x * dt;
+        p->velocity.y += p->acceleration.y * dt;
+        p->position.x += p->velocity.x * dt;
+        p->position.y += p->velocity.y * dt;
+        // p->position.x += 0.2;
+        // p->position.y += 0.2;
+
+        // Update rotation
+        // Update scale
+        p->scale += p->scaleVelocity * dt;
+        p->scale = Clamp(p->scale, 0, 30);
+        p->alpha += p->alphaVelocity * dt;
+        p->alpha = Clamp(p->alpha, 0, 1);
+
+        // Update color
+        p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
+
+        // printf("age %.2f\n", p->age);
+        // printf("scale %.2f\n", p->scale);
+        // printf("alpha %.2f\n", p->alpha);
+        // printf("---------------\n");
+    }
+}
+
+void DrawParticles(Game *game) {
+    Particle *particles = game->particles;
+    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+        Particle p = particles[i];
+        if (p.age <= 0) {
+            return;
+        }
+        DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
+        // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
+
+
+        // printf("%.2f,%.2f\n", p.position.x, p.position.y);
+    }
 }
 
 Texture2D CreateCheckeredBackground() {
@@ -482,6 +627,7 @@ void DrawCameraScreen(Game *game) {
     }
 
     DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
+    DrawParticles(game);
     EndMode2D();
 }
 
@@ -508,6 +654,7 @@ void DrawCameraScreenShake(Game *game) {
     }
 
     DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
+    DrawParticles(game);
     EndMode2D();
 }
 
@@ -1020,6 +1167,8 @@ void Update(Game *game) {
     // if (worldCamera.target.x > WORLD_WIDTH) worldCamera.target.x = WORLD_WIDTH;
     // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
 
+
+    UpdateParticles(game->particles);
 }
 
 void Draw(Game *game) {
@@ -1047,6 +1196,11 @@ void Draw(Game *game) {
 }
 
 int main(void) {
+
+    // for (int i = 0; i < 50; i++) {
+    //     printf("%.2f\n", GetRandomValueFloat(-1, 1));
+    // }
+    // return 0;
 
     srand((unsigned int)time(NULL));
 
@@ -1143,6 +1297,14 @@ int main(void) {
     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
     GuiSetStyle(CHECKBOX, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
 
+    // Particles
+    size_t particlesInBytes = sizeof(Particle) * NO_OF_PARTICLES;
+    printf("size of particles %lu bytes\n", particlesInBytes);
+    printf("No of particles %d\n", NO_OF_PARTICLES);
+    Particle *particles = RL_MALLOC(particlesInBytes);
+
+    CreateSimpleParticleEffect(particles);
+
     // Game
     Game game = { 0 };
     game.player = player;
@@ -1161,6 +1323,10 @@ int main(void) {
     game.overwriteTiles = false;
     game.screenShake = screenShake;
     game.toast = toast;
+    game.particles = particles;
+    game.img = LoadTexture("resources/sprites/piece.png");
+    game.img.width /= 6;
+    game.img.height /= 6;
 
     LoadMap(&game);
 
@@ -1199,8 +1365,10 @@ int main(void) {
     }
 
     // free(tiles);
+    RL_FREE(particles);
     UnloadTexture(game.checkered);
     UnloadTexture(game.tileset);
+    UnloadTexture(game.img);
     CloseWindow();
 
     return 0;
