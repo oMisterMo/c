@@ -164,6 +164,7 @@ typedef struct BoolFlags {
     bool showGUIwindow;
     bool showWindowBorder;
     bool showScreenBorder;
+    bool showParticles;
 } BoolFlags;
 
 typedef struct ScreenShake {
@@ -458,18 +459,20 @@ void UpdateParticles(Particle *particles) {
 }
 
 void DrawParticles(Game *game) {
-    Particle *particles = game->particles;
-    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
-        Particle p = particles[i];
-        if (p.age <= 0) {
-            return;
+    if (game->boolFlags.showParticles) {
+        Particle *particles = game->particles;
+        for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+            Particle p = particles[i];
+            if (p.age <= 0) {
+                return;
+            }
+
+
+            // DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
+            DrawRectangleRec((Rectangle){p.position.x,p.position.y,p.size*p.scale,p.size*p.scale},ColorAlpha(p.color, p.alpha));
+            // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
+            // printf("%.2f,%.2f\n", p.position.x, p.position.y);
         }
-
-
-        // DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
-        DrawRectangleRec((Rectangle){p.position.x,p.position.y,p.size*p.scale,p.size*p.scale},ColorAlpha(p.color, p.alpha));
-        // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
-        // printf("%.2f,%.2f\n", p.position.x, p.position.y);
     }
 }
 
@@ -573,6 +576,7 @@ void DrawGUI(Game *game) {
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
     }
     int pad = 20;
     int h = 40;
@@ -1296,7 +1300,8 @@ int main(void) {
         .showGUI = false,
         .showGUIwindow = true,
         .showWindowBorder = false,
-        .showScreenBorder = false
+        .showScreenBorder = false,
+        .showParticles = true
     };
     Toast toast = {
         .message = "Hello there whats goign one ok?",
