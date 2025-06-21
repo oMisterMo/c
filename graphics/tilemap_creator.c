@@ -430,9 +430,20 @@ void UpdateParticles(Particle *particles) {
 
         p->scale += p->scaleVelocity * dt;
         p->scale = Clamp(p->scale, 0, 30);
-        p->alpha = 1.0f - fabsf(2.0f * t - 1.0f); // creates a triangle fade: 0 → 1 → 0
+
+        // Update alpha
+        // 1 - mo
         // p->alpha += p->alphaVelocity * dt;
         // p->alpha = Clamp(p->alpha, 0, 1);
+    
+        // 2 - creates a triangle fade: 0 → 1 → 0
+        p->alpha = 1.0f - fabsf(2.0f * t - 1.0f);
+
+        // 3 - prettier easing: smooth in and out
+        // p->alpha = sinf(t * PI);
+
+        // 4 - sharper fade
+        // p->alpha = powf(1.0f - fabsf(2.0f * t - 1.0f), 2.0f);
 
         // Update color
         p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
@@ -1313,8 +1324,7 @@ int main(void) {
     for (int i = 0; i < NO_OF_PARTICLES; ++i) {
         Particle *p = &particles[i];
         p->id = GenerateRandomId();
-
-        printf("p->id: %d\n", p->id);
+        // printf("p->id: %d\n", p->id);
     }
 
     CreateSimpleParticleEffect(particles);
