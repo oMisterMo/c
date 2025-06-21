@@ -388,73 +388,76 @@ void CreateSimpleParticleEffect(Particle *particles) {
     }
 }
 
-void UpdateParticles(Particle *particles) {
-    float dt = GetFrameTime();
-    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
-        Particle *p = &particles[i];
-        p->age -= dt;
-        if (p->age <= 0) {
-            // printf("Age is over...\n");
-            // p->dead = true;
-            // p->age = 0;
-            SetPaticleFall(p);
-            return;
+void UpdateParticles(Game *game) {
+    if (game->boolFlags.showParticles) {
+        Particle *particles = game->particles;
+        float dt = GetFrameTime();
+        for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+            Particle *p = &particles[i];
+            p->age -= dt;
+            if (p->age <= 0) {
+                // printf("Age is over...\n");
+                // p->dead = true;
+                // p->age = 0;
+                SetPaticleFall(p);
+                return;
+            }
+            // if (p->scale <= 0) {
+            //     // printf("Scale is over...\n");
+            //     SetPaticleFall(p);
+            //     return;
+            // }
+            // if (p->alpha <= 0) {
+            //     // printf("Alpha is over...\n");
+            //     SetPaticleFall(p);
+            //     return;
+            // }
+
+            // Update position
+            p->velocity.x += p->acceleration.x * dt;
+            p->velocity.y += p->acceleration.y * dt;
+            p->position.x += p->velocity.x * dt;
+            p->position.y += p->velocity.y * dt;
+            // p->position.x += 0.2;
+            // p->position.y += 0.2;
+
+            // If I want to mess around with it, not got it moving nicely
+            // UpdateParticlePerlin(p);
+
+
+            // Update rotation
+
+            // Update scale
+            float d = p->age / p->ageStart;
+            float t = 1.0f - d; // progresses from 0 to 1 over the lifetime
+
+            // p->scale += p->scaleVelocity * dt;
+            // p->scale = Clamp(p->scale, 0, 30);
+            p->scale = p->scaleStart * d;
+
+            // Update alpha
+            // 1 - mo
+            // p->alpha += p->alphaVelocity * dt;
+            // p->alpha = Clamp(p->alpha, 0, 1);
+
+            // 2 - creates a triangle fade: 0 → 1 → 0
+            p->alpha = 1.0f - fabsf(2.0f * t - 1.0f);
+
+            // 3 - prettier easing: smooth in and out
+            // p->alpha = sinf(t * PI);
+
+            // 4 - sharper fade
+            // p->alpha = powf(1.0f - fabsf(2.0f * t - 1.0f), 2.0f);
+
+            // Update color
+            p->color = ColorLerp(p->colorStart, p->colorEnd, d);
+
+            // printf("t: %.2f\n", t);
+            // printf("age %.2f\n", p->age);
+            // printf("scale %.2f\n", p->scale);
+            // printf("alpha %.2f\n", p->alpha);
+            // printf("---------------\n");
         }
-        // if (p->scale <= 0) {
-        //     // printf("Scale is over...\n");
-        //     SetPaticleFall(p);
-        //     return;
-        // }
-        // if (p->alpha <= 0) {
-        //     // printf("Alpha is over...\n");
-        //     SetPaticleFall(p);
-        //     return;
-        // }
-
-        // Update position
-        p->velocity.x += p->acceleration.x * dt;
-        p->velocity.y += p->acceleration.y * dt;
-        p->position.x += p->velocity.x * dt;
-        p->position.y += p->velocity.y * dt;
-        // p->position.x += 0.2;
-        // p->position.y += 0.2;
-
-        // If I want to mess around with it, not got it moving nicely
-        // UpdateParticlePerlin(p);
-
-
-        // Update rotation
-
-        // Update scale
-        float d = p->age / p->ageStart;
-        float t = 1.0f - d; // progresses from 0 to 1 over the lifetime
-
-        // p->scale += p->scaleVelocity * dt;
-        // p->scale = Clamp(p->scale, 0, 30);
-        p->scale = p->scaleStart * d;
-
-        // Update alpha
-        // 1 - mo
-        // p->alpha += p->alphaVelocity * dt;
-        // p->alpha = Clamp(p->alpha, 0, 1);
-    
-        // 2 - creates a triangle fade: 0 → 1 → 0
-        p->alpha = 1.0f - fabsf(2.0f * t - 1.0f);
-
-        // 3 - prettier easing: smooth in and out
-        // p->alpha = sinf(t * PI);
-
-        // 4 - sharper fade
-        // p->alpha = powf(1.0f - fabsf(2.0f * t - 1.0f), 2.0f);
-
-        // Update color
-        p->color = ColorLerp(p->colorStart, p->colorEnd, d);
-
-        // printf("t: %.2f\n", t);
-        // printf("age %.2f\n", p->age);
-        // printf("scale %.2f\n", p->scale);
-        // printf("alpha %.2f\n", p->alpha);
-        // printf("---------------\n");
     }
 }
 
@@ -1192,7 +1195,7 @@ void Update(Game *game) {
     // if (worldCamera.target.y > WORLD_HEIGHT) worldCamera.target.y = WORLD_HEIGHT;
 
     TweenToast(&game->toast);
-    UpdateParticles(game->particles);
+    UpdateParticles(game);
 }
 
 void Draw(Game *game) {
