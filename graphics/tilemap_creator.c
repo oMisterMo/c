@@ -349,8 +349,7 @@ void SetPaticleFall(Particle *p) {
     p->acceleration.x = 0;
     p->acceleration.y = 0;
 
-    p->size = 3;
-    p->size = 3;
+    p->size = GetRandomValue(3, 4);
 
     // p->velocity.x = GetRandomValueFloat(50, speed);
     // p->velocity.y = GetRandomValueFloat(50, speed);
@@ -359,7 +358,7 @@ void SetPaticleFall(Particle *p) {
     p->scaleStart = 1.0f;
     p->scaleEnd = 0.0f;
     p->scale = p->scaleStart;
-    p->scaleVelocity = GetRandomValueFloat(-0.1, -1);
+    p->scaleVelocity = GetRandomValueFloat(-0.1, -1); // do I still need this?
 
     // printf("scale %f\n", p->scale);
     // printf("scale vel %f\n", p->scaleVelocity);
@@ -368,7 +367,7 @@ void SetPaticleFall(Particle *p) {
     p->alphaStart = 0.0f;
     p->alphaEnd = 0.0f;
     p->alpha = p->alphaStart;
-    p->alphaVelocity = GetRandomValueFloat(-0.1, -1);
+    p->alphaVelocity = GetRandomValueFloat(-0.1, -1);   // do I still need this?
 
     // color
     p->colorStart = WHITE;
@@ -426,10 +425,12 @@ void UpdateParticles(Particle *particles) {
         // Update rotation
 
         // Update scale
-        float t = 1.0f - (p->age / p->ageStart); // progresses from 0 to 1 over the lifetime
+        float d = p->age / p->ageStart;
+        float t = 1.0f - d; // progresses from 0 to 1 over the lifetime
 
-        p->scale += p->scaleVelocity * dt;
-        p->scale = Clamp(p->scale, 0, 30);
+        // p->scale += p->scaleVelocity * dt;
+        // p->scale = Clamp(p->scale, 0, 30);
+        p->scale = p->scaleStart * d;
 
         // Update alpha
         // 1 - mo
@@ -446,7 +447,7 @@ void UpdateParticles(Particle *particles) {
         // p->alpha = powf(1.0f - fabsf(2.0f * t - 1.0f), 2.0f);
 
         // Update color
-        p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
+        p->color = ColorLerp(p->colorStart, p->colorEnd, d);
 
         // printf("t: %.2f\n", t);
         // printf("age %.2f\n", p->age);
@@ -1377,6 +1378,7 @@ int main(void) {
     printf("Total (visible) y tiles: %d\n", (int) SCREEN_HEIGHT / TILE_HEIGHT);
 
     SetTargetFPS(60);
+    // SetTargetFPS(100);
     while(!WindowShouldClose()) {
         // input
         Input(&game);
