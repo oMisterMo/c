@@ -449,7 +449,8 @@ void DrawParticles(Game *game) {
         }
 
 
-        DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
+        // DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
+        DrawRectangleRec((Rectangle){p.position.x,p.position.y,p.size*p.scale,p.size*p.scale},ColorAlpha(p.color, p.alpha));
         // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
         // printf("%.2f,%.2f\n", p.position.x, p.position.y);
     }
