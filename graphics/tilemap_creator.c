@@ -63,7 +63,7 @@
 #include "raygui.h"
 #include "stb_perlin.h"
 
-#define NO_OF_PARTICLES 1024 / 8
+#define NO_OF_PARTICLES 1024 / 16
 // #define NO_OF_PARTICLES 1
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
@@ -129,6 +129,7 @@ typedef struct Tween {
 } Tween;
 
 typedef struct Particle {
+    int id;
     Vector2 position;
     Vector2 velocity;
     Vector2 acceleration;
@@ -213,6 +214,11 @@ typedef struct Game {
     Particle *particles;
 } Game;
 
+int GenerateRandomId() {
+    static int id = 0;
+    return id++;
+}
+
 int GetWidth() {
     if (IsWindowFullscreen()) {
         // printf("%d\n", WINDOW_WIDTH);
@@ -250,18 +256,34 @@ float GetPerlin(float time) {
     return np;
 }
 
+float GetPerlinPro(float x, float y, float z) {
+    float p = stb_perlin_noise3(x / 12 , y, z, 0, 0, 0);
+    // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
+
+    // Clamp between -1.0f and 1.0f
+    if (p < -1.0f) p = -1.0f;
+    if (p > 1.0f) p = 1.0f;
+
+    // We need to normalize the data from [-1..1] to [0..1]
+    float np = (p + 1.0f) / 2.0f;
+
+    return np;
+}
+
 void UpdateParticlePerlin(Particle *p) {
     float currentTime = GetTime();
     // printf("currentTime: %.2f\n", currentTime);
 
     // GetPerlin() returns a random value between [0 - 1]
     // I then add a random offset to avoid the same movement
-    float x = GetPerlin(currentTime + p->currentTimeOffsetX);
-    float y = GetPerlin(currentTime + p->currentTimeOffsetY);
+    float x = GetPerlinPro(currentTime + p->currentTimeOffsetX / 12, p->id * 7.23f, 0.0f);
+    float y = GetPerlinPro(currentTime + p->currentTimeOffsetY / 12, 0.0f, p->id * 3.71f);
 
     // Fill the screen
-    p->position.x = x *  GetWidth();
-    p->position.y = y * GetHeight();
+    p->position.x = (x *  GetWidth() * 2) - GetWidth() / 2;
+    p->position.y = (y * GetHeight() * 2) - GetWidth() / 2;
+    // p->velocity.x = x * GetWidth();
+    // p->velocity.y = y * GetHeight();
     // printf("perlin (x,y):\t %.2f, %.2f\n", x, y);
 }
 
@@ -312,11 +334,16 @@ void PlayToastTween(Toast *toast, char *message) {
 void SetPaticleFall(Particle *p) {
     float speed = 50;
 
+    // PERLIN NOISE STUFF
+    p->position.x = 0;
+    p->position.y = 0;
+    p->currentTimeOffsetX = GetRandomValueFloat(10000, 500000);
+    p->currentTimeOffsetY = GetRandomValueFloat(500000, 100000);
+
+    // REGULAR
     // position
-    // p->position.x = GetRandomValue(0, GetWidth());
-    // p->position.y = GetRandomValue(0, GetHeight());
-    p->position.x = -1000;
-    p->position.y = -1000;
+    p->position.x = GetRandomValue(0, GetWidth());
+    p->position.y = GetRandomValue(0, GetHeight());
     p->velocity.x = GetRandomValueFloat(-100, 100);
     p->velocity.y = GetRandomValueFloat(50, speed);
     p->acceleration.x = 0;
@@ -352,8 +379,6 @@ void SetPaticleFall(Particle *p) {
     p->dead = false;
     p->age = GetRandomValueFloat(1, 15);
     p->ageStart = p->age;
-    p->currentTimeOffsetX = GetRandomValueFloat(10000, 500000);
-    p->currentTimeOffsetY = GetRandomValueFloat(500000, 100000);
 }
 
 void CreateSimpleParticleEffect(Particle *particles) {
@@ -385,23 +410,25 @@ void UpdateParticles(Particle *particles) {
             SetPaticleFall(p);
             return;
         }
+
         // Update position
-        // p->velocity.x += p->acceleration.x * dt;
-        // p->velocity.y += p->acceleration.y * dt;
-        // p->position.x += p->velocity.x * dt;
-        // p->position.y += p->velocity.y * dt;
-
-        UpdateParticlePerlin(p);
-
+        p->velocity.x += p->acceleration.x * dt;
+        p->velocity.y += p->acceleration.y * dt;
+        p->position.x += p->velocity.x * dt;
+        p->position.y += p->velocity.y * dt;
         // p->position.x += 0.2;
         // p->position.y += 0.2;
 
+        // If I want to mess around with it, not got it moving nicely
+        // UpdateParticlePerlin(p);
+
+
         // Update rotation
         // Update scale
-        // p->scale += p->scaleVelocity * dt;
-        // p->scale = Clamp(p->scale, 0, 30);
-        // p->alpha += p->alphaVelocity * dt;
-        // p->alpha = Clamp(p->alpha, 0, 1);
+        p->scale += p->scaleVelocity * dt;
+        p->scale = Clamp(p->scale, 0, 30);
+        p->alpha += p->alphaVelocity * dt;
+        p->alpha = Clamp(p->alpha, 0, 1);
 
         // Update color
         p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
@@ -1277,6 +1304,12 @@ int main(void) {
     printf("size of particles %lu bytes\n", particlesInBytes);
     printf("No of particles %d\n", NO_OF_PARTICLES);
     Particle *particles = RL_MALLOC(particlesInBytes);
+    for (int i = 0; i < NO_OF_PARTICLES; ++i) {
+        Particle *p = &particles[i];
+        p->id = GenerateRandomId();
+
+        printf("p->id: %d\n", p->id);
+    }
 
     CreateSimpleParticleEffect(particles);
 
