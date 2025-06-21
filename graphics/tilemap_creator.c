@@ -365,7 +365,7 @@ void SetPaticleFall(Particle *p) {
     // printf("scale vel %f\n", p->scaleVelocity);
 
     // alpha
-    p->alphaStart = 1.0f;
+    p->alphaStart = 0.0f;
     p->alphaEnd = 0.0f;
     p->alpha = p->alphaStart;
     p->alphaVelocity = GetRandomValueFloat(-0.1, -1);
@@ -395,21 +395,21 @@ void UpdateParticles(Particle *particles) {
         p->age -= dt;
         if (p->age <= 0) {
             // printf("Age is over...\n");
-            p->dead = true;
-            p->age = 0;
+            // p->dead = true;
+            // p->age = 0;
             SetPaticleFall(p);
             return;
         }
-        if (p->scale <= 0) {
-            // printf("Scale is over...\n");
-            SetPaticleFall(p);
-            return;
-        }
-        if (p->alpha <= 0) {
-            // printf("Alpha is over...\n");
-            SetPaticleFall(p);
-            return;
-        }
+        // if (p->scale <= 0) {
+        //     // printf("Scale is over...\n");
+        //     SetPaticleFall(p);
+        //     return;
+        // }
+        // if (p->alpha <= 0) {
+        //     // printf("Alpha is over...\n");
+        //     SetPaticleFall(p);
+        //     return;
+        // }
 
         // Update position
         p->velocity.x += p->acceleration.x * dt;
@@ -424,15 +424,20 @@ void UpdateParticles(Particle *particles) {
 
 
         // Update rotation
+
         // Update scale
+        float t = 1.0f - (p->age / p->ageStart); // progresses from 0 to 1 over the lifetime
+
         p->scale += p->scaleVelocity * dt;
         p->scale = Clamp(p->scale, 0, 30);
-        p->alpha += p->alphaVelocity * dt;
-        p->alpha = Clamp(p->alpha, 0, 1);
+        p->alpha = 1.0f - fabsf(2.0f * t - 1.0f); // creates a triangle fade: 0 → 1 → 0
+        // p->alpha += p->alphaVelocity * dt;
+        // p->alpha = Clamp(p->alpha, 0, 1);
 
         // Update color
         p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
 
+        // printf("t: %.2f\n", t);
         // printf("age %.2f\n", p->age);
         // printf("scale %.2f\n", p->scale);
         // printf("alpha %.2f\n", p->alpha);
