@@ -61,6 +61,7 @@
 #include "reasings.h"
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
+#include "stb_perlin.h"
 
 #define NO_OF_PARTICLES 1024 / 8
 // #define NO_OF_PARTICLES 1
@@ -152,6 +153,8 @@ typedef struct Particle {
     bool dead;
     float age;
     float ageStart;
+    float currentTimeOffsetX;   // For perlin noise
+    float currentTimeOffsetY;   // For perlin noise
     // Texture2D img;
 } Particle;
 
@@ -233,6 +236,35 @@ float GetRandomValueFloat(float min, float max) {
     // return (((float)rand()/(float)(RAND_MAX)) * 2) - 1; // between -1 and 1
 }
 
+float GetPerlin(float time) {
+    float p = stb_perlin_noise3(time / 12 , 0.0f, 0.0f, 0, 0, 0);
+    // float p = stb_perlin_fbm_noise3(currentTime, y, z, 2.0f, 0.5f, 1);
+
+    // Clamp between -1.0f and 1.0f
+    if (p < -1.0f) p = -1.0f;
+    if (p > 1.0f) p = 1.0f;
+
+    // We need to normalize the data from [-1..1] to [0..1]
+    float np = (p + 1.0f) / 2.0f;
+
+    return np;
+}
+
+void UpdateParticlePerlin(Particle *p) {
+    float currentTime = GetTime();
+    // printf("currentTime: %.2f\n", currentTime);
+
+    // GetPerlin() returns a random value between [0 - 1]
+    // I then add a random offset to avoid the same movement
+    float x = GetPerlin(currentTime + p->currentTimeOffsetX);
+    float y = GetPerlin(currentTime + p->currentTimeOffsetY);
+
+    // Fill the screen
+    p->position.x = x *  GetWidth();
+    p->position.y = y * GetHeight();
+    // printf("perlin (x,y):\t %.2f, %.2f\n", x, y);
+}
+
 void ApplyShake(Game *game, float trauma) {
     printf("Shake...\n");
     game->cameraType = CAMERA_SCREEN_SHAKE;
@@ -281,8 +313,10 @@ void SetPaticleFall(Particle *p) {
     float speed = 50;
 
     // position
-    p->position.x = GetRandomValue(0, GetWidth());
-    p->position.y = GetRandomValue(0, GetHeight());
+    // p->position.x = GetRandomValue(0, GetWidth());
+    // p->position.y = GetRandomValue(0, GetHeight());
+    p->position.x = -1000;
+    p->position.y = -1000;
     p->velocity.x = GetRandomValueFloat(-100, 100);
     p->velocity.y = GetRandomValueFloat(50, speed);
     p->acceleration.x = 0;
@@ -318,6 +352,8 @@ void SetPaticleFall(Particle *p) {
     p->dead = false;
     p->age = GetRandomValueFloat(1, 15);
     p->ageStart = p->age;
+    p->currentTimeOffsetX = GetRandomValueFloat(10000, 500000);
+    p->currentTimeOffsetY = GetRandomValueFloat(500000, 100000);
 }
 
 void CreateSimpleParticleEffect(Particle *particles) {
@@ -350,19 +386,22 @@ void UpdateParticles(Particle *particles) {
             return;
         }
         // Update position
-        p->velocity.x += p->acceleration.x * dt;
-        p->velocity.y += p->acceleration.y * dt;
-        p->position.x += p->velocity.x * dt;
-        p->position.y += p->velocity.y * dt;
+        // p->velocity.x += p->acceleration.x * dt;
+        // p->velocity.y += p->acceleration.y * dt;
+        // p->position.x += p->velocity.x * dt;
+        // p->position.y += p->velocity.y * dt;
+
+        UpdateParticlePerlin(p);
+
         // p->position.x += 0.2;
         // p->position.y += 0.2;
 
         // Update rotation
         // Update scale
-        p->scale += p->scaleVelocity * dt;
-        p->scale = Clamp(p->scale, 0, 30);
-        p->alpha += p->alphaVelocity * dt;
-        p->alpha = Clamp(p->alpha, 0, 1);
+        // p->scale += p->scaleVelocity * dt;
+        // p->scale = Clamp(p->scale, 0, 30);
+        // p->alpha += p->alphaVelocity * dt;
+        // p->alpha = Clamp(p->alpha, 0, 1);
 
         // Update color
         p->color = ColorLerp(p->colorStart, p->colorEnd, p->age / p->ageStart);
@@ -1007,70 +1046,6 @@ void Input(Game *game) {
                 tile->srcRect.y = blankTile * TILE_HEIGHT;
                 tile->id = TILE_EMPTY;
             }
-            // if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            //     Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
-            //     int x = (int) (mouse.x / TILE_WIDTH);
-            //     int y = (int) (mouse.y / TILE_HEIGHT);
-            //     if (x < 0 || x > NO_OF_TILES_X) return;
-            //     if (y < 0 || y > NO_OF_TILES_Y) return;
-
-            //     Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-            //     printf("Touching tile id %d\n", tile->id);
-            //     if (tile->id != TILE_EMPTY) return;
-            //     printf("%d,%d\n", x, y);
-            //     printf("Fill\n");
-
-            //     switch (game->fillMode) {
-            //         case FILL_OFF:
-            //             // Store the source rect pointer
-            //             Rectangle *rect = &game->tiles[y * NO_OF_TILES_X + x].srcRect;
-            //             // Set the selected tile
-            //             rect->x = game->tileSelected.x * TILE_WIDTH;
-            //             rect->y = game->tileSelected.y * TILE_HEIGHT;
-            //             break;
-            //         case FILL_EMPTY:
-            //             // Should find contained tiles only
-            //             break;
-            //             case FILL_ALL:
-            //             // Should find contained tiles only
-            //             break;
-            //         case FILL_HORIZONTAL:
-            //             for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
-            //                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
-            //                 if (tile->id > TILE_EMPTY) break;
-            //                 tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-            //                 tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-            //                 tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-            //             }
-            //             for (int i = x; i >= 0; --i) {
-            //                 Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
-            //                 if (tile->id > 0) break;
-            //                 tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-            //                 tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-            //                 tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-            //             }
-            //             break;
-            //         case FILL_VERTICAL:
-            //             // Should it stop when it finds a non empty tile?
-            //             for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
-            //                 Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-            //                 // Rectangle *rect = &game->tiles[i * NO_OF_TILES_X + x].srcRect;
-            //                 if (tile->id > TILE_EMPTY) break;
-            //                 tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-            //                 tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-            //                 tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-            //             }
-            //             for (int i = y; i >= 0; --i) {
-            //                 Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-            //                 // Rectangle *rect = &game->tiles[i * NO_OF_TILES_X + x].srcRect;
-            //                 if (tile->id > TILE_EMPTY) break;
-            //                 tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-            //                 tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-            //                 tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-            //             }
-            //             break;
-            //     }
-            // }
             break;
         case CAMERA_SCREEN:
             break;
@@ -1215,7 +1190,6 @@ int main(void) {
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
     Tile tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
-    Rectangle tile = { 0, 0, TILE_WIDTH, TILE_HEIGHT };
     int lineThick = 1;
 
     int i = 0;
