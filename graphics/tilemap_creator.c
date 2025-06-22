@@ -152,8 +152,8 @@ typedef struct Particle {
     Color colorEnd;
 
     bool dead;
-    float age;
-    float ageStart;
+    float ageSeconds;
+    float ageStartSeconds;
     float currentTimeOffsetX;   // For perlin noise
     float currentTimeOffsetY;   // For perlin noise
     // Texture2D img;
@@ -377,8 +377,8 @@ void SetPaticleFall(Particle *p) {
 
 
     p->dead = false;
-    p->age = GetRandomValueFloat(1, 15);
-    p->ageStart = p->age;
+    p->ageSeconds = GetRandomValueFloat(1, 15);
+    p->ageStartSeconds = p->ageSeconds;
 }
 
 void CreateSimpleParticleEffect(Particle *particles) {
@@ -394,11 +394,11 @@ void UpdateParticles(Game *game) {
         float dt = GetFrameTime();
         for (int i = 0; i < NO_OF_PARTICLES; ++i) {
             Particle *p = &particles[i];
-            p->age -= dt;
-            if (p->age <= 0) {
+            p->ageSeconds -= dt;
+            if (p->ageSeconds <= 0) {
                 // printf("Age is over...\n");
                 // p->dead = true;
-                // p->age = 0;
+                // p->ageSeconds = 0;
                 SetPaticleFall(p);
                 return;
             }
@@ -428,7 +428,7 @@ void UpdateParticles(Game *game) {
             // Update rotation
 
             // Update scale
-            float d = p->age / p->ageStart;
+            float d = p->ageSeconds / p->ageStartSeconds;
             float t = 1.0f - d; // progresses from 0 to 1 over the lifetime
 
             // p->scale += p->scaleVelocity * dt;
@@ -453,7 +453,7 @@ void UpdateParticles(Game *game) {
             p->color = ColorLerp(p->colorStart, p->colorEnd, d);
 
             // printf("t: %.2f\n", t);
-            // printf("age %.2f\n", p->age);
+            // printf("ageSeconds %.2f\n", p->ageSeconds);
             // printf("scale %.2f\n", p->scale);
             // printf("alpha %.2f\n", p->alpha);
             // printf("---------------\n");
@@ -466,7 +466,7 @@ void DrawParticles(Game *game) {
         Particle *particles = game->particles;
         for (int i = 0; i < NO_OF_PARTICLES; ++i) {
             Particle p = particles[i];
-            if (p.age <= 0) {
+            if (p.ageSeconds <= 0) {
                 return;
             }
 
