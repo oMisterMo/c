@@ -164,6 +164,7 @@ typedef struct BoolFlags {
     bool showGUIwindow;
     bool showWindowBorder;
     bool showScreenBorder;
+    bool showAxis;
     bool showParticles;
 } BoolFlags;
 
@@ -563,7 +564,8 @@ void DrawGUI(Game *game) {
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Axis", &game->boolFlags.showAxis);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (5 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
     }
     int pad = 20;
     int h = 40;
@@ -575,7 +577,9 @@ void DrawGUI(Game *game) {
 void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
 
-    DrawAxis();
+    if (game->boolFlags.showAxis) {
+        DrawAxis();
+    }
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
@@ -994,6 +998,20 @@ void Input(Game *game) {
         PlayToastTween(&game->toast, "Toggle Fullscreen");
     }
 
+
+    // Do not let users interact with world while menu is up
+    if (game->boolFlags.showGUI) {
+        // Clicked left sections
+        if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 0, 0, guiWidth, GetHeight() })) {
+            return;
+        }
+
+        // Clicked right section
+        if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
+            return;
+        }
+    }
+
     switch (game->cameraType) {
         case CAMERA_TILESET:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -1295,6 +1313,7 @@ int main(void) {
         .showGUIwindow = true,
         .showWindowBorder = false,
         .showScreenBorder = false,
+        .showAxis = false,
         .showParticles = true
     };
     Toast toast = {
