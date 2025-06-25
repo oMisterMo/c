@@ -63,7 +63,7 @@
 #include "raygui.h"
 #include "stb_perlin.h"
 
-#define NO_OF_PARTICLES 1024 / 16
+#define NO_OF_PARTICLES 1 << 6
 // #define NO_OF_PARTICLES 1
 #define WORLD_WIDTH 1280
 #define WORLD_HEIGHT 720
@@ -394,24 +394,15 @@ void UpdateParticles(Game *game) {
         float dt = GetFrameTime();
         for (int i = 0; i < NO_OF_PARTICLES; ++i) {
             Particle *p = &particles[i];
-            p->ageSeconds -= dt;
+            if (p->dead) continue;
             if (p->ageSeconds <= 0) {
                 // printf("Age is over...\n");
-                // p->dead = true;
-                // p->ageSeconds = 0;
+                p->dead = true;
+                p->ageSeconds = 0;
                 SetPaticleFall(p);
-                return;
+                continue;
             }
-            // if (p->scale <= 0) {
-            //     // printf("Scale is over...\n");
-            //     SetPaticleFall(p);
-            //     return;
-            // }
-            // if (p->alpha <= 0) {
-            //     // printf("Alpha is over...\n");
-            //     SetPaticleFall(p);
-            //     return;
-            // }
+            p->ageSeconds -= dt;
 
             // Update position
             p->velocity.x += p->acceleration.x * dt;
@@ -466,12 +457,9 @@ void DrawParticles(Game *game) {
         Particle *particles = game->particles;
         for (int i = 0; i < NO_OF_PARTICLES; ++i) {
             Particle p = particles[i];
-            if (p.ageSeconds <= 0) {
-                return;
-            }
+            if (p.dead) continue;
+            if (p.ageSeconds <= 0) continue;
 
-
-            // DrawRectangle((int)p.position.x, (int)p.position.y, (int)p.size * p.scale, (int)p.size * p.scale, ColorAlpha(p.color, p.alpha));
             DrawRectangleRec((Rectangle){p.position.x,p.position.y,p.size*p.scale,p.size*p.scale},ColorAlpha(p.color, p.alpha));
             // DrawTexturePro(game->img, (Rectangle){0,0,game->img.width,game->img.height}, (Rectangle){p.position.x, p.position.y, game->img.width * p.scale,game->img.height * p.scale}, (Vector2){0}, 0, ColorAlpha(p.color, p.alpha));
             // printf("%.2f,%.2f\n", p.position.x, p.position.y);
@@ -512,8 +500,8 @@ Texture2D CreateCheckeredBackground() {
 void DrawAxis() {
     // DrawLine(-1000, 0, 1000, 0, WHITE);
     // DrawLine(0, -1000, 0, 1000, WHITE);
-    DrawLineEx((Vector2){-5000,0}, (Vector2){5000,0}, 4, WHITE);
-    DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, WHITE);
+    DrawLineEx((Vector2){-5000,0}, (Vector2){5000,0}, 4, ColorAlpha(WHITE, 0.5f));
+    DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, ColorAlpha(WHITE, 0.5f));
 }
 
 void DrawGUI(Game *game) {
@@ -521,10 +509,6 @@ void DrawGUI(Game *game) {
     Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
     Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
     Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
-
-    // Screenshake bar
-    DrawRectangle(20, 20, game->screenShake.shake * 400, 25, ColorAlpha(GREEN, 0.6f));
-    DrawRectangleLines(20, 20,400,25, ColorAlpha(BLACK, 0.2f));
 
     // UI
     if (game->boolFlags.showGUI) {
@@ -591,19 +575,7 @@ void DrawGUI(Game *game) {
 void DrawCameraWorld(Game *game) {
     BeginMode2D(game->worldCamera);
 
-    // DrawAxis();
-
-    // Red tiles
-    int i = 0;
-    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
-        for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            // DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
-            //     TILE_WIDTH, TILE_HEIGHT, GRAY);
-            DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
-                TILE_WIDTH, TILE_HEIGHT, ColorAlpha(WHITE, 0.3f));
-            ++i;
-        }
-    }
+    DrawAxis();
 
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
@@ -614,6 +586,19 @@ void DrawCameraWorld(Game *game) {
             DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
         }
     }
+
+    // Red tiles
+    int i = 0;
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            // DrawRectangle(x * TILE_WIDTH, y * TILE_HEIGHT,
+            //     TILE_WIDTH, TILE_HEIGHT, GRAY);
+            DrawRectangleLines(x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT, ColorAlpha(WHITE, 0.25f));
+            ++i;
+        }
+    }
+
 
     // Draw Preview tiles
     Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
@@ -1211,9 +1196,15 @@ void Draw(Game *game) {
             DrawCameraWorld(game);
         } else if (game->cameraType == CAMERA_SCREEN) {
             DrawCameraScreen(game);
+            // Screenshake bar
+            DrawRectangle(20, 20, game->screenShake.shake * 400, 25, ColorAlpha(GREEN, 0.6f));
+            DrawRectangleLines(20, 20, 400, 25, ColorAlpha(BLACK, 0.2f));
         } else if (game->cameraType == CAMERA_SCREEN_SHAKE) {
             // DrawCameraScreen(game);
             DrawCameraScreenShake(game);
+            // Screenshake bar
+            DrawRectangle(20, 20, game->screenShake.shake * 400, 25, ColorAlpha(GREEN, 0.6f));
+            DrawRectangleLines(20, 20, 400, 25, ColorAlpha(BLACK, 0.2f));
         }
 
         DrawGUI(game);
@@ -1260,7 +1251,7 @@ int main(void) {
     }
 
     // Player
-    Rectangle player = { SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20};
+    Rectangle player = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f, 20, 20};
 
     // Camera
     Camera2D worldCamera = { 0 };
@@ -1326,10 +1317,10 @@ int main(void) {
     GuiSetStyle(CHECKBOX, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
 
     // Particles
-    size_t particlesInBytes = sizeof(Particle) * NO_OF_PARTICLES;
-    printf("size of particles %lu bytes\n", particlesInBytes);
+    size_t PARTICLES_SIZE_BYTE = sizeof(Particle) * NO_OF_PARTICLES;
+    Particle *particles = RL_MALLOC(PARTICLES_SIZE_BYTE);
+    printf("size of particles %lu bytes\n", PARTICLES_SIZE_BYTE);
     printf("No of particles %d\n", NO_OF_PARTICLES);
-    Particle *particles = RL_MALLOC(particlesInBytes);
     for (int i = 0; i < NO_OF_PARTICLES; ++i) {
         Particle *p = &particles[i];
         p->id = GenerateRandomId();
