@@ -204,8 +204,6 @@ void DrawParticles(Particle *particles) {
 
 // ================================================================================
 
-
-void Collisions();
 void UpdateBall() {
     float dt = GetFrameTime();
 
@@ -230,8 +228,6 @@ void UpdateBall() {
     }
     // printf("%f\n", velX);
     if (velX >= 1000) velX = 1000;
-
-    Collisions();
 }
 
 void Collisions() {
@@ -278,8 +274,6 @@ void Collisions() {
     if (CheckCollisionRecs(ball, paddle_other)) {
         other_hit = true;
         Rectangle rec = GetCollisionRec(ball, paddle_other);
-        // printf("%.2f, %.2f, %.2f, %.2f\n", rec.x, rec.y, rec.width, rec.height);
-        // add to ball
         if (velX > 0) {
             ball.x -= rec.width;
         } else {
@@ -355,6 +349,7 @@ void Input() {
 
 void Update(Particle *particles) {
     UpdateBall();
+    Collisions();
     UpdateParticles(particles);
 }
 
