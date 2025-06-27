@@ -21,6 +21,11 @@ typedef enum MODE {
     PLAY_MULTIPLE
 } MODE;
 
+typedef enum CameraType {
+    CAMERA_SCREEN = 0,
+    CAMERA_SCREEN_SHAKE,
+} CameraType;
+
 typedef struct Particle {
     int id;
     Vector2 position;
@@ -52,6 +57,15 @@ typedef struct Particle {
     // Texture2D img;
 } Particle;
 
+typedef struct ScreenShake {
+    float shake;
+    float maxAngle;
+    float maxOffset;
+    float angle;
+    float offsetX;
+    float offsetY;
+} ScreenShake;
+
 static Rectangle paddle_player = { PADDING, (HEIGHT - PADDLE_HEIGHT) / 2, PADDLE_WIDTH, PADDLE_HEIGHT };
 static Rectangle paddle_other = { WIDTH - PADDLE_WIDTH - PADDING, 200, PADDLE_WIDTH, PADDLE_HEIGHT };
 static Rectangle ball = { 130, 160, BALL_SIZE, BALL_SIZE };
@@ -60,17 +74,18 @@ static float velY = INITIAL_BALL_SPEED;
 static float speed = 450;
 float t = 0.0f;
 
-MODE playmode = PLAY_SINGLE;
+MODE playmode = PLAY_MULTIPLE;
 
 static bool player_hit = false;
 static bool other_hit = false;
 
+static Camera2D camera = { 0 };
+static Camera2D camera_shake = { 0 };
+static ScreenShake screenShake = { 0 };
+static CameraType cameraType = 0;
 
 
-
-// ================================================================================
-// Particles
-// ================================================================================
+// =========== Particles ===========
 
 int GenerateRandomId() {
     static int id = 0;
@@ -202,7 +217,36 @@ void DrawParticles(Particle *particles) {
 
 }
 
-// ================================================================================
+// =========== Screen shake ===========
+
+void ApplyShake(float trauma) {
+    printf("Shake...\n");
+    cameraType = CAMERA_SCREEN_SHAKE;
+    screenShake.shake += trauma;
+    if (screenShake.shake > 1.0f) screenShake.shake = 1.0f;
+}
+
+void UpdateScreenShake() {
+    if (screenShake.shake > 0) {
+        // TODO: FRAME RATE INDEPENDENT
+        screenShake.shake -= 0.01;
+
+        // Update shake
+        screenShake.angle = screenShake.shake * GetRandomValueFloat(-1, 1);
+        screenShake.offsetX = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
+        screenShake.offsetY = screenShake.maxOffset * screenShake.shake * GetRandomValueFloat(-1, 1);
+
+        // Apply rotation and translation
+        camera_shake.rotation = camera.rotation + screenShake.angle;
+        camera_shake.target = Vector2Add(camera.target,  (Vector2){screenShake.offsetX, screenShake.offsetX});
+
+    } else {
+        screenShake.shake = 0;
+        cameraType = CAMERA_SCREEN;
+    }
+}
+
+// =========== Game ===========
 
 void UpdateBall() {
     float dt = GetFrameTime();
@@ -213,18 +257,22 @@ void UpdateBall() {
     if (ball.x < 0) {
         ball.x = 0;
         velX *= -1.0f;
+        ApplyShake(0.1f);
     }
     if (ball.x + BALL_SIZE >= WIDTH) {
         ball.x = WIDTH - BALL_SIZE;
         velX *= -1.1;
+        ApplyShake(0.1f);
     }
     if (ball.y < 0) {
         ball.y = 0;
         velY *= -1.0f;
+        ApplyShake(0.1f);
     }
     if (ball.y + BALL_SIZE >= HEIGHT) {
         ball.y = HEIGHT - BALL_SIZE;
         velY *= -1.0f;
+        ApplyShake(0.1f);
     }
     // printf("%f\n", velX);
     if (velX >= 1000) velX = 1000;
@@ -239,6 +287,7 @@ void Collisions() {
 
     if (CheckCollisionRecs(ball, paddle_player)) {
         player_hit = true;
+        ApplyShake(0.2f);
 
         // Find the amount collided
         Rectangle rec = GetCollisionRec(ball, paddle_player);
@@ -273,6 +322,7 @@ void Collisions() {
     }
     if (CheckCollisionRecs(ball, paddle_other)) {
         other_hit = true;
+        ApplyShake(0.2f);
         Rectangle rec = GetCollisionRec(ball, paddle_other);
         if (velX > 0) {
             ball.x -= rec.width;
@@ -315,6 +365,15 @@ void Input() {
         }
     }
 
+    if (IsKeyPressed(KEY_FOUR)) {
+        ApplyShake(0.2f);
+    }
+
+    if (IsKeyPressed(KEY_R)) {
+        camera.rotation += 45;
+        camera_shake.rotation = camera.rotation;
+    }
+
 
     switch (playmode) {
         case PLAY_SINGLE:
@@ -351,30 +410,37 @@ void Update(Particle *particles) {
     UpdateBall();
     Collisions();
     UpdateParticles(particles);
+    UpdateScreenShake();
 }
 
 void Draw() {
-    // Draw padal
-    DrawRectangleRec(paddle_player, player_hit ? RED : WHITE);
-    DrawRectangleRec(paddle_other, other_hit ? RED : WHITE);
-    // Draw ball
-    DrawRectangleRec(ball, WHITE);
-    
-    // Draw seperator
-    // DrawRectangleRec((Rectangle) {(WIDTH - PADDLE_WIDTH) / 2, 0, PADDLE_WIDTH, HEIGHT}, WHITE);
-    
-    t += 0.01;
-    if (t > 1.0f) t = 1.0f;
-    int ITESM = 16;
-    for (int i = 0; i < ITESM; ++i) {
-        // DrawRectangle((WIDTH - BALL_SIZE) / 2, 0 + i * BALL_SIZE * 2, BALL_SIZE, BALL_SIZE, WHITE);
-        DrawRectangle(
-            (WIDTH - BALL_SIZE) / 2,
-            Lerp(0, HEIGHT -  BALL_SIZE, (float) i / (ITESM - 1)),
-            BALL_SIZE, BALL_SIZE, WHITE);
-    }
-    // Draw text
+    BeginMode2D(screenShake.shake > 0 ? camera_shake : camera);
+
+        // Draw padal
+        DrawRectangleRec(paddle_player, player_hit ? RED : WHITE);
+        DrawRectangleRec(paddle_other, other_hit ? RED : WHITE);
+        // Draw ball
+        DrawRectangleRec(ball, WHITE);
+
+        // Draw seperator
+        // DrawRectangleRec((Rectangle) {(WIDTH - PADDLE_WIDTH) / 2, 0, PADDLE_WIDTH, HEIGHT}, WHITE);
+
+        t += 0.01;
+        if (t > 1.0f) t = 1.0f;
+        int ITESM = 16;
+        for (int i = 0; i < ITESM; ++i) {
+            // DrawRectangle((WIDTH - BALL_SIZE) / 2, 0 + i * BALL_SIZE * 2, BALL_SIZE, BALL_SIZE, WHITE);
+            DrawRectangle(
+                (WIDTH - BALL_SIZE) / 2,
+                Lerp(0, HEIGHT -  BALL_SIZE, (float) i / (ITESM - 1)),
+                BALL_SIZE, BALL_SIZE, WHITE);
+        }
+        // Draw text
+
+    EndMode2D();
 }
+
+// =========== Main ===========
 
 int main(void) {
 
@@ -391,6 +457,26 @@ int main(void) {
         p->id = GenerateRandomId();
     }
     CreateSimpleParticleEffect(particles);
+
+    // =========== Camera ===========
+    camera.offset = (Vector2) { WIDTH / 2, HEIGHT / 2 };
+    camera.target = (Vector2) { WIDTH / 2, HEIGHT / 2 };
+    camera.zoom = 1.0f;
+    // camera.rotation = 45.0f;
+    camera.rotation = 0.0f;
+
+    camera_shake.offset = (Vector2) { WIDTH / 2, HEIGHT / 2 };
+    camera_shake.target = (Vector2) { WIDTH / 2, HEIGHT / 2 };
+    camera_shake.zoom = 1.0f;
+    camera_shake.rotation = 0.0f;
+
+    // =========== Screen shake ===========
+    screenShake.shake = 0.0f;
+    screenShake.maxAngle = 10.0f;
+    screenShake.maxOffset = 10.0f;
+    screenShake.angle   = 0.0f;
+    screenShake.offsetX = 0.0f;
+    screenShake.offsetY = 0.0f;
 
 
     SetTargetFPS(60);
