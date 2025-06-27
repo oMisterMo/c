@@ -216,11 +216,6 @@ typedef struct Game {
     Particle *particles;
 } Game;
 
-int GenerateRandomId() {
-    static int id = 0;
-    return id++;
-}
-
 int GetWidth() {
     if (IsWindowFullscreen()) {
         // printf("%d\n", WINDOW_WIDTH);
@@ -235,6 +230,13 @@ int GetHeight() {
         return WINDOW_HEIGHT;
     }
     return WORLD_HEIGHT;
+}
+
+// =========== Particles ===========
+
+int GenerateRandomId() {
+    static int id = 0;
+    return id++;
 }
 
 float GetRandomValueFloat(float min, float max) {
@@ -287,50 +289,6 @@ void UpdateParticlePerlin(Particle *p) {
     // p->velocity.x = x * GetWidth();
     // p->velocity.y = y * GetHeight();
     // printf("perlin (x,y):\t %.2f, %.2f\n", x, y);
-}
-
-void ApplyShake(Game *game, float trauma) {
-    printf("Shake...\n");
-    game->cameraType = CAMERA_SCREEN_SHAKE;
-    game->screenShake.shake += trauma;
-    if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
-}
-
-void TweenToast(Toast *toast) {
-    if (toast->tween.state == TWEENING) {
-        // printf("twwenz %d\n", toast->tween.frameCounter);
-        toast->tween.frameCounter++;
-
-        // Tween
-        toast->position.y  = EaseQuadOut(
-            (float) toast->tween.frameCounter,
-            toast->tween.currentPosition.y,
-            toast->tween.targetPosition.y - toast->tween.currentPosition.y,
-            toast->tween.duration
-        );
-
-        // Tween complete
-        if (toast->tween.frameCounter >= toast->tween.duration) {
-            printf("complete\n");
-            toast->tween.frameCounter = 0;
-            toast->tween.state = IDLE;
-
-            // Set final position
-            toast->position.y = toast->tween.currentPosition.y;
-        }
-    }
-}
-
-void PlayToastTween(Toast *toast, char *message) {
-    toast->message = message;
-    toast->tween.currentPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
-    toast->tween.currentPosition.y = GetHeight() + 50;
-    toast->tween.targetPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
-    toast->tween.targetPosition.y = GetHeight() - 50;
-    toast->position.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
-    toast->position.y = GetHeight() + 50;
-    toast->tween.state = TWEENING;
-    toast->tween.frameCounter = 0;
 }
 
 void SetPaticleFall(Particle *p) {
@@ -468,6 +426,83 @@ void DrawParticles(Game *game) {
     }
 }
 
+// =========== Screen shake ===========
+
+void ApplyShake(Game *game, float trauma) {
+    printf("Shake...\n");
+    game->cameraType = CAMERA_SCREEN_SHAKE;
+    game->screenShake.shake += trauma;
+    if (game->screenShake.shake > 1.0f) game->screenShake.shake = 1.0f;
+}
+
+void UpdateScreenShake(Game *game) {
+    if (game->screenShake.shake > 0) {
+        // TODO: FRAME RATE INDEPENDENT
+        game->screenShake.shake -= 0.01;
+
+        // Update shake
+        game->screenShake.angle = game->screenShake.shake * GetRandomValueFloat(-1, 1);
+        game->screenShake.offsetX = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
+        game->screenShake.offsetY = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
+
+        // Just rotation
+        // game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
+        // game->shakyCamera.target = game->screenCamera.target;
+
+        // Just translation
+        // game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
+
+        // Apply rotation and translation
+        game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
+        game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
+
+    } else {
+        game->screenShake.shake = 0;
+        game->cameraType = CAMERA_SCREEN;
+    }
+}
+
+// =========== Toast ===========
+
+void TweenToast(Toast *toast) {
+    if (toast->tween.state == TWEENING) {
+        // printf("twwenz %d\n", toast->tween.frameCounter);
+        toast->tween.frameCounter++;
+
+        // Tween
+        toast->position.y  = EaseQuadOut(
+            (float) toast->tween.frameCounter,
+            toast->tween.currentPosition.y,
+            toast->tween.targetPosition.y - toast->tween.currentPosition.y,
+            toast->tween.duration
+        );
+
+        // Tween complete
+        if (toast->tween.frameCounter >= toast->tween.duration) {
+            printf("complete\n");
+            toast->tween.frameCounter = 0;
+            toast->tween.state = IDLE;
+
+            // Set final position
+            toast->position.y = toast->tween.currentPosition.y;
+        }
+    }
+}
+
+void PlayToastTween(Toast *toast, char *message) {
+    toast->message = message;
+    toast->tween.currentPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->tween.currentPosition.y = GetHeight() + 50;
+    toast->tween.targetPosition.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->tween.targetPosition.y = GetHeight() - 50;
+    toast->position.x = (GetWidth() - MeasureText(toast->message, 20)) / 2;
+    toast->position.y = GetHeight() + 50;
+    toast->tween.state = TWEENING;
+    toast->tween.frameCounter = 0;
+}
+
+// =========== Utils ===========
+
 Texture2D CreateCheckeredBackground() {
     // Checkered background
     int w = GetMonitorWidth(2);
@@ -497,6 +532,154 @@ Texture2D CreateCheckeredBackground() {
     UnloadImage(checkedIm);     // free img.data aka pixels
     return checkered;
 }
+
+int TileIndexToId(int x, int y) {
+    int id = TILE_EMPTY;
+
+    // Wall
+    if (x == 0 && y == 0) {
+        id = TILE_GRASS_TOP;
+    }
+    if (x == 0 && y == 1) {
+        id = TILE_GRASS_MIDDLE;
+    }
+    if (x == 0 && y == 2) {
+        id = TILE_GRASS_QUESTION;
+    }
+    if (x == 1 && y == 0) {
+        id = TILE_GRASS_BRICK;
+    }
+    if (x == 1 && y == 1) {
+        id = TILE_GRASS_BRICK_BROKEN;
+    }
+    if (x == 1 && y == 2) {
+        id = TILE_GRASS_EXCLAMATION;
+    }
+
+    // Others
+    if (x == 7 && y == 3) {
+        id = TILE_BOX;
+    }
+    if (x == 8 && y == 3) {
+        id = TILE_SIGN;
+    }
+    if (x == 9 && y == 3) {
+        id = TILE_LADDER;
+    }
+    return id;
+}
+
+Vector2 IdToTileIndex(char id) {
+    Vector2 index = {blankTile, blankTile};
+
+    // Wall
+    if (id == TILE_GRASS_TOP) {
+        index.x = 0;
+        index.y = 0;
+    }
+    if (id == TILE_GRASS_MIDDLE) {
+        index.x = 0;
+        index.y = 1;
+    }
+    if (id == TILE_GRASS_QUESTION) {
+        index.x = 0;
+        index.y = 2;
+    }
+    if (id == TILE_GRASS_BRICK) {
+        index.x = 1;
+        index.y = 0;
+    }
+    if (id == TILE_GRASS_BRICK_BROKEN) {
+        index.x = 1;
+        index.y = 1;
+    }
+    if (id == TILE_GRASS_EXCLAMATION) {
+        index.x = 1;
+        index.y = 2;
+    }
+
+    // Others
+    if (id == TILE_BOX) {
+        index.x = 7;
+        index.y = 3;
+    }
+    if (id == TILE_SIGN) {
+        index.x = 8;
+        index.y = 3;
+    }
+    if (id == TILE_LADDER) {
+        index.x = 9;
+        index.y = 3;
+    }
+    return index;
+}
+
+void SaveMap(Game *game) {
+    // Calculate size required
+    // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
+    // I'll do it later
+    // Just using random number thats high enough for now
+
+
+    // Save map to text
+    char data[8192 * 2] = "";
+    size_t offset = 0;
+
+    for (int y = 0; y < NO_OF_TILES_Y; ++y){
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
+            int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
+
+            // Store the {x,y} texture location
+            // offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
+
+            // Store the ID
+            offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
+        }
+        offset += snprintf(data + offset, sizeof(data) - offset, "\n");
+    }
+    SaveFileText("./resources/maps/map.txt", data);
+}
+
+void LoadMap(Game *game) {
+    // ATTEMPT 2
+    FILE *file = fopen("./resources/maps/map.txt", "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    int ch;
+    int i = 0;
+    while (fscanf(file, "%d", &ch) == 1) {
+        Vector2 index = IdToTileIndex(ch);
+        game->tiles[i].id = ch;
+        game->tiles[i].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+        // putchar(ch);
+        // printf("%d", ch);
+        ++i;
+    }
+
+    fclose(file);
+
+
+    // ATTEMPT 1
+    // char *map = LoadFileText("map.txt");
+    // // printf("%s", map);
+    // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
+    //         char id = map[y * NO_OF_TILES_X + x];
+    //         Vector2 index = IdToTileIndex(id - '0');
+    //         game->tiles[y * NO_OF_TILES_X + x].id = id;
+    //         game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+    //         printf("%c", id);
+
+    //     }
+    // }
+    // UnloadFileText(map);
+}
+
+// =========== Game ===========
 
 void DrawAxis() {
     // DrawLine(-1000, 0, 1000, 0, WHITE);
@@ -737,152 +920,6 @@ void DrawCameraScreenShake(Game *game) {
     DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
     DrawParticles(game);
     EndMode2D();
-}
-
-int TileIndexToId(int x, int y) {
-    int id = TILE_EMPTY;
-
-    // Wall
-    if (x == 0 && y == 0) {
-        id = TILE_GRASS_TOP;
-    }
-    if (x == 0 && y == 1) {
-        id = TILE_GRASS_MIDDLE;
-    }
-    if (x == 0 && y == 2) {
-        id = TILE_GRASS_QUESTION;
-    }
-    if (x == 1 && y == 0) {
-        id = TILE_GRASS_BRICK;
-    }
-    if (x == 1 && y == 1) {
-        id = TILE_GRASS_BRICK_BROKEN;
-    }
-    if (x == 1 && y == 2) {
-        id = TILE_GRASS_EXCLAMATION;
-    }
-
-    // Others
-    if (x == 7 && y == 3) {
-        id = TILE_BOX;
-    }
-    if (x == 8 && y == 3) {
-        id = TILE_SIGN;
-    }
-    if (x == 9 && y == 3) {
-        id = TILE_LADDER;
-    }
-    return id;
-}
-
-Vector2 IdToTileIndex(char id) {
-    Vector2 index = {blankTile, blankTile};
-
-    // Wall
-    if (id == TILE_GRASS_TOP) {
-        index.x = 0;
-        index.y = 0;
-    }
-    if (id == TILE_GRASS_MIDDLE) {
-        index.x = 0;
-        index.y = 1;
-    }
-    if (id == TILE_GRASS_QUESTION) {
-        index.x = 0;
-        index.y = 2;
-    }
-    if (id == TILE_GRASS_BRICK) {
-        index.x = 1;
-        index.y = 0;
-    }
-    if (id == TILE_GRASS_BRICK_BROKEN) {
-        index.x = 1;
-        index.y = 1;
-    }
-    if (id == TILE_GRASS_EXCLAMATION) {
-        index.x = 1;
-        index.y = 2;
-    }
-
-    // Others
-    if (id == TILE_BOX) {
-        index.x = 7;
-        index.y = 3;
-    }
-    if (id == TILE_SIGN) {
-        index.x = 8;
-        index.y = 3;
-    }
-    if (id == TILE_LADDER) {
-        index.x = 9;
-        index.y = 3;
-    }
-    return index;
-}
-
-void SaveMap(Game *game) {
-    // Calculate size required
-    // int size = NO_OF_TILES_X * NO_OF_TILES_Y * 2;
-    // I'll do it later
-    // Just using random number thats high enough for now
-
-
-    // Save map to text
-    char data[8192 * 2] = "";
-    size_t offset = 0;
-
-    for (int y = 0; y < NO_OF_TILES_Y; ++y){
-        for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            int xIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.x / TILE_WIDTH;
-            int yIndex = (int) game->tiles[y * NO_OF_TILES_X + x].srcRect.y / TILE_HEIGHT;
-
-            // Store the {x,y} texture location
-            // offset += snprintf(data + offset, sizeof(data) - offset, "{%d, %d} ", xIndex, yIndex);
-
-            // Store the ID
-            offset += snprintf(data + offset, sizeof(data) - offset, "%d ", TileIndexToId(xIndex, yIndex));
-        }
-        offset += snprintf(data + offset, sizeof(data) - offset, "\n");
-    }
-    SaveFileText("./resources/maps/map.txt", data);
-}
-
-void LoadMap(Game *game) {
-    // ATTEMPT 2
-    FILE *file = fopen("./resources/maps/map.txt", "r");
-    if (file == NULL) {
-        perror("Error opening file");
-        return;
-    }
-
-    int ch;
-    int i = 0;
-    while (fscanf(file, "%d", &ch) == 1) {
-        Vector2 index = IdToTileIndex(ch);
-        game->tiles[i].id = ch;
-        game->tiles[i].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
-        // putchar(ch);
-        // printf("%d", ch);
-        ++i;
-    }
-
-    fclose(file);
-
-
-    // ATTEMPT 1
-    // char *map = LoadFileText("map.txt");
-    // // printf("%s", map);
-    // for (int y = 0; y < NO_OF_TILES_Y; ++y) {
-    //     for (int x = 0; x < NO_OF_TILES_X; ++x) {
-    //         char id = map[y * NO_OF_TILES_X + x];
-    //         Vector2 index = IdToTileIndex(id - '0');
-    //         game->tiles[y * NO_OF_TILES_X + x].id = id;
-    //         game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {index.x * TILE_WIDTH, index.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
-    //         printf("%c", id);
-
-    //     }
-    // }
-    // UnloadFileText(map);
 }
 
 void Input(Game *game) {
@@ -1165,30 +1202,7 @@ void Update(Game *game) {
 
     if (game->cameraType == CAMERA_SCREEN_SHAKE) {
 
-        if (game->screenShake.shake > 0) {
-            // TODO: FRAME RATE INDEPENDENT
-            game->screenShake.shake -= 0.01;
-
-            // Update shake
-            game->screenShake.angle = game->screenShake.shake * GetRandomValueFloat(-1, 1);
-            game->screenShake.offsetX = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
-            game->screenShake.offsetY = game->screenShake.maxOffset * game->screenShake.shake * GetRandomValueFloat(-1, 1);
-
-            // Just rotation
-            // game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
-            // game->shakyCamera.target = game->screenCamera.target;
-
-            // Just translation
-            // game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
-
-            // Apply rotation and translation
-            game->shakyCamera.rotation = game->screenCamera.rotation + game->screenShake.angle;
-            game->shakyCamera.target = Vector2Add(game->screenCamera.target,  (Vector2){game->screenShake.offsetX, game->screenShake.offsetX});
-
-        } else {
-            game->screenShake.shake = 0;
-            game->cameraType = CAMERA_SCREEN;
-        }
+        UpdateScreenShake(game);
     }
 
     // Bound world camera
@@ -1230,6 +1244,8 @@ void Draw(Game *game) {
         DrawFPS(GetWidth() - MeasureText("60 FPS", 20) - 20, 20);
     EndDrawing();
 }
+
+// =========== Main ===========
 
 int main(void) {
 
@@ -1338,15 +1354,13 @@ int main(void) {
     // Particles
     size_t PARTICLES_SIZE_BYTE = sizeof(Particle) * NO_OF_PARTICLES;
     Particle *particles = RL_MALLOC(PARTICLES_SIZE_BYTE);
-    printf("size of particles %lu bytes\n", PARTICLES_SIZE_BYTE);
-    printf("No of particles %d\n", NO_OF_PARTICLES);
     for (int i = 0; i < NO_OF_PARTICLES; ++i) {
         Particle *p = &particles[i];
         p->id = GenerateRandomId();
         // printf("p->id: %d\n", p->id);
     }
 
-    CreateSimpleParticleEffect(particles);
+    // CreateSimpleParticleEffect(particles);
 
     // Game
     Game game = { 0 };
@@ -1394,6 +1408,11 @@ int main(void) {
     printf("---------------------\n");
     printf("Total (visible) x tiles: %d\n", (int) SCREEN_WIDTH / TILE_WIDTH);
     printf("Total (visible) y tiles: %d\n", (int) SCREEN_HEIGHT / TILE_HEIGHT);
+    printf("---------------------\n");
+    printf("No of particles: %d\n", NO_OF_PARTICLES);
+    printf("Size particles:  %lu bytes\n", PARTICLES_SIZE_BYTE);
+    printf("---------------------\n");
+    printf("\n");
 
     SetTargetFPS(60);
     // SetTargetFPS(100);
