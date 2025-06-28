@@ -124,14 +124,24 @@ Pokemon* SECOND_ATTEMPT(const cJSON *json) {
     return sprites;
 }
 
+Rectangle FindPokemon(Pokemon *sprites, int size, char *name) {
+    for (int i = 0; i < size; ++i) {
+        Pokemon poke = sprites[i];
+        printf("does %s == %s\n", name, poke.filename);
+        if (strcmp(name, poke.filename) == 0) return poke.srcRect;
+    }
+    printf("Not Found :(\n");
+    return (Rectangle) {0, 0, 0, 0};
+}
+
 // cc json.c -lcjson && ./a.out
 int main(void) {
 
-    // Load json file into memory
+    // Load json file into memory, store in *data
     FILE *fp = fopen("../graphics/resources/sprites/poke.json", "rb");
     if (!fp) {
         perror("File opening failed");
-        return EXIT_FAILURE;    // error this function returns char*
+        return EXIT_FAILURE;
     }
 
     printf("FILE OPENED...\n");
@@ -144,38 +154,61 @@ int main(void) {
     printf("\t...Load data in RAM\n");
     printf("\t...length (bytes): %ld\n", length);
     printf("\n");
+
+
     char *data = malloc(length + 1);
     fread(data, 1, length, fp);
     data[length] = '\0';
     fclose(fp);
+
+
+
     printf("FILE CLOSED...\n");
     printf("\n");
+
+
+
+
+
     
+    // Parse the data
     cJSON *json = cJSON_Parse(data);
     if (!json) {
         printf("Error before: %s\n", cJSON_GetErrorPtr());
         return 1;
     }
 
-    // Parse the data
     // FIRST_ATTEMPT(json);
     Pokemon *sprites = SECOND_ATTEMPT(json);
 
-    for (int i = 0; i < 151; ++i) {
+    for (int i = 0; i < 391; ++i) {
         char *name = sprites[i].filename;
         Rectangle rec = sprites[i].srcRect;
         // printf("%s\n", name);
-        printf("%s: %d,%d,%d,%d\n", name, (int) rec.x, (int) rec.y, (int) rec.width, (int) rec.height);
+        // printf("%s: %d,%d,%d,%d\n", name, (int) rec.x, (int) rec.y, (int) rec.width, (int) rec.height);
     }
 
 
-    // Now sort the data
+    // Now sort the data? Or dont. Just get the srcRect through the filename
+
+    Rectangle bounds = FindPokemon(sprites, 391, "3");
+    if (bounds.x == 0 && bounds.y == 0 && bounds.width == 0 && bounds.height == 0) {
+        printf("NO.");
+    } else {
+        printf("found...!\n");
+        printf("%d,%d,%d,%d\n", (int) bounds.x, (int) bounds.y, (int) bounds.width, (int) bounds.height);
+    }
 
     
 
 
-    cJSON_Delete(json);
+    // data = memory allocated for json file
     free(data);
+
+    // json = cJSON object, the data post parse
+    cJSON_Delete(json);
+
+    // sprite = the pokemon collection I created
     free(sprites);
 
 
