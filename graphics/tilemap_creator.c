@@ -129,7 +129,7 @@ typedef struct Tween {
 } Tween;
 
 typedef struct Particle {
-    int id;
+    unsigned int id;
     Vector2 position;
     Vector2 velocity;
     Vector2 acceleration;
