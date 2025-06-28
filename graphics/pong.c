@@ -84,6 +84,8 @@ static Camera2D camera_shake = { 0 };
 static ScreenShake screenShake = { 0 };
 static CameraType cameraType = 0;
 
+static Particle *particles;
+
 
 // =========== Particles ===========
 
@@ -147,7 +149,7 @@ void CreateSimpleParticleEffect(Particle *particles) {
     }
 }
 
-void UpdateParticles(Particle *particles) {
+void UpdateParticles() {
     float dt = GetFrameTime();
     for (int i = 0; i < NO_OF_PARTICLES; ++i) {
         Particle *p = &particles[i];
@@ -205,7 +207,7 @@ void UpdateParticles(Particle *particles) {
 
 }
 
-void DrawParticles(Particle *particles) {
+void DrawParticles() {
     for (int i = 0; i < NO_OF_PARTICLES; ++i) {
         Particle p = particles[i];
         if (p.ageSeconds <= 0) {
@@ -409,7 +411,7 @@ void Input() {
 void Update(Particle *particles) {
     UpdateBall();
     Collisions();
-    UpdateParticles(particles);
+    UpdateParticles();
     UpdateScreenShake();
 }
 
@@ -447,7 +449,7 @@ int main(void) {
     InitWindow(WIDTH, HEIGHT, "pong");
 
     size_t PARTICLES_SIZE_BYTE = sizeof(Particle) * NO_OF_PARTICLES;
-    Particle *particles = RL_MALLOC(PARTICLES_SIZE_BYTE);
+    particles = RL_MALLOC(PARTICLES_SIZE_BYTE);
 
     printf("size of particles %lu bytes\n", PARTICLES_SIZE_BYTE);
     printf("No of particles %d\n", NO_OF_PARTICLES);
@@ -491,7 +493,7 @@ int main(void) {
 
             Draw();
             DrawGUI();
-            DrawParticles(particles);
+            DrawParticles();
 
             DrawFPS(20,20);
         EndDrawing();
