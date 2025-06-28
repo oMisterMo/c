@@ -1269,18 +1269,14 @@ int main(void) {
     Tile tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
     int lineThick = 1;
 
-    int i = 0;
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
-            // y * NO_OF_TILES_Y + x
             // printf("%d - %d\n", i, y * NO_OF_TILES_Y + x);
-            tiles[i].id = TILE_EMPTY;
-            tiles[i].destRect = (Rectangle) {
+            tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
+            tiles[y * NO_OF_TILES_X + x].destRect = (Rectangle) {
                 x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT};
-            tiles[i].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
-
-            ++i;
+            tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
         }
     }
 
