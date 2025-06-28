@@ -923,6 +923,7 @@ void DrawCameraScreenShake(Game *game) {
 }
 
 void Input(Game *game) {
+    // Switch camera tileset/world
     if (IsKeyPressed(KEY_SPACE)) {
         if (game->cameraType == CAMERA_WORLD) {
             game->cameraType = CAMERA_TILESET;
@@ -930,28 +931,27 @@ void Input(Game *game) {
             game->cameraType = CAMERA_WORLD;
         }
     }
-    if (IsKeyPressed(KEY_EQUAL)) {
-        // *lineThick += 1;
-    }
+    // Camera = tileset
     if (IsKeyPressed(KEY_ONE)) {
         game->cameraType = CAMERA_TILESET;
         // game->boolFlags.showGUI = !game->boolFlags.showGUI;
     }
+    // Camera = world
     if (IsKeyPressed(KEY_TWO)) {
         game->cameraType = CAMERA_WORLD;
         // game->boolFlags.showScreenBorder = false;
         // game->boolFlags.showGUIwindow = !game->boolFlags.showGUIwindow;
     }
+    // Camera = screen
     if (IsKeyPressed(KEY_THREE)) {
         game->cameraType = CAMERA_SCREEN;
         // game->boolFlags.showScreenBorder = true;
     }
-    // Screen shake
+    // Camera = screenshake
     if (IsKeyPressed(KEY_FOUR)) {
         ApplyShake(game, 0.3f);
     }
-
-
+    // UI stuff
     if (IsKeyPressed(KEY_EIGHT)) {
         game->boolFlags.showWindowBorder = !game->boolFlags.showWindowBorder;
     }
@@ -961,45 +961,7 @@ void Input(Game *game) {
     if (IsKeyPressed(KEY_ZERO)) {
         game->boolFlags.showGUI = !game->boolFlags.showGUI;
     }
-    // Reset
-    if (IsKeyPressed(KEY_R)) {
-        printf("Reset tiles...\n");
-        for (int y = 0; y < NO_OF_TILES_Y; ++y) {
-            for (int x = 0; x < NO_OF_TILES_X; ++x) {
-                game->tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
-                game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
-            }
-        }
-
-        PlayToastTween(&game->toast, "Reset");
-    }
-    // Load map
-    if (IsKeyPressed(KEY_L)) {
-        printf("Load map...\n");
-        LoadMap(game);
-
-        PlayToastTween(&game->toast, "Load");
-    }
-    // Save map
-    if (IsKeyPressed(KEY_PERIOD)) {
-        printf("Save map...\n");
-        SaveMap(game);
-        PlayToastTween(&game->toast, "Save");
-    }
-    // Set tile modes
-    if (IsKeyPressed(KEY_H)) {
-        game->fillMode = FILL_HORIZONTAL;
-        PlayToastTween(&game->toast, "Horizontal Fill");
-    }
-    if (IsKeyPressed(KEY_V)) {
-        game->fillMode = FILL_VERTICAL;
-        PlayToastTween(&game->toast, "Vertical Fill");
-    }
-    if (IsKeyPressed(KEY_O)) {
-        game->fillMode = FILL_OFF;
-        PlayToastTween(&game->toast, "Stamp");
-    }
-
+    // Fullscreen
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
 
@@ -1058,9 +1020,46 @@ void Input(Game *game) {
             }
             break;
         case CAMERA_WORLD:
-            // if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
-            //     printf("down\n");
-            // }
+            // Reset
+            if (IsKeyPressed(KEY_R)) {
+                printf("Reset tiles...\n");
+                for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+                    for (int x = 0; x < NO_OF_TILES_X; ++x) {
+                        game->tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
+                        game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+                    }
+                }
+
+                PlayToastTween(&game->toast, "Reset");
+            }
+            // Load map
+            if (IsKeyPressed(KEY_L)) {
+                printf("Load map...\n");
+                LoadMap(game);
+
+                PlayToastTween(&game->toast, "Load");
+            }
+            // Save map
+            if (IsKeyPressed(KEY_PERIOD)) {
+                printf("Save map...\n");
+                SaveMap(game);
+                PlayToastTween(&game->toast, "Save");
+            }
+            // Set tile modes
+            if (IsKeyPressed(KEY_H)) {
+                game->fillMode = FILL_HORIZONTAL;
+                PlayToastTween(&game->toast, "Horizontal Fill");
+            }
+            if (IsKeyPressed(KEY_V)) {
+                game->fillMode = FILL_VERTICAL;
+                PlayToastTween(&game->toast, "Vertical Fill");
+            }
+            if (IsKeyPressed(KEY_O)) {
+                game->fillMode = FILL_OFF;
+                PlayToastTween(&game->toast, "Stamp");
+            }
+
+            // Draw tiles
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
                 int x = (int) (mouse.x / TILE_WIDTH);
