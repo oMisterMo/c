@@ -130,6 +130,8 @@ Rectangle FindPokemon(Pokemon *sprites, int size, char *name) {
         printf("does %s == %s\n", name, poke.filename);
         if (strcmp(name, poke.filename) == 0) return poke.srcRect;
     }
+
+    printf("\n");
     printf("Not Found :(\n");
     return (Rectangle) {0, 0, 0, 0};
 }
@@ -181,7 +183,7 @@ int main(void) {
     // FIRST_ATTEMPT(json);
     Pokemon *sprites = SECOND_ATTEMPT(json);
 
-    for (int i = 0; i < 391; ++i) {
+    for (int i = 0; i <= 391; ++i) {
         char *name = sprites[i].filename;
         Rectangle rec = sprites[i].srcRect;
         // printf("%s\n", name);
@@ -191,12 +193,14 @@ int main(void) {
 
     // Now sort the data? Or dont. Just get the srcRect through the filename
 
-    Rectangle bounds = FindPokemon(sprites, 391, "3");
+    Rectangle bounds = FindPokemon(sprites, 391, "9");
     if (bounds.x == 0 && bounds.y == 0 && bounds.width == 0 && bounds.height == 0) {
-        printf("NO.");
+        printf("\n\nNO.\n\n");
     } else {
-        printf("found...!\n");
+        printf("\n");
+        printf("=================\n");
         printf("%d,%d,%d,%d\n", (int) bounds.x, (int) bounds.y, (int) bounds.width, (int) bounds.height);
+        printf("=================\n");
     }
 
     
