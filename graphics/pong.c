@@ -354,6 +354,9 @@ void DrawGUI() {
     }
 }
 
+float bounceY() {
+    return sin(GetTime() * 6);
+}
 
 void Input() {
     float dt = GetFrameTime();
@@ -494,6 +497,8 @@ int main(void) {
             Draw();
             DrawGUI();
             DrawParticles();
+
+            DrawRectangle(200,HEIGHT/2 + bounceY() * 20, 10, 10, RED);
 
             DrawFPS(20,20);
         EndDrawing();
