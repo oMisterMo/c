@@ -1,3 +1,11 @@
+/**
+ * So I DON'T forget !!!
+ *
+ * Todo: Actually load the spritesheet data using the example in others/json.c
+ * Todo: Remove comments and that
+ *
+ */
+
 #include <stdio.h>
 #include "raylib.h"
 #include "raymath.h"

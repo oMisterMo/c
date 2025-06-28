@@ -1,3 +1,9 @@
+/**
+ * Todo: Tidy up file
+ * Todo: Create function to load json file memory
+ * Todo: Create Pokemon* THIRD_ATTEMPT(const cJSON *frames) so that the size of array is now on main stack and reusable
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
