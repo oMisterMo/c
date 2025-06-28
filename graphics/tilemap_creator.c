@@ -178,9 +178,9 @@ typedef struct ScreenShake {
 } ScreenShake;
 
 typedef struct Tile {
-    int id; // what tile (grass, water)
-    Rectangle srcRect;  // spritesheet index
-    Rectangle destRect; // position
+    unsigned int id;    // what tile (grass, water): 4 bytes
+    Rectangle srcRect;  // spritesheet index: 16 bytes
+    Rectangle destRect; // position: 16 bytes
 } Tile;
 
 typedef struct Toast {
@@ -1402,6 +1402,9 @@ int main(void) {
     printf("windowEnd %d, %d\n", (int) windowEnd.x, (int) windowEnd.y);
     printf("screenStart %d, %d\n", (int) screenStart.x, (int) screenStart.y);
     printf("screenEnd %d, %d\n", (int) screenEnd.x, (int) screenEnd.y);
+    printf("---------------------\n");
+    printf("Tile size: %ld bytes\n", sizeof(Tile));
+    printf("Total size: %ld bytes\n", sizeof(Tile) * NO_OF_TILES_X * NO_OF_TILES_Y);
     printf("---------------------\n");
     printf("Total x tiles: %d\n", TOTAL_TILES_X);
     printf("Total y tiles: %d\n", TOTAL_TILES_Y);
