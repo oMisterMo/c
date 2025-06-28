@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 // #include "cJSON.h"
 #include <cjson/cJSON.h>
 #include "raylib.h"
+
+typedef struct Pokemon {
+    char *filename;     // 8 bytes
+    Rectangle srcRect;  // 16 bytes
+} Pokemon;
 
 char* LoadJSON(const char *filename) {
     // Load json file into memory
@@ -70,7 +76,7 @@ void FIRST_ATTEMPT(const cJSON *json) {
     free(frames_print);
 }
 
-Rectangle* SECOND_ATTEMPT(const cJSON *json) {
+Pokemon* SECOND_ATTEMPT(const cJSON *json) {
     const cJSON *frame = NULL;
     const cJSON *frames = NULL;
     const cJSON *meta = NULL;
@@ -82,7 +88,7 @@ Rectangle* SECOND_ATTEMPT(const cJSON *json) {
     // Create an array holding all of our Rectangles
     int len = cJSON_GetArraySize(frames);
     int i = 0;
-    Rectangle *sprites = malloc(sizeof(Rectangle) * len);
+    Pokemon *sprites = malloc(sizeof(Pokemon) * len);
 
     printf("=== Load Rectangles ===\n");
     printf("len: %d\n", len);
@@ -97,7 +103,16 @@ Rectangle* SECOND_ATTEMPT(const cJSON *json) {
         cJSON *w = cJSON_GetObjectItemCaseSensitive(srcRect, "w");
         cJSON *h = cJSON_GetObjectItemCaseSensitive(srcRect, "h");
 
-        sprites[i] = (Rectangle) { x->valueint,y->valueint,w->valueint,h->valueint };
+        // 1
+        // memcpy(sprites->filename, filename, sizeof(filename));
+
+        // 2
+        // sprites[i].filename = malloc(strlen(filename->valuestring));
+        // strcpy(sprites[i].filename, filename->valuestring);
+
+        //3 
+        sprites[i].filename = filename->valuestring;
+        sprites[i].srcRect = (Rectangle) { x->valueint,y->valueint,w->valueint,h->valueint };
 
         // printf("filename: %s\n", filename->valuestring);
         // printf("%d %d %d %d\n", x->valueint, y->valueint, w->valueint, h->valueint);
@@ -144,12 +159,18 @@ int main(void) {
 
     // Parse the data
     // FIRST_ATTEMPT(json);
-    Rectangle *sprites = SECOND_ATTEMPT(json);
+    Pokemon *sprites = SECOND_ATTEMPT(json);
 
-    for (int i = 0; i < 35; ++i) {
-        Rectangle rec = sprites[i];
-        printf("%d,%d,%d,%d\n", (int) rec.x, (int) rec.y, (int) rec.width, (int) rec.height);
+    for (int i = 0; i < 151; ++i) {
+        char *name = sprites[i].filename;
+        Rectangle rec = sprites[i].srcRect;
+        // printf("%s\n", name);
+        printf("%s: %d,%d,%d,%d\n", name, (int) rec.x, (int) rec.y, (int) rec.width, (int) rec.height);
     }
+
+
+    // Now sort the data
+
     
 
 
