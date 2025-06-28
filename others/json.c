@@ -74,11 +74,19 @@ Rectangle* SECOND_ATTEMPT(const cJSON *json) {
     const cJSON *frame = NULL;
     const cJSON *frames = NULL;
     const cJSON *meta = NULL;
-    static int NO_OF_ELEMENTS = 0;
 
 
     frames = cJSON_GetObjectItemCaseSensitive(json, "frames");
     meta = cJSON_GetObjectItemCaseSensitive(json, "meta");
+
+    // Create an array holding all of our Rectangles
+    int len = cJSON_GetArraySize(frames);
+    int i = 0;
+    Rectangle *sprites = malloc(sizeof(Rectangle) * len);
+
+    printf("=== Load Rectangles ===\n");
+    printf("len: %d\n", len);
+    printf("\n");
 
     cJSON_ArrayForEach(frame, frames) {
         cJSON *filename = cJSON_GetObjectItemCaseSensitive(frame, "filename");
@@ -89,16 +97,15 @@ Rectangle* SECOND_ATTEMPT(const cJSON *json) {
         cJSON *w = cJSON_GetObjectItemCaseSensitive(srcRect, "w");
         cJSON *h = cJSON_GetObjectItemCaseSensitive(srcRect, "h");
 
+        sprites[i] = (Rectangle) { x->valueint,y->valueint,w->valueint,h->valueint };
+
         // printf("filename: %s\n", filename->valuestring);
         // printf("%d %d %d %d\n", x->valueint, y->valueint, w->valueint, h->valueint);
         // printf("-------------------\n");
-        ++NO_OF_ELEMENTS;
+        ++i;
     }
 
-    printf("No of elements: %d\n", NO_OF_ELEMENTS);
 
-    // Create an array holding all of our Rectangles
-    Rectangle *sprites = malloc(sizeof(Rectangle) * NO_OF_ELEMENTS);
     return sprites;
 }
 
@@ -134,14 +141,14 @@ int main(void) {
         printf("Error before: %s\n", cJSON_GetErrorPtr());
         return 1;
     }
-    
+
     // Parse the data
     // FIRST_ATTEMPT(json);
     Rectangle *sprites = SECOND_ATTEMPT(json);
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 35; ++i) {
         Rectangle rec = sprites[i];
-        printf("%f\n", rec.x);
+        printf("%d,%d,%d,%d\n", (int) rec.x, (int) rec.y, (int) rec.width, (int) rec.height);
     }
     
 
