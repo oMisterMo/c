@@ -750,13 +750,14 @@ void DrawGUIWorld(Game *game) {
         DrawText(TextFormat("No y tiles %d", NO_OF_TILES_Y), 20, 520, 20, WHITE);
 
         // RIGHT
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY, 20, 20 }, "Close", &game->boolFlags.showGUI);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Axis", &game->boolFlags.showAxis);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (5 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
-        // GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (6 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Axis", &game->boolFlags.showAxis);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
+        if (GuiButton((Rectangle){ GetWidth() - guiX, guiY + (6 * 40), MeasureText("Close", 20), 20 }, "Close") == 1) {
+            game->boolFlags.showGUI = false;
+        }
     }
     int pad = 20;
     int h = 40;
@@ -793,10 +794,8 @@ void DrawGUITileset(Game *game) {
         // LEFT
 
         // RIGHT
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY, 20, 20 }, "Close", &game->boolFlags.showGUI);
-        // GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
-        GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
-        if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
+        GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
+        if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
             game->guiFlags.dropdownActive = !game->guiFlags.dropdownActive;
             /*
                 dropdownActive = whether the box is open or not
@@ -808,6 +807,9 @@ void DrawGUITileset(Game *game) {
                 1 = second item
                 ...
             */
+        }
+        if (GuiButton((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), MeasureText("Close", 20), 20 }, "Close") == 1) {
+            game->boolFlags.showGUI = false;
         }
     }
 }
@@ -1489,12 +1491,14 @@ int main(void) {
     GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 25);
     GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xFFFFFFFF);
     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
+    // checkbox
     GuiSetStyle(CHECKBOX, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
-    // normal
+    // button
+    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0xFFFFFF00);
+    // dropdown
     GuiSetStyle(DROPDOWNBOX, BASE_COLOR_NORMAL, 0xFFFFFF00);
-    // focused
     GuiSetStyle(DROPDOWNBOX, BASE_COLOR_FOCUSED, 0xFFFFFF00);
-    // opened
+    // dropdown - opened
     GuiSetStyle(DROPDOWNBOX, BASE_COLOR_PRESSED, ColorToInt(ColorAlpha(GRAY, 0.8f)));
     GuiSetStyle(DROPDOWNBOX, TEXT_COLOR_PRESSED, 0xFFFFFFFF);
     GuiSetStyle(DEFAULT, BACKGROUND_COLOR, 0xFFFFFF00);
