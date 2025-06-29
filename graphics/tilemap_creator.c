@@ -166,6 +166,7 @@ typedef struct BoolFlags {
     bool showScreenBorder;
     bool showAxis;
     bool showParticles;
+    bool isBackgroundTile;
 } BoolFlags;
 
 typedef struct ScreenShake {
@@ -209,6 +210,7 @@ typedef struct Game {
 
     Vector2 tileSelected;
     Tile *tiles;
+    Tile *backgroundTiles;
     FillMode fillMode;
     bool overwriteTiles;
 
@@ -749,6 +751,7 @@ void DrawGUI(Game *game) {
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Axis", &game->boolFlags.showAxis);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (5 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (6 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
     }
     int pad = 20;
     int h = 40;
@@ -762,6 +765,15 @@ void DrawCameraWorld(Game *game) {
 
     if (game->boolFlags.showAxis) {
         DrawAxis();
+    }
+
+    // Background tiles
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            Rectangle src = game->backgroundTiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->backgroundTiles[y * NO_OF_TILES_X + x].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+        }
     }
 
     // Texture tiles
@@ -786,6 +798,7 @@ void DrawCameraWorld(Game *game) {
         }
     }
 
+    // TODO - LATER FIX THIS FOR BG TILES!!!
 
     // Draw Preview tiles
     Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
@@ -874,6 +887,15 @@ void DrawCameraScreen(Game *game) {
 
     // DrawAxis();
 
+    // Background tiles
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            Rectangle src = game->backgroundTiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->backgroundTiles[y * NO_OF_TILES_X + x].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+        }
+    }
+
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
@@ -901,6 +923,15 @@ void DrawCameraScreenShake(Game *game) {
 
     // DrawAxis();
 
+    // Background tiles
+    for (int y = 0; y < NO_OF_TILES_Y; ++y) {
+        for (int x = 0; x < NO_OF_TILES_X; ++x) {
+            Rectangle src = game->backgroundTiles[y * NO_OF_TILES_X + x].srcRect;
+            Rectangle dest = game->backgroundTiles[y * NO_OF_TILES_X + x].destRect;
+            DrawTexturePro(game->tileset,src,dest,(Vector2){0},0, WHITE);
+        }
+    }
+
     // Texture tiles
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
@@ -920,6 +951,72 @@ void DrawCameraScreenShake(Game *game) {
     DrawRectangleRec(game->player, ColorAlpha(ORANGE, 0.2f));
     DrawParticles(game);
     EndMode2D();
+}
+
+void OnMouseDownLeft(Game *game, Tile *tiles, int x, int y) {
+        // printf("Touching tile id %d\n", tile->id);
+        Tile *tile = &tiles[y * NO_OF_TILES_X + x];
+        if (!game->overwriteTiles) {
+            if (tile->id != TILE_EMPTY) return;
+        }
+        printf("draw %d,%d\n", x, y);
+
+        switch (game->fillMode) {
+            case FILL_OFF:
+                tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
+                tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
+                tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
+                break;
+            case FILL_EMPTY:
+                // Should find contained tiles only
+                break;
+                case FILL_ALL:
+                // Should find contained tiles only
+                break;
+            case FILL_HORIZONTAL:
+                for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
+                    Tile *t = &tiles[y * NO_OF_TILES_X + i];
+                    if (t->id > TILE_EMPTY) break;
+                    t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
+                    t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
+                    t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
+                }
+                for (int i = x; i >= 0; --i) {
+                    Tile *t = &tiles[y * NO_OF_TILES_X + i];
+                    if (t->id > TILE_EMPTY) break;
+                    t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
+                    t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
+                    t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
+                }
+                break;
+            case FILL_VERTICAL:
+                // Should it stop when it finds a non empty tile?
+                for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
+                    Tile *t = &tiles[i * NO_OF_TILES_X + x];
+                    if (t->id > TILE_EMPTY) break;
+                    t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
+                    t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
+                    t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
+                }
+                for (int i = y; i >= 0; --i) {
+                    Tile *t = &tiles[i * NO_OF_TILES_X + x];
+                    if (t->id > TILE_EMPTY) break;
+                    t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
+                    t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
+                    t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
+                }
+                break;
+        }
+}
+
+void OnMouseDownRight(Tile *tiles, int x, int y) {
+    Tile *tile = &tiles[y * NO_OF_TILES_X + x];
+    // if (tile->id == TILE_EMPTY) return;
+    printf("erase %d,%d\n", x, y);
+    // Set the empty tile
+    tile->srcRect.x = blankTile * TILE_WIDTH;
+    tile->srcRect.y = blankTile * TILE_HEIGHT;
+    tile->id = TILE_EMPTY;
 }
 
 void Input(Game *game) {
@@ -1027,6 +1124,8 @@ void Input(Game *game) {
                     for (int x = 0; x < NO_OF_TILES_X; ++x) {
                         game->tiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
                         game->tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+                        game->backgroundTiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
+                        game->backgroundTiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile * TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
                     }
                 }
 
@@ -1066,59 +1165,13 @@ void Input(Game *game) {
                 int y = (int) (mouse.y / TILE_HEIGHT);
                 if (x < 0 || x > NO_OF_TILES_X) return;
                 if (y < 0 || y > NO_OF_TILES_Y) return;
-                Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-                // printf("Touching tile id %d\n", tile->id);
-                if (!game->overwriteTiles) {
-                    if (tile->id != TILE_EMPTY) return;
-                }
-                printf("draw %d,%d\n", x, y);
 
-                switch (game->fillMode) {
-                    case FILL_OFF:
-                        tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-                        tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-                        tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-                        break;
-                    case FILL_EMPTY:
-                        // Should find contained tiles only
-                        break;
-                        case FILL_ALL:
-                        // Should find contained tiles only
-                        break;
-                    case FILL_HORIZONTAL:
-                        for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
-                            Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
-                            if (tile->id > TILE_EMPTY) break;
-                            tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-                            tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-                            tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-                        }
-                        for (int i = x; i >= 0; --i) {
-                            Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
-                            if (tile->id > TILE_EMPTY) break;
-                            tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-                            tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-                            tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-                        }
-                        break;
-                    case FILL_VERTICAL:
-                        // Should it stop when it finds a non empty tile?
-                        for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
-                            Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-                            if (tile->id > TILE_EMPTY) break;
-                            tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-                            tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-                            tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-                        }
-                        for (int i = y; i >= 0; --i) {
-                            Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
-                            if (tile->id > TILE_EMPTY) break;
-                            tile->srcRect.x = game->tileSelected.x * TILE_WIDTH;
-                            tile->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
-                            tile->id = TileIndexToId(tile->srcRect.x / TILE_WIDTH, tile->srcRect.y / TILE_HEIGHT);
-                        }
-                        break;
+                if (game->boolFlags.isBackgroundTile) {
+                    OnMouseDownLeft(game, game->backgroundTiles, x, y);
+                } else {
+                    OnMouseDownLeft(game, game->tiles, x, y);
                 }
+
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
@@ -1128,14 +1181,12 @@ void Input(Game *game) {
                 if (y < 0 || y > NO_OF_TILES_Y) return;
 
                 // Store the source rect pointer
-                Tile *tile = &game->tiles[y * NO_OF_TILES_X + x];
-                // if (tile->id == TILE_EMPTY) return;
-                printf("erase %d,%d\n", x, y);
+                if (game->boolFlags.isBackgroundTile) {
+                    OnMouseDownRight(game->backgroundTiles, x, y);
+                } else {
+                    OnMouseDownRight(game->tiles, x, y);
+                }
 
-                // Set the empty tile
-                tile->srcRect.x = blankTile * TILE_WIDTH;
-                tile->srcRect.y = blankTile * TILE_HEIGHT;
-                tile->id = TILE_EMPTY;
             }
             break;
         case CAMERA_SCREEN:
@@ -1266,7 +1317,7 @@ int main(void) {
     // World
     // Rectangle *tiles = malloc(sizeof(Rectangle) * NO_OF_TILES_X * NO_OF_TILES_Y);
     Tile tiles[NO_OF_TILES_X * NO_OF_TILES_Y];
-    int lineThick = 1;
+    Tile backgroundTiles[NO_OF_TILES_X * NO_OF_TILES_Y];
 
     for (int y = 0; y < NO_OF_TILES_Y; ++y) {
         for (int x = 0; x < NO_OF_TILES_X; ++x) {
@@ -1276,6 +1327,13 @@ int main(void) {
                 x * TILE_WIDTH, y * TILE_HEIGHT,
                 TILE_WIDTH, TILE_HEIGHT};
             tiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
+
+            // background tiles
+            backgroundTiles[y * NO_OF_TILES_X + x].id = TILE_EMPTY;
+            backgroundTiles[y * NO_OF_TILES_X + x].destRect = (Rectangle) {
+                x * TILE_WIDTH, y * TILE_HEIGHT,
+                TILE_WIDTH, TILE_HEIGHT};
+            backgroundTiles[y * NO_OF_TILES_X + x].srcRect = (Rectangle) {blankTile * TILE_WIDTH,blankTile*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT};
         }
     }
 
@@ -1325,7 +1383,8 @@ int main(void) {
         .showWindowBorder = false,
         .showScreenBorder = false,
         .showAxis = false,
-        .showParticles = true
+        .showParticles = true,
+        .isBackgroundTile = false
     };
     Toast toast = {
         .message = "Hello there whats goign one ok?",
@@ -1371,6 +1430,7 @@ int main(void) {
     game.tileset = tileset;
     game.tileSelected = (Vector2) { 0, 0};
     game.tiles = tiles;
+    game.backgroundTiles = backgroundTiles; // I should use single struct for 2d tiles layers
     game.fillMode = fillMode;
     game.overwriteTiles = false;
     game.screenShake = screenShake;
@@ -1412,7 +1472,7 @@ int main(void) {
     printf("---------------------\n");
     printf("\n");
 
-    SetTargetFPS(60);
+    // SetTargetFPS(60);
     // SetTargetFPS(100);
     while(!WindowShouldClose()) {
         // input
