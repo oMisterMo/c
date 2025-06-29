@@ -166,8 +166,12 @@ typedef struct BoolFlags {
     bool showScreenBorder;
     bool showAxis;
     bool showParticles;
-    bool isBackgroundTile;
 } BoolFlags;
+
+typedef struct GUIFlags {
+    bool dropdownActive;
+    int dropdownState;
+} GUIFlags;
 
 typedef struct ScreenShake {
     float shake;
@@ -197,6 +201,7 @@ typedef struct Game {
     Rectangle screenBounds;
 
     BoolFlags boolFlags;
+    GUIFlags guiFlags;
 
     CameraType cameraType;
     Camera2D worldCamera;
@@ -690,7 +695,7 @@ void DrawAxis() {
     DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, ColorAlpha(WHITE, 0.5f));
 }
 
-void DrawGUI(Game *game) {
+void DrawGUIWorld(Game *game) {
     Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
     Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
     Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
@@ -751,12 +756,71 @@ void DrawGUI(Game *game) {
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (4 * 40), 20, 20}, "Axis", &game->boolFlags.showAxis);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (5 * 40), 20, 20}, "Particles", &game->boolFlags.showParticles);
-        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (6 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
+        // GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (6 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
     }
     int pad = 20;
     int h = 40;
     DrawRectangleRounded((Rectangle) {game->toast.position.x - pad, game->toast.position.y - h / 4, MeasureText(game->toast.message, 20) + pad * 2, h}, 10, 4, ColorAlpha(BLACK, 1.0f));
     DrawText(TextFormat("%s",  game->toast.message), game->toast.position.x, game->toast.position.y, 20, WHITE);
+}
+
+void DrawGUITileset(Game *game) {
+    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
+    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
+    Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
+    Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
+    // UI
+    if (game->boolFlags.showGUI) {
+        if (game->boolFlags.showGUIwindow) {
+            // Draw window
+            DrawRectangleRec((Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
+        }
+        switch (game->cameraType) {
+            case CAMERA_TILESET:
+                DrawText("Camera Tileset", 20, GetHeight() - 40, 20, WHITE);
+                break;
+            case CAMERA_WORLD:
+                DrawText("Camera World", 20, GetHeight() - 40, 20, WHITE);
+                break;
+            case CAMERA_SCREEN:
+                DrawText("Camera Screen", 20, GetHeight() - 40, 20, WHITE);
+                break;
+            case CAMERA_SCREEN_SHAKE:
+                DrawText("Camera Shake", 20, GetHeight() - 40, 20, WHITE);
+                break;
+        }
+
+        // LEFT
+
+        // RIGHT
+        GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY, 20, 20 }, "Close", &game->boolFlags.showGUI);
+        // GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20}, "Background Tile", &game->boolFlags.isBackgroundTile);
+        GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
+        if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
+            game->guiFlags.dropdownActive = !game->guiFlags.dropdownActive;
+            /*
+                dropdownActive = whether the box is open or not
+                0 = do not show dropdown
+                1 = show drop down
+
+                dropdownState = the selected dropdown item
+                0 = first item
+                1 = second item
+                ...
+            */
+        }
+    }
+}
+
+void DrawGUI(Game *game) {
+    switch(game->cameraType) {
+        case CAMERA_TILESET:
+            DrawGUITileset(game);
+            break;
+        default:
+            DrawGUIWorld(game);
+            break;
+    }
 
 }
 
@@ -1094,22 +1158,17 @@ void Input(Game *game) {
         PlayToastTween(&game->toast, "Toggle Fullscreen");
     }
 
-
-    // Do not let users interact with world while menu is up
-    if (game->boolFlags.showGUI) {
-        // Clicked left sections
-        if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 0, 0, guiWidth, GetHeight() })) {
-            return;
-        }
-
-        // Clicked right section
-        if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
-            return;
-        }
-    }
-
     switch (game->cameraType) {
         case CAMERA_TILESET:
+
+            // Do not let users interact with world while menu is up
+            if (game->boolFlags.showGUI) {
+                // Clicked right section
+                if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
+                    return;
+                }
+            }
+
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 printf("%d, %d\n", GetMouseX() / TILE_WIDTH, GetMouseY() / TILE_HEIGHT);
                 game->tileSelected.x = GetMouseX() / TILE_WIDTH;
@@ -1117,6 +1176,20 @@ void Input(Game *game) {
             }
             break;
         case CAMERA_WORLD:
+
+            // Do not let users interact with world while menu is up
+            if (game->boolFlags.showGUI) {
+                // Clicked left sections
+                if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 0, 0, guiWidth, GetHeight() })) {
+                    return;
+                }
+
+                // Clicked right section
+                if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
+                    return;
+                }
+            }
+
             // Reset
             if (IsKeyPressed(KEY_R)) {
                 printf("Reset tiles...\n");
@@ -1166,10 +1239,15 @@ void Input(Game *game) {
                 if (x < 0 || x > NO_OF_TILES_X) return;
                 if (y < 0 || y > NO_OF_TILES_Y) return;
 
-                if (game->boolFlags.isBackgroundTile) {
-                    OnMouseDownLeft(game, game->backgroundTiles, x, y);
-                } else {
-                    OnMouseDownLeft(game, game->tiles, x, y);
+                switch (game->guiFlags.dropdownState) {
+                    case 0:
+                        // Foreground Layer
+                        OnMouseDownLeft(game, game->tiles, x, y);
+                        break;
+                    case 1:
+                        // Background Layer
+                        OnMouseDownLeft(game, game->backgroundTiles, x, y);
+                        break;
                 }
 
             }
@@ -1181,10 +1259,15 @@ void Input(Game *game) {
                 if (y < 0 || y > NO_OF_TILES_Y) return;
 
                 // Store the source rect pointer
-                if (game->boolFlags.isBackgroundTile) {
-                    OnMouseDownRight(game->backgroundTiles, x, y);
-                } else {
-                    OnMouseDownRight(game->tiles, x, y);
+                switch (game->guiFlags.dropdownState) {
+                    case 0:
+                        // Foreground Layer
+                        OnMouseDownRight(game->tiles, x, y);
+                        break;
+                    case 1:
+                        // Background Layer
+                        OnMouseDownRight(game->backgroundTiles, x, y);
+                        break;
                 }
 
             }
@@ -1384,7 +1467,10 @@ int main(void) {
         .showScreenBorder = false,
         .showAxis = false,
         .showParticles = true,
-        .isBackgroundTile = false
+    };
+    GUIFlags guiFlags = {
+        .dropdownActive = false,
+        .dropdownState = 0
     };
     Toast toast = {
         .message = "Hello there whats goign one ok?",
@@ -1404,6 +1490,15 @@ int main(void) {
     GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL, 0xFFFFFFFF);
     GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
     GuiSetStyle(CHECKBOX, TEXT_COLOR_NORMAL, 0xFFFFFFFF);
+    // normal
+    GuiSetStyle(DROPDOWNBOX, BASE_COLOR_NORMAL, 0xFFFFFF00);
+    // focused
+    GuiSetStyle(DROPDOWNBOX, BASE_COLOR_FOCUSED, 0xFFFFFF00);
+    // opened
+    GuiSetStyle(DROPDOWNBOX, BASE_COLOR_PRESSED, ColorToInt(ColorAlpha(GRAY, 0.8f)));
+    GuiSetStyle(DROPDOWNBOX, TEXT_COLOR_PRESSED, 0xFFFFFFFF);
+    GuiSetStyle(DEFAULT, BACKGROUND_COLOR, 0xFFFFFF00);
+
 
     // Particles
     size_t PARTICLES_SIZE_BYTE = sizeof(Particle) * NO_OF_PARTICLES;
@@ -1422,6 +1517,7 @@ int main(void) {
     game.worldBounds = worldBounds;
     game.screenBounds = screenBounds;
     game.boolFlags = boolFlags;
+    game.guiFlags = guiFlags;
     game.cameraType = cameraType;
     game.worldCamera = worldCamera;
     game.screenCamera = screenCamera;
