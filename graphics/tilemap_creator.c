@@ -686,6 +686,12 @@ void LoadMap(Game *game) {
     // UnloadFileText(map);
 }
 
+char* PrintTilesLayer(Game *game) {
+    if (game->guiFlags.dropdownState == 0) return "Foreground Layer";
+    if (game->guiFlags.dropdownState == 1) return "Background Layer";
+    return "";
+}
+
 // =========== Game ===========
 
 void DrawAxis() {
@@ -693,6 +699,23 @@ void DrawAxis() {
     // DrawLine(0, -1000, 0, 1000, WHITE);
     DrawLineEx((Vector2){-5000,0}, (Vector2){5000,0}, 4, ColorAlpha(WHITE, 0.5f));
     DrawLineEx((Vector2){0,-5000}, (Vector2){0,5000}, 4, ColorAlpha(WHITE, 0.5f));
+}
+
+void DrawCameraLabel(Game *game) {
+    switch (game->cameraType) {
+        case CAMERA_TILESET:
+            DrawText("Camera Tileset", 20, GetHeight() - 40, 20, WHITE);
+            break;
+        case CAMERA_WORLD:
+            DrawText("Camera World", 20, GetHeight() - 40, 20, WHITE);
+            break;
+        case CAMERA_SCREEN:
+            DrawText("Camera Screen", 20, GetHeight() - 40, 20, WHITE);
+            break;
+        case CAMERA_SCREEN_SHAKE:
+            DrawText("Camera Shake", 20, GetHeight() - 40, 20, WHITE);
+            break;
+    }
 }
 
 void DrawGUIWorld(Game *game) {
@@ -708,22 +731,10 @@ void DrawGUIWorld(Game *game) {
             DrawRectangleRec((Rectangle) { 0, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
             DrawRectangleRec((Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
         }
-        switch (game->cameraType) {
-            case CAMERA_TILESET:
-                DrawText("Camera Tileset", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_WORLD:
-                DrawText("Camera World", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_SCREEN:
-                DrawText("Camera Screen", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_SCREEN_SHAKE:
-                DrawText("Camera Shake", 20, GetHeight() - 40, 20, WHITE);
-                break;
-        }
 
-        // LEFT
+        // === LEFT SIDE ===
+        DrawCameraLabel(game);
+
 
         // Tiles on screen
         DrawText(TextFormat("x (%d,%d)", (int) windowStart.x / TILE_WIDTH, (int)(windowEnd.x / TILE_WIDTH) + 1), 20, 60, 20, WHITE);
@@ -749,7 +760,7 @@ void DrawGUIWorld(Game *game) {
         DrawText(TextFormat("No x tiles %d", NO_OF_TILES_X), 20, 480, 20, WHITE);
         DrawText(TextFormat("No y tiles %d", NO_OF_TILES_Y), 20, 520, 20, WHITE);
 
-        // RIGHT
+        // === RIGHT SIDE ===
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), 20, 20 }, "Background", &game->boolFlags.showGUIwindow);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), 20, 20}, "Window border", &game->boolFlags.showWindowBorder);
         GuiCheckBox((Rectangle){ GetWidth() - guiX, guiY + (2 * 40), 20, 20}, "Screen border", &game->boolFlags.showScreenBorder);
@@ -772,24 +783,11 @@ void DrawGUITileset(Game *game) {
             // Draw window
             DrawRectangleRec((Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
         }
-        switch (game->cameraType) {
-            case CAMERA_TILESET:
-                DrawText("Camera Tileset", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_WORLD:
-                DrawText("Camera World", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_SCREEN:
-                DrawText("Camera Screen", 20, GetHeight() - 40, 20, WHITE);
-                break;
-            case CAMERA_SCREEN_SHAKE:
-                DrawText("Camera Shake", 20, GetHeight() - 40, 20, WHITE);
-                break;
-        }
 
-        // LEFT
+        // === LEFT SIDE ===
+        DrawCameraLabel(game);
 
-        // RIGHT
+        // === RIGHT SIDE ===
         GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
         if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
             game->guiFlags.dropdownActive = !game->guiFlags.dropdownActive;
@@ -819,6 +817,16 @@ void DrawGUI(Game *game) {
             DrawGUIWorld(game);
             break;
     }
+}
+
+Tile* GetTiles(Game *game, unsigned int index) {
+    switch (game->guiFlags.dropdownState) {
+        case 0:
+            return &game->tiles[index];
+        case 1:
+            return &game->backgroundTiles[index];
+    }
+    return &game->tiles[index];;
 }
 
 void DrawCameraWorld(Game *game) {
@@ -859,13 +867,11 @@ void DrawCameraWorld(Game *game) {
         }
     }
 
-    // TODO - LATER FIX THIS FOR BG TILES!!!
-
     // Draw Preview tiles
     Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
     int x = (int) (mouse.x / TILE_WIDTH);
     int y = (int) (mouse.y / TILE_HEIGHT);
-    // When the mouse is hovering on the tile map
+    // When the mouse is hovering on the tile map AND not earsing tiles
     if (x >= 0 && x < NO_OF_TILES_X && y >= 0 && y < NO_OF_TILES_Y && !IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
         // printf("%d,%d\n", x , y);
         switch (game->fillMode) {
@@ -885,7 +891,7 @@ void DrawCameraWorld(Game *game) {
                 // }
                 // Break on found tile
                 for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
-                    Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
+                    Tile *tile = GetTiles(game, y * NO_OF_TILES_X + i);
                     if (tile->id > TILE_EMPTY) break;
                         DrawTexturePro(game->tileset,
                         (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
@@ -893,7 +899,7 @@ void DrawCameraWorld(Game *game) {
                         (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
                 }
                 for (int i = x; i >= 0; --i) {
-                    Tile *tile = &game->tiles[y * NO_OF_TILES_X + i];
+                    Tile *tile = GetTiles(game , y * NO_OF_TILES_X + i);
                     if (tile->id > TILE_EMPTY) break;
                         DrawTexturePro(game->tileset,
                         (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
@@ -911,7 +917,7 @@ void DrawCameraWorld(Game *game) {
                 // }
                 // Break on found tile
                 for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
-                    Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
+                    Tile *tile = GetTiles(game, i * NO_OF_TILES_X + x);
                     if (tile->id > TILE_EMPTY) break;
                          DrawTexturePro(game->tileset,
                         (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
@@ -919,7 +925,7 @@ void DrawCameraWorld(Game *game) {
                         (Vector2){0},0, ColorAlpha(WHITE, 0.2f));
                 }
                 for (int i = y; i >= 0; --i) {
-                    Tile *tile = &game->tiles[i * NO_OF_TILES_X + x];
+                    Tile *tile = GetTiles(game, i * NO_OF_TILES_X + x);
                     if (tile->id > TILE_EMPTY) break;
                         DrawTexturePro(game->tileset,
                         (Rectangle){game->tileSelected.x * TILE_WIDTH,game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT},
@@ -1014,9 +1020,9 @@ void DrawCameraScreenShake(Game *game) {
     EndMode2D();
 }
 
-void OnMouseDownLeft(Game *game, Tile *tiles, int x, int y) {
+void OnMouseDownLeft(Game *game, int x, int y) {
         // printf("Touching tile id %d\n", tile->id);
-        Tile *tile = &tiles[y * NO_OF_TILES_X + x];
+        Tile *tile = GetTiles(game, y * NO_OF_TILES_X + x);
         if (!game->overwriteTiles) {
             if (tile->id != TILE_EMPTY) return;
         }
@@ -1036,14 +1042,14 @@ void OnMouseDownLeft(Game *game, Tile *tiles, int x, int y) {
                 break;
             case FILL_HORIZONTAL:
                 for (int i = x + 1; i < NO_OF_TILES_X; ++i) {
-                    Tile *t = &tiles[y * NO_OF_TILES_X + i];
+                    Tile *t = GetTiles(game, y * NO_OF_TILES_X + i);
                     if (t->id > TILE_EMPTY) break;
                     t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                     t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
                     t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
                 }
                 for (int i = x; i >= 0; --i) {
-                    Tile *t = &tiles[y * NO_OF_TILES_X + i];
+                    Tile *t = GetTiles(game, y * NO_OF_TILES_X + i);
                     if (t->id > TILE_EMPTY) break;
                     t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                     t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
@@ -1053,14 +1059,14 @@ void OnMouseDownLeft(Game *game, Tile *tiles, int x, int y) {
             case FILL_VERTICAL:
                 // Should it stop when it finds a non empty tile?
                 for (int i = y + 1; i < NO_OF_TILES_Y; ++i) {
-                    Tile *t = &tiles[i * NO_OF_TILES_X + x];
+                    Tile *t = GetTiles(game, i * NO_OF_TILES_X + x);
                     if (t->id > TILE_EMPTY) break;
                     t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                     t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
                     t->id = TileIndexToId(t->srcRect.x / TILE_WIDTH, t->srcRect.y / TILE_HEIGHT);
                 }
                 for (int i = y; i >= 0; --i) {
-                    Tile *t = &tiles[i * NO_OF_TILES_X + x];
+                    Tile *t = GetTiles(game, i * NO_OF_TILES_X + x);
                     if (t->id > TILE_EMPTY) break;
                     t->srcRect.x = game->tileSelected.x * TILE_WIDTH;
                     t->srcRect.y = game->tileSelected.y * TILE_HEIGHT;
@@ -1070,8 +1076,8 @@ void OnMouseDownLeft(Game *game, Tile *tiles, int x, int y) {
         }
 }
 
-void OnMouseDownRight(Tile *tiles, int x, int y) {
-    Tile *tile = &tiles[y * NO_OF_TILES_X + x];
+void OnMouseDownRight(Game *game, int x, int y) {
+    Tile *tile = GetTiles(game, y * NO_OF_TILES_X + x);
     // if (tile->id == TILE_EMPTY) return;
     printf("erase %d,%d\n", x, y);
     // Set the empty tile
@@ -1236,16 +1242,7 @@ void Input(Game *game) {
                 if (x < 0 || x > NO_OF_TILES_X) return;
                 if (y < 0 || y > NO_OF_TILES_Y) return;
 
-                switch (game->guiFlags.dropdownState) {
-                    case 0:
-                        // Foreground Layer
-                        OnMouseDownLeft(game, game->tiles, x, y);
-                        break;
-                    case 1:
-                        // Background Layer
-                        OnMouseDownLeft(game, game->backgroundTiles, x, y);
-                        break;
-                }
+                OnMouseDownLeft(game, x, y);
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
@@ -1255,16 +1252,7 @@ void Input(Game *game) {
                 if (y < 0 || y > NO_OF_TILES_Y) return;
 
                 // Store the source rect pointer
-                switch (game->guiFlags.dropdownState) {
-                    case 0:
-                        // Foreground Layer
-                        OnMouseDownRight(game->tiles, x, y);
-                        break;
-                    case 1:
-                        // Background Layer
-                        OnMouseDownRight(game->backgroundTiles, x, y);
-                        break;
-                }
+                OnMouseDownRight(game, x, y);
             }
             break;
         case CAMERA_SCREEN:
@@ -1352,8 +1340,10 @@ void Draw(Game *game) {
         if (game->cameraType == CAMERA_TILESET) {
             DrawTexture(game->tileset, 0, 0, WHITE);
             DrawRectangleLinesEx((Rectangle) {game->tileSelected.x * TILE_WIDTH, game->tileSelected.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT}, 4 ,ColorAlpha(RED, 1.0f));
+            DrawText(PrintTilesLayer(game), (GetWidth() - MeasureText("Foreground Layer", 20)) / 2, 50, 20, WHITE);
         } else if (game->cameraType == CAMERA_WORLD) {
             DrawCameraWorld(game);
+            DrawText(PrintTilesLayer(game), (GetWidth() - MeasureText("Foreground Layer", 20)) / 2, 50, 20, WHITE);
         } else if (game->cameraType == CAMERA_SCREEN) {
             DrawCameraScreen(game);
             // Screenshake bar
