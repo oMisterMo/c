@@ -1,7 +1,7 @@
 /**
  * Functional Requirements:
- *  - Set background tiles in UI
- *  - Render background tiles
+ *  - Set background tiles in UI ✔️
+ *  - Render background tiles ✔️
  *  - Show ghost tile (preview) ✔️
  *  - Show toast when user saves/loads/resets file ✔️
  *  - Player spawn location (ID = 'p')
@@ -13,8 +13,8 @@
  *  - Add RayGUI
  *      - Fill horizonal tiles ✔️
  *      - Fill vertical tiles ✔️
- *      - Select layer to add tiles
- *      - Fill all tiles
+ *      - Select layer to add tiles ✔️
+ *      - Fill all tiles in an area
  *      - Save multiple files
  *      - Load multiple files
  *          - Dropdown list of all maps in resources
@@ -26,9 +26,10 @@
  *
  *
  * Non-Functional Requirements:
- *  - Particles
+ *  - Particles ✔️
  *      - Rain animation
  *      - Snow animation
+ *      - Dust animation ✔️
  *  - Screen shake ✔️
  *  - Add more usable tiles
  *  - Better way to load texture atlas (using ray texture packer)
@@ -778,33 +779,24 @@ void DrawGUIWorld(Game *game) {
 
 void DrawGUITileset(Game *game) {
     // UI
-    if (game->boolFlags.showGUI) {
-        if (game->boolFlags.showGUIwindow) {
-            // Draw window
-            DrawRectangleRec((Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() }, ColorAlpha(GRAY, 0.8f));
-        }
 
-        // === LEFT SIDE ===
-        DrawCameraLabel(game);
+    // === LEFT SIDE ===
+    DrawCameraLabel(game);
 
-        // === RIGHT SIDE ===
-        GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
-        if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
-            game->guiFlags.dropdownActive = !game->guiFlags.dropdownActive;
-            /*
-                dropdownActive = whether the box is open or not
-                0 = do not show dropdown
-                1 = show drop down
+    // === RIGHT SIDE ===
+    GuiLabel((Rectangle){ GetWidth() - guiX, guiY + (0 * 40), MeasureText("Select Layer", 20), 20}, "Select Layer");
+    if (GuiDropdownBox((Rectangle){ GetWidth() - guiX, guiY + (1 * 40), MeasureText("Select Layer", 20), 20}, "Foreground;Background", &game->guiFlags.dropdownState, game->guiFlags.dropdownActive)) {
+        game->guiFlags.dropdownActive = !game->guiFlags.dropdownActive;
+        /*
+            dropdownActive = whether the box is open or not
+            0 = do not show dropdown
+            1 = show drop down
 
-                dropdownState = the selected dropdown item
-                0 = first item
-                1 = second item
-                ...
-            */
-        }
-        if (GuiButton((Rectangle){ GetWidth() - guiX, guiY + (3 * 40), MeasureText("Close", 20), 20 }, "Close") == 1) {
-            game->boolFlags.showGUI = false;
-        }
+            dropdownState = the selected dropdown item
+            0 = first item
+            1 = second item
+            ...
+        */
     }
 }
 
@@ -1164,12 +1156,9 @@ void Input(Game *game) {
     switch (game->cameraType) {
         case CAMERA_TILESET:
 
-            // Do not let users interact with world while menu is up
-            if (game->boolFlags.showGUI) {
-                // Clicked right section
-                if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
-                    return;
-                }
+            // Do not let users interact with tileset
+            if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { GetWidth() - guiWidth, 0, guiWidth, GetHeight() })) {
+                return;
             }
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
