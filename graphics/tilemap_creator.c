@@ -4,12 +4,15 @@
  *  - Render background tiles ✔️
  *  - Show ghost tile (preview) ✔️
  *  - Show toast when user saves/loads/resets file ✔️
- *  - Player spawn location (ID = 'p')
- *  - Middle click to drag
- *  - Scroll to zoom
+ *  - Fix gap at the bottom of screen ✔️
+ *  - Tween / Animations are framerate limited
+ *      - Toast
+ *      - Screenshake
+
  *  - Fullscreen ✔️
- *  - Select multiple tiles
- *  - Draw multiple tiles
+ *  - Multiple tiles
+ *      - Select multiple tiles
+ *      - Draw multiple tiles
  *  - Add RayGUI
  *      - Fill horizonal tiles ✔️
  *      - Fill vertical tiles ✔️
@@ -34,7 +37,9 @@
  *  - Add more usable tiles
  *  - Better way to load texture atlas (using ray texture packer)
  *  - Player physics/collisions
- *
+ *  - Player spawn location (ID = 'p') ?
+ *  - Middle click to drag ?
+ *  - Scroll to zoom ?
  *
  * Number of character idsL
  * A-Z
@@ -75,8 +80,8 @@
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 32
 
-#define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH      // 40
-#define NO_OF_TILES_Y WORLD_HEIGHT / TILE_HEIGHT    // 22.5
+#define NO_OF_TILES_X WORLD_WIDTH / TILE_WIDTH              // 40
+#define NO_OF_TILES_Y ((WORLD_HEIGHT / TILE_HEIGHT)+1)      // 22.5 + 1
 
 int WINDOW_WIDTH  = WORLD_WIDTH;
 int WINDOW_HEIGHT  = WORLD_HEIGHT;
