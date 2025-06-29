@@ -766,10 +766,6 @@ void DrawGUIWorld(Game *game) {
 }
 
 void DrawGUITileset(Game *game) {
-    Vector2 windowStart = GetScreenToWorld2D((Vector2){0,0}, game->worldCamera);
-    Vector2 windowEnd = GetScreenToWorld2D((Vector2){WORLD_WIDTH,WORLD_HEIGHT}, game->worldCamera);
-    Vector2 screenStart = GetScreenToWorld2D((Vector2){0,0}, game->screenCamera);
-    Vector2 screenEnd = GetScreenToWorld2D((Vector2){SCREEN_WIDTH,SCREEN_HEIGHT}, game->screenCamera);
     // UI
     if (game->boolFlags.showGUI) {
         if (game->boolFlags.showGUIwindow) {
@@ -823,7 +819,6 @@ void DrawGUI(Game *game) {
             DrawGUIWorld(game);
             break;
     }
-
 }
 
 void DrawCameraWorld(Game *game) {
@@ -1251,7 +1246,6 @@ void Input(Game *game) {
                         OnMouseDownLeft(game, game->backgroundTiles, x, y);
                         break;
                 }
-
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
@@ -1271,7 +1265,6 @@ void Input(Game *game) {
                         OnMouseDownRight(game->backgroundTiles, x, y);
                         break;
                 }
-
             }
             break;
         case CAMERA_SCREEN:
