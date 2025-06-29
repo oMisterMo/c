@@ -5,9 +5,9 @@
  *  - Show ghost tile (preview) ✔️
  *  - Show toast when user saves/loads/resets file ✔️
  *  - Fix gap at the bottom of screen ✔️
- *  - Tween / Animations are framerate limited
- *      - Toast
- *      - Screenshake
+ *  - Tween / Animations are framerate limited ✔️
+ *      - Toast ✔️
+ *      - Screenshake ✔️
 
  *  - Fullscreen ✔️
  *  - Multiple tiles
@@ -128,7 +128,7 @@ typedef enum TweenState {
 
 typedef struct Tween {
     int state;                  // IDLE | TWEENING
-    int frameCounter;           // Current time in tween
+    float frameCounter;         // Current time in tween
     Vector2 currentPosition;    // Tween start
     Vector2 targetPosition;     // Tween end [could be consts]
     int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
@@ -450,8 +450,8 @@ void ApplyShake(Game *game, float trauma) {
 
 void UpdateScreenShake(Game *game) {
     if (game->screenShake.shake > 0) {
-        // TODO: FRAME RATE INDEPENDENT
-        game->screenShake.shake -= 0.01;
+        float dt = GetFrameTime();
+        game->screenShake.shake -= 0.01 * 60 * dt;
 
         // Update shake
         game->screenShake.angle = game->screenShake.shake * GetRandomValueFloat(-1, 1);
@@ -479,8 +479,9 @@ void UpdateScreenShake(Game *game) {
 
 void TweenToast(Toast *toast) {
     if (toast->tween.state == TWEENING) {
-        // printf("twwenz %d\n", toast->tween.frameCounter);
-        toast->tween.frameCounter++;
+        // printf("twwenz %.2f\n", toast->tween.frameCounter);
+        float dt = GetFrameTime();
+        toast->tween.frameCounter += 60 * dt;
 
         // Tween
         toast->position.y  = EaseQuadOut(
