@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
-#include <raylib.h>
+#include "raylib.h"
 
 #define WIDTH 800
 #define HEIGHT 800
