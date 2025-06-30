@@ -19,10 +19,10 @@ typedef enum {
 } TweenState;
 
 typedef struct Tween {
-    Vector2 currentPosition;      // Tween start
+    Vector2 currentPosition;    // Tween start
     Vector2 targetPosition;     // Tween end [could be consts]
     int state;                  // IDLE | TWEENING
-    int frameCounter;           // Current time in tween
+    float frameCounter;         // Current time in tween
     int duration;               // How long to tween in frames e.g 30 frames = 500ms, 60 = 1sec
 } Tween;
 
@@ -62,7 +62,7 @@ int main() {
     Vector2 center = { GetScreenWidth() / 2, GetScreenHeight() / 2 };
 
     // Mo stuff
-    Texture2D bunny = LoadTexture("resources/sprites/piece.png");
+    Texture2D bunny = LoadTexture("../graphics/resources/sprites/piece.png");
     Rectangle bounds = { 0, center.y  - bunny.height / 2, bunny.width, bunny.height };
     Tween tween = { 0 };
     tween.currentPosition = (Vector2) { bounds.x, bounds.y };
@@ -155,7 +155,8 @@ void handleInput(Rectangle *rect, int *state, Vector2 center, GameObject *mo) {
 
 void updateMo(GameObject *mo) {
         if (mo->tween.state == TWEENING) {
-            mo->tween.frameCounter++;
+            float dt = GetFrameTime();
+            mo->tween.frameCounter += 60 * dt;
 
             // Tween
             mo->bounds.x  = EaseElasticOut(
@@ -187,6 +188,7 @@ void drawMo(GameObject mo) {
 void updateRect(Rectangle *rect, Vector2 start, Vector2 end, int *frameCounter, int *state, int duration) {
     // printf("rect => %p\n", rect);
     if (*state == TWEENING) {
+        float dt = GetFrameTime();
 
         (*frameCounter)++;
 
