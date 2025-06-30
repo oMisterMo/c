@@ -1234,8 +1234,8 @@ void Input(Game *game) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
                 int x = (int) (mouse.x / TILE_WIDTH);
                 int y = (int) (mouse.y / TILE_HEIGHT);
-                if (x < 0 || x > NO_OF_TILES_X) return;
-                if (y < 0 || y > NO_OF_TILES_Y) return;
+                if (x < 0 || x >= NO_OF_TILES_X) return;
+                if (y < 0 || y >= NO_OF_TILES_Y) return;
 
                 OnMouseDownLeft(game, x, y);
             }
@@ -1243,8 +1243,8 @@ void Input(Game *game) {
                 Vector2 mouse = GetScreenToWorld2D(GetMousePosition(), game->worldCamera);
                 int x = (int) (mouse.x / TILE_WIDTH);
                 int y = (int) (mouse.y / TILE_HEIGHT);
-                if (x < 0 || x > NO_OF_TILES_X) return;
-                if (y < 0 || y > NO_OF_TILES_Y) return;
+                if (x < 0 || x >= NO_OF_TILES_X) return;
+                if (y < 0 || y >= NO_OF_TILES_Y) return;
 
                 // Store the source rect pointer
                 OnMouseDownRight(game, x, y);
